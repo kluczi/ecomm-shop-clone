@@ -1,1 +1,10 @@
 .env
+
+deploy/ssl/*.key
+deploy/ssl/*.crt
+deploy/ssl/*.csr
+deploy/ssl/*.pem
+
+*.log
+.DS_Store
+Thumbs.db
