@@ -8,8 +8,17 @@ services:
             DB_NAME: prestashop
             DB_USER: prestashop
             DB_PASSWD: ${DATABASE_PASSWORD}
+            PS_INSTALL_AUTO: 1
+            PS_DEV_MODE: 0
+            PS_LANGUAGE: pl
+            PS_COUNTRY: PL
+            PS_DOMAIN: localhost:8000
+            ADMIN_MAIL: ${ADMIN_MAIL}
+            ADMIN_PASSWD: ${ADMIN_PASSWORD}
         volumes:
             - prestashop_data:/var/www/html
+        depends_on:
+            - mariadb
 
     mariadb:
         image: mariadb:10.11
