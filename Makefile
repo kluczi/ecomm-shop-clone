@@ -1,4 +1,4 @@
-.PHONY: up down init cms payments
+.PHONY: up down init cms payments shipping
 
 up:
 	docker compose -f deploy/compose.yaml up -d --build
@@ -15,4 +15,7 @@ cms:
 payments:
 	docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u prestashop -padmin prestashop < deploy/payment_config.sql
 
-init: cms payments
+shipping:
+	docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u prestashop -padmin prestashop < deploy/shipping_config.sql
+
+init: cms payments shipping
