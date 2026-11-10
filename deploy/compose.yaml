@@ -19,6 +19,7 @@ services:
             - prestashop_data:/var/www/html
         depends_on:
             - mariadb
+            - mailpit
 
     mariadb:
         image: mariadb:10.11
@@ -31,6 +32,17 @@ services:
             MARIADB_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
         volumes:
             - db_data:/var/lib/mysql
+
+    mailpit:
+        image: axllent/mailpit:v1.33.0
+        container_name: shop-mailpit
+        restart: unless-stopped
+        ports:
+            - "8025:8025" # Web UI
+            - "1025:1025" # Port SMTP
+        environment:
+            MP_SMTP_AUTH_ACCEPT_ANY: 1
+            MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
 volumes:
     prestashop_data:
