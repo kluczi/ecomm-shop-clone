@@ -128,4 +128,9 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+-- Translate footer link block headers for Polish (id_lang = 1)
+UPDATE `ps_link_block_lang` SET `name` = 'Produkty' WHERE `id_link_block` = 1 AND `id_lang` = 1;
+UPDATE `ps_link_block_lang` SET `name` = 'Informacje' WHERE `id_link_block` = 2 AND `id_lang` = 1;
+
+
 -- Dump completed on 2026-11-11  0:28:49
