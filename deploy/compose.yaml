@@ -1,8 +1,25 @@
 services:
+    nginx:
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
+        image: shop-nginx:1.0
+        container_name: shop-nginx
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./ssl:/etc/nginx/ssl
+        depends_on:
+            - prestashop
+
     prestashop:
         image: prestashop/prestashop:8.2.8
-        ports:
-            - "8000:80"
+        container_name: shop-prestashop
+        restart: unless-stopped
+        expose:
+            - "80"
         environment:
             DB_SERVER: mariadb
             DB_NAME: prestashop
@@ -12,7 +29,9 @@ services:
             PS_DEV_MODE: 0
             PS_LANGUAGE: pl
             PS_COUNTRY: PL
-            PS_DOMAIN: localhost:8000
+            PS_DOMAIN: localhost
+            PS_SSL_DOMAIN: localhost
+            PS_ENABLE_SSL: 1
             ADMIN_MAIL: ${ADMIN_MAIL}
             ADMIN_PASSWD: ${ADMIN_PASSWORD}
         volumes:
@@ -20,9 +39,12 @@ services:
             - ../shop/modules/domitekcookies:/var/www/html/modules/domitekcookies
         depends_on:
             - mariadb
+            - mailpit
 
     mariadb:
         image: mariadb:10.11
+        container_name: shop-mariadb
+        restart: unless-stopped
         ports:
             - "3000:3306"
         environment:
@@ -32,6 +54,17 @@ services:
             MARIADB_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
         volumes:
             - db_data:/var/lib/mysql
+
+    mailpit:
+        image: axllent/mailpit:v1.33.0
+        container_name: shop-mailpit
+        restart: unless-stopped
+        ports:
+            - "8025:8025" # Web UI
+            - "1025:1025" # Port SMTP
+        environment:
+            MP_SMTP_AUTH_ACCEPT_ANY: 1
+            MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
 volumes:
     prestashop_data:
