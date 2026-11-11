@@ -36,6 +36,7 @@ services:
             ADMIN_PASSWD: ${ADMIN_PASSWORD}
         volumes:
             - prestashop_data:/var/www/html
+            - ../shop/modules/domitekcookies:/var/www/html/modules/domitekcookies
         depends_on:
             - mariadb
             - mailpit
