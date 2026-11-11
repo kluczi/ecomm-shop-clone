@@ -1,9 +1,5 @@
-| Pole              | Opis |
-| ----------------- | ---- |
-| Data i autor      |      |
-| Narzędzie i model |      |
-| Zadanie           |      |
-| Opis              |      |
-| Co otrzymano      |      |
-| Co było błędne    |      |
-| Weryfikacja       |      |
+# Dziennik użycia AI (AI Log)
+
+| Data i autor | Narzędzie i model | Zadanie | Co otrzymano | Co było błędne | Weryfikacja |
+| --- | --- | --- | --- | --- | --- |
+| 11.11.2026, Dominik Szwed | Antigravity (Gemini 3.8 Flash Low) | Issue #11: Strony CMS i moduł informacji o plikach cookies | Zaproponowane szablony treści CMS (O sklepie, Regulamin, Polityka prywatności, Dostawa, Płatności) dopasowane do branży AGD/RTV (Domitek) oraz szkielet autorskiego modułu PrestaShop `domitekcookies`. | Propozycja pobierania zewnętrznego modułu przez `curl` z GitHub nie zadziałała z powodu błędnego linku/przekierowania. AI początkowo sugerowało użycie `psgdpr` do banera cookie, co nie pokrywało wymogu pełnego paska zgody. Skorygowałem to, zlecając stworzenie dedykowanego, lokalnego modułu w repozytorium. | Ręczne wprowadzenie i korekta tekstów w panelu CMS PrestaShop, instalacja i test modułu `domitekcookies` w przeglądarce (weryfikacja wyświetlania banera, zamykania i zapisu do localStorage), eksport tabel CMS do pliku SQL. |
