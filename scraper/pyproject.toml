@@ -1,0 +1,20 @@
+[project]
+name = "topmarket-scraper"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx",
+    "selectolax",
+    "pydantic",
+    "pillow>=13.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
