@@ -47,3 +47,10 @@ playwright-report/
 
 # macOS
 .DS_Store
+
+# Shared HTTPS and Windows exclusions
+deploy/ssl/*.key
+deploy/ssl/*.crt
+deploy/ssl/*.csr
+deploy/ssl/*.pem
+Thumbs.db
