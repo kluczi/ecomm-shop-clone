@@ -1,10 +1,56 @@
+# Secrets - only .env.example is committed
 .env
+.env.*
+!.env.example
 
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Dependencies and build output
+vendor/
+node_modules/
+
+# Logs
+*.log
+logs/
+var/logs/
+
+# Cache
+cache/
+var/cache/
+
+# Uploads (PrestaShop user uploads and generated product images)
+upload/
+uploads/
+shop/img/p/
+
+# Scraper: full image set (published as an archive in Releases), working files
+scraper-results/images/
+scraper-results/*.zip
+scraper-results/*.tar.gz
+scraper-results/products.jsonl
+scraper-results/listings.json
+scraper-results/*.tmp
+
+# Local download of the course requirements and its browser assets
+eBiz-2026-2027_ Wymagania projektowe - etap 1_2 _ eNauczanie.html
+eBiz-2026-2027_ Wymagania projektowe - etap 1_2 _ eNauczanie_files/
+
+# E2E test output
+test-results/
+playwright-report/
+
+# macOS
+.DS_Store
+
+# Shared HTTPS and Windows exclusions
 deploy/ssl/*.key
 deploy/ssl/*.crt
 deploy/ssl/*.csr
 deploy/ssl/*.pem
-
-*.log
-.DS_Store
 Thumbs.db
