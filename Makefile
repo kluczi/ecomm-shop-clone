@@ -17,7 +17,7 @@ ifndef PRESTASHOP_WEBSERVICE_KEY
 $(error BŁĄD: Brak zmiennej PRESTASHOP_WEBSERVICE_KEY w pliku .env!)
 endif
 
-.PHONY: up down init cms payments shipping webservice import
+.PHONY: up down init cms payments shipping webservice images import
 
 up:
 	docker compose -f deploy/compose.yaml up -d --build
@@ -41,7 +41,10 @@ webservice:
 	docker compose -f deploy/compose.yaml cp deploy/init-webservice.sql mariadb:/tmp/init-webservice.sql
 	docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) -e "SET @api_key = '$(PRESTASHOP_WEBSERVICE_KEY)'; SOURCE /tmp/init-webservice.sql;"
 
-init: cms payments shipping webservice
+init: cms payments shipping webservice images import
 
-import:
+images:
+	python scraper/download_release_images.py
+
+import: images
 	python shop/import_api.py
