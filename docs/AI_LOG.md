@@ -121,6 +121,19 @@
 | **Co było błędne** | AI początkowo zaproponowało sztywny próg 1000 zdjęć oraz pobieranie bezpośrednim URL `curl` bez uwzględnienia prywatnego repozytorium. Skorygowano to poprzez dynamiczne wyliczanie wymaganych zdjęć na podstawie `products.json`, wdrożenie weryfikacji sumy kontrolnej SHA-256 z wbudowanym `hashlib.file_digest`, usunięcie zbędnego handlera przekierowań oraz zaimplementowanie pełnego mechanizmu awaryjnego. |
 | **Weryfikacja** | Opublikowanie wydania `v1.0.0-images` z plikiem `images.zip` na GitHubie. Przetestowanie wszystkich 5 metod pobierania w terminalu (cache lokalny, lokalny zip z SHA-256, GitHub CLI, bezpośrednie REST API oraz fallback scrapera) – każda zakończona sukcesem. Weryfikacja linterem `ruff` oraz `pyright`. |
 
+---
+
+## Wpis 8: Issue #32 – Backup i procedura Disaster Recovery (Wymóg D4)
+
+| Pole | Opis |
+| --- | --- |
+| **Data i autor** | 21.11.2026, Michał Łysiak |
+| **Narzędzie i model** | Antigravity (Gemini 3.8 Flash) |
+| **Zadanie** | Issue #32: Backup and Disaster Recovery – Automatyzacja tworzenia kopii zapasowej i odtwarzania sklepu (Wymóg D4) |
+| **Co otrzymano** | Architekturę procedury Disaster Recovery: skrypty `deploy/backup.py` i `deploy/restore.py` (wraz z uniksowymi wrapperami `.sh`), kompresję zrzutu MariaDB do `database.sql.gz`, archiwizację zdjęć wolumenu PrestaShop (`/var/www/html/img/p`) do `images.tar.gz`, eksport konfiguracji SQL, integrację celów `make backup` oraz `make restore` w `Makefile` oraz automatyczny benchmark czasu odzyskiwania. |
+| **Co było błędne** | AI początkowo nie uwzględniło obsługi strumieniowej dekompresji w `subprocess` oraz bezpiecznego zamykania potoków, co mogło prowadzić do blokowania procesu na dużych archiwach. Dodatkowo brakowało automatycznego sprawdzania zdrowia sklepu po odtworzeniu. Skorygowano to dodając strumieniowanie chunków 1 MB, czyszczenie cache produkcyjnego `var/cache/prod`, weryfikację `HTTP 200 OK` na `https://localhost` oraz sprawdzanie liczby produktów w bazie. |
+| **Weryfikacja** | Wykonanie pełnego backupu żywego sklepu (1271 produktów, 1777 zdjęć) – czas wykonania 16.75 s, rozmiar archiwum 336.35 MB. Następnie przeprowadzenie procedury Disaster Recovery (`make restore`): całkowite zresetowanie bazy danych, import zrzutu i odtworzenie zdjęć zajęło 26.49 s (0.44 min), co z olbrzymim zapasem spełnia wymóg SLA <= 10 minut. Sprawdzenie stanu sklepu wykazało dokładnie 1271 odtworzonych produktów i status HTTP 200 OK. Weryfikacja jakości kodu linterem `ruff check deploy/` (0 błędów). |
+
 <!--
 ## Wpis X:
 

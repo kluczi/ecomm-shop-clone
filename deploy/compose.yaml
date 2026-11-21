@@ -25,6 +25,7 @@ services:
       DB_NAME: ${DATABASE_NAME}
       DB_USER: ${DATABASE_USER}
       DB_PASSWD: ${DATABASE_PASSWORD}
+      PS_FOLDER_ADMIN: admin-dev
       PS_INSTALL_AUTO: 1
       PS_DEV_MODE: 0
       PS_LANGUAGE: pl

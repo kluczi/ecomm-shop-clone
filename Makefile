@@ -19,7 +19,7 @@ endif
 
 COMPOSE ?= docker compose --env-file .env -f deploy/compose.yaml
 
-.PHONY: up down init cms payments shipping webservice images import
+.PHONY: up down init cms payments shipping webservice images import backup restore
 
 up:
 	$(COMPOSE) up -d --build
@@ -50,3 +50,9 @@ images:
 
 import: images
 	python shop/import_api.py
+
+backup:
+	python deploy/backup.py
+
+restore:
+	python deploy/restore.py
