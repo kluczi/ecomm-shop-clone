@@ -54,3 +54,6 @@ deploy/ssl/*.crt
 deploy/ssl/*.csr
 deploy/ssl/*.pem
 Thumbs.db
+
+# PrestaShop module generated metadata cache
+shop/modules/**/config_*.xml

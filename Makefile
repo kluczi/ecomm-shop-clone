@@ -17,29 +17,31 @@ ifndef PRESTASHOP_WEBSERVICE_KEY
 $(error BŁĄD: Brak zmiennej PRESTASHOP_WEBSERVICE_KEY w pliku .env!)
 endif
 
+COMPOSE ?= docker compose --env-file .env -f deploy/compose.yaml
+
 .PHONY: up down init cms payments shipping webservice images import
 
 up:
-	docker compose -f deploy/compose.yaml up -d --build
+	$(COMPOSE) up -d --build
 
 down:
-	docker compose -f deploy/compose.yaml down
+	$(COMPOSE) down
 
 cms:
-	docker compose -f deploy/compose.yaml cp deploy/init-cms.sql mariadb:/tmp/init-cms.sql
-	docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) -e "SOURCE /tmp/init-cms.sql;"
-	docker compose -f deploy/compose.yaml exec -T prestashop php /var/www/html/bin/console prestashop:module install domitekcookies || true
-	docker compose -f deploy/compose.yaml exec -T prestashop rm -rf /var/www/html/var/cache/prod
+	$(COMPOSE) cp deploy/init-cms.sql mariadb:/tmp/init-cms.sql
+	$(COMPOSE) exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) -e "SOURCE /tmp/init-cms.sql;"
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module install domitekcookies || true"
+	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
 
 payments:
-	docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) < deploy/payment_config.sql
+	$(COMPOSE) exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) < deploy/payment_config.sql
 
 shipping:
-	docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) < deploy/shipping_config.sql
+	$(COMPOSE) exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) < deploy/shipping_config.sql
 
 webservice:
-	docker compose -f deploy/compose.yaml cp deploy/init-webservice.sql mariadb:/tmp/init-webservice.sql
-	docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) -e "SET @api_key = '$(PRESTASHOP_WEBSERVICE_KEY)'; SOURCE /tmp/init-webservice.sql;"
+	$(COMPOSE) cp deploy/init-webservice.sql mariadb:/tmp/init-webservice.sql
+	$(COMPOSE) exec -T mariadb mariadb --default-character-set=utf8mb4 -u $(DB_USER) -p$(DB_PASS) $(DB_NAME) -e "SET @api_key = '$(PRESTASHOP_WEBSERVICE_KEY)'; SOURCE /tmp/init-webservice.sql;"
 
 init: cms payments shipping webservice images import
 

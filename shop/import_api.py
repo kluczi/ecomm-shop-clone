@@ -106,7 +106,8 @@ class PrestaShopImporter:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                for p in data.get("products", []):
+                prods = data.get("products", []) if isinstance(data, dict) else []
+                for p in prods:
                     ref = p.get("reference", "")
                     if ref.startswith("demo_"):
                         self.client.delete(f"{self.api_url}/products/{p['id']}")
@@ -124,7 +125,7 @@ class PrestaShopImporter:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                cats = data.get("categories", [])
+                cats = data.get("categories", []) if isinstance(data, dict) else []
                 for c in cats:
                     c_id = int(c.get("id"))
                     name = c.get("name")
@@ -148,7 +149,7 @@ class PrestaShopImporter:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                prods = data.get("products", [])
+                prods = data.get("products", []) if isinstance(data, dict) else []
                 for p in prods:
                     ref = p.get("reference", "").strip()
                     pid = int(p.get("id"))
@@ -238,7 +239,7 @@ class PrestaShopImporter:
             if resp.status_code != 200:
                 return False
             data = resp.json()
-            stocks = data.get("stock_availables", [])
+            stocks = data.get("stock_availables", []) if isinstance(data, dict) else []
             if not stocks:
                 return False
 
@@ -476,7 +477,7 @@ class PrestaShopImporter:
         )
 
         print("\n" + "=" * 55)
-        print("         PRESTASHOP IMPORT REPORT (D2 & W3)       ")
+        print("         PRESTASHOP IMPORT REPORT       ")
         print("=" * 55)
         print(
             f"Execution Time       : {duration_sec:.2f} s ({duration_sec / 60:.2f} min)"
