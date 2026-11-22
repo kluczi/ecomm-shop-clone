@@ -51,6 +51,27 @@ def slugify(text: str) -> str:
     return text.strip("-") or "item"
 
 
+def clean_manufacturer(raw: str) -> str:
+    """Universally normalize raw company strings into clean brand names."""
+    # 1. Split at legal entity form (discards Sp. z o.o. etc.)
+    name = re.split(
+        r"\s+(?:(?:polska\s+)?(?:sp\.\s*z\s*o\.\s*o\.|sp\.\s*k\.|sp\.\s*j\.|s\.a\.|gmbh|ltd|inc|llc|co\.)|polska$)",
+        raw,
+        flags=re.IGNORECASE,
+    )[0].strip()
+
+    # 2. Truncate at comma or address prefixes for companies without explicit legal entity
+    name = name.split(",")[0].strip()
+    name = re.split(
+        r"\s+(?:ul\.|al\.|str\.|\d{2}-\d{3})", name, flags=re.IGNORECASE
+    )[0].strip()
+
+    # 3. Capitalize first letter if lowercase
+    if name and name[0].islower():
+        name = name.capitalize()
+
+    return name[:64]
+
 class PrestaShopImporter:
     def __init__(
         self,
@@ -72,6 +93,8 @@ class PrestaShopImporter:
             "categories_created": 0,
             "categories_updated": 0,
             "categories_skipped": 0,
+            "manufacturers_created": 0,
+            "manufacturers_skipped": 0,
             "products_created": 0,
             "products_updated": 0,
             "products_rejected": 0,
@@ -81,6 +104,7 @@ class PrestaShopImporter:
         }
         self.category_map: dict[int, int] = {}  # scraper_cat_id -> prestashop_cat_id
         self.existing_categories: dict[str, int] = {}  # "name|id_parent" -> id
+        self.manufacturer_map: dict[str, int] = {}  # normalized_name -> id_manufacturer
         self.existing_products: dict[str, int] = {}  # reference -> id
         self.products_with_images: set[int] = set()  # product_id set with cover image
 
@@ -228,6 +252,77 @@ class PrestaShopImporter:
             f"{self.stats['categories_skipped']} existing/skipped."
         )
 
+    def load_existing_manufacturers(self):
+        """Fetch existing manufacturers from PrestaShop API for idempotency"""
+        try:
+            resp = self.client.get(
+                f"{self.api_url}/manufacturers?display=[id,name]&output_format=JSON"
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                manufs = data.get("manufacturers", [])
+                for m in manufs:
+                    m_id = int(m.get("id"))
+                    m_name = m.get("name", "").strip().lower()
+                    if m_name:
+                        self.manufacturer_map[m_name] = m_id
+        except (httpx.HTTPError, OSError) as e:
+            print(f"[WARN] Failed to preload manufacturers: {e}")
+
+    def import_manufacturers(self, products_file: Path):
+        """Extract unique manufacturers from products and create them via PrestaShop API"""
+        print("\n--- Importing Manufacturers ---")
+        with open(products_file, "r", encoding="utf-8") as f:
+            products = json.load(f)
+
+        self.load_existing_manufacturers()
+
+        unique_names: set[str] = set()
+        for p in products:
+            raw_m = p.get("attributes", {}).get("Producent")
+            if raw_m:
+                cleaned = clean_manufacturer(raw_m)
+                if cleaned:
+                    unique_names.add(cleaned)
+
+        for name in sorted(unique_names):
+            norm_name = name.lower()
+            if norm_name in self.manufacturer_map:
+                self.stats["manufacturers_skipped"] += 1
+                continue
+
+            xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+<manufacturer>
+    <active>1</active>
+    <name><![CDATA[{name}]]></name>
+</manufacturer>
+</prestashop>"""
+
+            resp = self.client.post(
+                f"{self.api_url}/manufacturers",
+                content=xml.encode("utf-8"),
+                headers={"Content-Type": "application/xml"},
+            )
+
+            if resp.status_code == 201:
+                root = ET.fromstring(resp.text)
+                id_elem = root.find(".//manufacturer/id")
+                if id_elem is not None and id_elem.text:
+                    created_id = int(id_elem.text)
+                    self.manufacturer_map[norm_name] = created_id
+                    self.stats["manufacturers_created"] += 1
+            else:
+                print(
+                    f"[WARN] Failed to create manufacturer '{name}': {resp.status_code} {resp.text[:100]}"
+                )
+                self.stats["manufacturers_skipped"] += 1
+
+        print(
+            f"Manufacturers complete: {self.stats['manufacturers_created']} created, "
+            f"{self.stats['manufacturers_skipped']} existing/skipped."
+        )
+
     def update_stock(self, product_id: int, quantity: int):
         """Update stock_available quantity for a simple product"""
         try:
@@ -357,6 +452,13 @@ class PrestaShopImporter:
                 [f"<category><id>{cid}</id></category>" for cid in ps_cat_ids]
             )
 
+            # Manufacturer association
+            raw_manuf = prod.get("attributes", {}).get("Producent")
+            manuf_id = 0
+            if raw_manuf:
+                clean_m = clean_manufacturer(raw_manuf)
+                manuf_id = self.manufacturer_map.get(clean_m.lower(), 0)
+
             # Stock quantity logic:
             # Range: 0 to 10
             # Exactly 10% get 0 (unavailable), satisfying 5-20% metric
@@ -377,6 +479,7 @@ class PrestaShopImporter:
 <product>
     <id>{ps_product_id}</id>
     <id_category_default>{default_cat}</id_category_default>
+    <id_manufacturer>{manuf_id}</id_manufacturer>
     <id_tax_rules_group>{tax_group_id}</id_tax_rules_group>
     <type>simple</type>
     <id_shop_default>1</id_shop_default>
@@ -418,6 +521,7 @@ class PrestaShopImporter:
 <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
 <product>
     <id_category_default>{default_cat}</id_category_default>
+    <id_manufacturer>{manuf_id}</id_manufacturer>
     <id_tax_rules_group>{tax_group_id}</id_tax_rules_group>
     <type>simple</type>
     <id_shop_default>1</id_shop_default>
@@ -483,6 +587,8 @@ class PrestaShopImporter:
         )
         print(f"Categories Created   : {self.stats['categories_created']}")
         print(f"Categories Skipped   : {self.stats['categories_skipped']}")
+        print(f"Manufacturers Created: {self.stats['manufacturers_created']}")
+        print(f"Manufacturers Skipped: {self.stats['manufacturers_skipped']}")
         print(f"Products Created     : {self.stats['products_created']}")
         print(f"Products Updated     : {self.stats['products_updated']}")
         print(f"Products Rejected    : {self.stats['products_rejected']}")
@@ -550,6 +656,7 @@ def main():
     start_time = time.time()
     importer.cleanup_demo_data()
     importer.import_categories(categories_file)
+    importer.import_manufacturers(products_file)
     importer.import_products(
         products_file, limit=args.limit, skip_images=args.skip_images
     )
