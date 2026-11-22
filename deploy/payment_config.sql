@@ -1,4 +1,4 @@
-﻿/*M!999999\- enable the sandbox mode */ 
+/*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19  Distrib 10.11.19-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: prestashop
@@ -15,6 +15,104 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ps_currency`
+--
+
+DROP TABLE IF EXISTS `ps_currency`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ps_currency` (
+  `id_currency` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `iso_code` varchar(3) NOT NULL DEFAULT '0',
+  `numeric_iso_code` varchar(3) DEFAULT NULL,
+  `precision` int(2) NOT NULL DEFAULT 6,
+  `conversion_rate` decimal(13,6) NOT NULL,
+  `deleted` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `active` tinyint(1) unsigned NOT NULL DEFAULT 1,
+  `unofficial` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `modified` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id_currency`),
+  KEY `currency_iso_code` (`iso_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ps_currency`
+--
+
+LOCK TABLES `ps_currency` WRITE;
+/*!40000 ALTER TABLE `ps_currency` DISABLE KEYS */;
+INSERT INTO `ps_currency` VALUES
+(1,'Euro','EUR','978',2,0.220000,0,0,0,0),
+(2,'Dolar amerykański','USD','840',2,0.240000,0,0,0,0),
+(3,'Polski złoty','PLN','985',2,1.000000,0,1,0,0);
+/*!40000 ALTER TABLE `ps_currency` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ps_currency_lang`
+--
+
+DROP TABLE IF EXISTS `ps_currency_lang`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ps_currency_lang` (
+  `id_currency` int(10) unsigned NOT NULL,
+  `id_lang` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `symbol` varchar(255) NOT NULL,
+  `pattern` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_currency`,`id_lang`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ps_currency_lang`
+--
+
+LOCK TABLES `ps_currency_lang` WRITE;
+/*!40000 ALTER TABLE `ps_currency_lang` DISABLE KEYS */;
+INSERT INTO `ps_currency_lang` VALUES
+(1,1,'euro','€',''),
+(1,2,'Euro','€',''),
+(2,1,'dolar amerykański','$',''),
+(2,2,'US Dollar','$',''),
+(3,1,'złoty polski','zł',''),
+(3,2,'Polish Zloty','zł','');
+/*!40000 ALTER TABLE `ps_currency_lang` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ps_currency_shop`
+--
+
+DROP TABLE IF EXISTS `ps_currency_shop`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ps_currency_shop` (
+  `id_currency` int(11) unsigned NOT NULL,
+  `id_shop` int(11) unsigned NOT NULL,
+  `conversion_rate` decimal(13,6) NOT NULL,
+  PRIMARY KEY (`id_currency`,`id_shop`),
+  KEY `id_shop` (`id_shop`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ps_currency_shop`
+--
+
+LOCK TABLES `ps_currency_shop` WRITE;
+/*!40000 ALTER TABLE `ps_currency_shop` DISABLE KEYS */;
+INSERT INTO `ps_currency_shop` VALUES
+(1,1,0.220000),
+(2,1,0.240000),
+(3,1,1.000000);
+/*!40000 ALTER TABLE `ps_currency_shop` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `ps_module`
@@ -201,6 +299,323 @@ INSERT INTO `ps_module_shop` VALUES
 UNLOCK TABLES;
 
 --
+-- Table structure for table `ps_module_carrier`
+--
+
+DROP TABLE IF EXISTS `ps_module_carrier`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ps_module_carrier` (
+  `id_module` int(10) unsigned NOT NULL,
+  `id_shop` int(11) unsigned NOT NULL DEFAULT 1,
+  `id_reference` int(11) NOT NULL,
+  PRIMARY KEY (`id_module`,`id_shop`,`id_reference`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ps_module_carrier`
+--
+
+LOCK TABLES `ps_module_carrier` WRITE;
+/*!40000 ALTER TABLE `ps_module_carrier` DISABLE KEYS */;
+INSERT INTO `ps_module_carrier` VALUES
+(34,1,5),
+(34,1,6),
+(43,1,5),
+(43,1,6),
+(45,1,1),
+(45,1,2),
+(45,1,3),
+(45,1,4);
+/*!40000 ALTER TABLE `ps_module_carrier` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ps_module_currency`
+--
+
+DROP TABLE IF EXISTS `ps_module_currency`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ps_module_currency` (
+  `id_module` int(10) unsigned NOT NULL,
+  `id_shop` int(11) unsigned NOT NULL DEFAULT 1,
+  `id_currency` int(11) NOT NULL,
+  PRIMARY KEY (`id_module`,`id_shop`,`id_currency`),
+  KEY `id_module` (`id_module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ps_module_currency`
+--
+
+LOCK TABLES `ps_module_currency` WRITE;
+/*!40000 ALTER TABLE `ps_module_currency` DISABLE KEYS */;
+INSERT INTO `ps_module_currency` VALUES
+(34,1,3),
+(43,1,3),
+(45,1,1),
+(45,1,2);
+/*!40000 ALTER TABLE `ps_module_currency` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ps_module_country`
+--
+
+DROP TABLE IF EXISTS `ps_module_country`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ps_module_country` (
+  `id_module` int(10) unsigned NOT NULL,
+  `id_shop` int(11) unsigned NOT NULL DEFAULT 1,
+  `id_country` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id_module`,`id_shop`,`id_country`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ps_module_country`
+--
+
+LOCK TABLES `ps_module_country` WRITE;
+/*!40000 ALTER TABLE `ps_module_country` DISABLE KEYS */;
+INSERT INTO `ps_module_country` VALUES
+(34,1,14),
+(43,1,14),
+(45,1,14);
+/*!40000 ALTER TABLE `ps_module_country` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ps_module_group`
+--
+
+DROP TABLE IF EXISTS `ps_module_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ps_module_group` (
+  `id_module` int(10) unsigned NOT NULL,
+  `id_shop` int(11) unsigned NOT NULL DEFAULT 1,
+  `id_group` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id_module`,`id_shop`,`id_group`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ps_module_group`
+--
+
+LOCK TABLES `ps_module_group` WRITE;
+/*!40000 ALTER TABLE `ps_module_group` DISABLE KEYS */;
+INSERT INTO `ps_module_group` VALUES
+(1,1,1),
+(1,1,2),
+(1,1,3),
+(2,1,1),
+(2,1,2),
+(2,1,3),
+(3,1,1),
+(3,1,2),
+(3,1,3),
+(4,1,1),
+(4,1,2),
+(4,1,3),
+(5,1,1),
+(5,1,2),
+(5,1,3),
+(6,1,1),
+(6,1,2),
+(6,1,3),
+(7,1,1),
+(7,1,2),
+(7,1,3),
+(8,1,1),
+(8,1,2),
+(8,1,3),
+(9,1,1),
+(9,1,2),
+(9,1,3),
+(10,1,1),
+(10,1,2),
+(10,1,3),
+(11,1,1),
+(11,1,2),
+(11,1,3),
+(12,1,1),
+(12,1,2),
+(12,1,3),
+(13,1,1),
+(13,1,2),
+(13,1,3),
+(14,1,1),
+(14,1,2),
+(14,1,3),
+(15,1,1),
+(15,1,2),
+(15,1,3),
+(16,1,1),
+(16,1,2),
+(16,1,3),
+(17,1,1),
+(17,1,2),
+(17,1,3),
+(18,1,1),
+(18,1,2),
+(18,1,3),
+(19,1,1),
+(19,1,2),
+(19,1,3),
+(20,1,1),
+(20,1,2),
+(20,1,3),
+(21,1,1),
+(21,1,2),
+(21,1,3),
+(22,1,1),
+(22,1,2),
+(22,1,3),
+(23,1,1),
+(23,1,2),
+(23,1,3),
+(25,1,1),
+(25,1,2),
+(25,1,3),
+(26,1,1),
+(26,1,2),
+(26,1,3),
+(27,1,1),
+(27,1,2),
+(27,1,3),
+(28,1,1),
+(28,1,2),
+(28,1,3),
+(29,1,1),
+(29,1,2),
+(29,1,3),
+(30,1,1),
+(30,1,2),
+(30,1,3),
+(31,1,1),
+(31,1,2),
+(31,1,3),
+(32,1,1),
+(32,1,2),
+(32,1,3),
+(33,1,1),
+(33,1,2),
+(33,1,3),
+(34,1,1),
+(34,1,2),
+(34,1,3),
+(35,1,1),
+(35,1,2),
+(35,1,3),
+(36,1,1),
+(36,1,2),
+(36,1,3),
+(37,1,1),
+(37,1,2),
+(37,1,3),
+(38,1,1),
+(38,1,2),
+(38,1,3),
+(39,1,1),
+(39,1,2),
+(39,1,3),
+(40,1,1),
+(40,1,2),
+(40,1,3),
+(41,1,1),
+(41,1,2),
+(41,1,3),
+(42,1,1),
+(42,1,2),
+(42,1,3),
+(43,1,1),
+(43,1,2),
+(43,1,3),
+(44,1,1),
+(44,1,2),
+(44,1,3),
+(45,1,1),
+(45,1,2),
+(45,1,3),
+(46,1,1),
+(46,1,2),
+(46,1,3),
+(47,1,1),
+(47,1,2),
+(47,1,3),
+(48,1,1),
+(48,1,2),
+(48,1,3),
+(49,1,1),
+(49,1,2),
+(49,1,3),
+(50,1,1),
+(50,1,2),
+(50,1,3),
+(51,1,1),
+(51,1,2),
+(51,1,3),
+(52,1,1),
+(52,1,2),
+(52,1,3),
+(53,1,1),
+(53,1,2),
+(53,1,3),
+(54,1,1),
+(54,1,2),
+(54,1,3),
+(55,1,1),
+(55,1,2),
+(55,1,3),
+(56,1,1),
+(56,1,2),
+(56,1,3),
+(57,1,1),
+(57,1,2),
+(57,1,3),
+(58,1,1),
+(58,1,2),
+(58,1,3),
+(59,1,1),
+(59,1,2),
+(59,1,3),
+(60,1,1),
+(60,1,2),
+(60,1,3),
+(61,1,1),
+(61,1,2),
+(61,1,3),
+(62,1,1),
+(62,1,2),
+(62,1,3),
+(63,1,1),
+(63,1,2),
+(63,1,3),
+(64,1,1),
+(64,1,2),
+(64,1,3),
+(65,1,1),
+(65,1,2),
+(65,1,3),
+(66,1,1),
+(66,1,2),
+(66,1,3),
+(67,1,1),
+(67,1,2),
+(67,1,3),
+(68,1,1),
+(68,1,2),
+(68,1,3);
+/*!40000 ALTER TABLE `ps_module_group` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ps_configuration`
 --
 
@@ -219,7 +634,7 @@ CREATE TABLE `ps_configuration` (
   KEY `name` (`name`),
   KEY `id_shop` (`id_shop`),
   KEY `id_shop_group` (`id_shop_group`)
-) ENGINE=InnoDB AUTO_INCREMENT=432 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=433 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -232,7 +647,7 @@ INSERT INTO `ps_configuration` VALUES
 (1,NULL,NULL,'PS_LANG_DEFAULT','1','2026-11-09 15:19:42','2026-11-09 15:19:42'),
 (2,NULL,NULL,'PS_VERSION_DB','8.2.8','2026-11-09 15:19:42','2026-11-09 15:19:42'),
 (3,NULL,NULL,'PS_INSTALL_VERSION','8.2.8','2026-11-09 15:19:42','2026-11-09 15:19:42'),
-(4,NULL,NULL,'PS_CARRIER_DEFAULT','7','2026-11-09 15:19:43','2026-11-09 20:30:02'),
+(4,NULL,NULL,'PS_CARRIER_DEFAULT','10','2026-11-09 15:19:43','2026-11-22 19:00:20'),
 (5,NULL,NULL,'PS_GROUP_FEATURE_ACTIVE','1','2026-11-09 15:19:43','2026-11-09 15:19:43'),
 (6,NULL,NULL,'PS_CURRENCY_DEFAULT','3','0000-00-00 00:00:00','2026-11-09 18:54:58'),
 (7,NULL,NULL,'PS_COUNTRY_DEFAULT','14','0000-00-00 00:00:00','2026-11-09 15:19:43'),
@@ -294,7 +709,7 @@ INSERT INTO `ps_configuration` VALUES
 (63,NULL,NULL,'PS_SEARCH_WEIGHT_ATTRIBUTE','2','0000-00-00 00:00:00','0000-00-00 00:00:00'),
 (64,NULL,NULL,'PS_SEARCH_WEIGHT_FEATURE','2','0000-00-00 00:00:00','0000-00-00 00:00:00'),
 (65,NULL,NULL,'PS_SEARCH_AJAX','1','0000-00-00 00:00:00','0000-00-00 00:00:00'),
-(66,NULL,NULL,'PS_TIMEZONE','Europe/Paris','0000-00-00 00:00:00','0000-00-00 00:00:00'),
+(66,NULL,NULL,'PS_TIMEZONE','Europe/Warsaw','0000-00-00 00:00:00','2026-11-22 18:59:18'),
 (67,NULL,NULL,'PS_THEME_V11','0','0000-00-00 00:00:00','0000-00-00 00:00:00'),
 (68,NULL,NULL,'PS_TIN_ACTIVE','0','0000-00-00 00:00:00','0000-00-00 00:00:00'),
 (69,NULL,NULL,'PS_SHOW_ALL_MODULES','0','0000-00-00 00:00:00','0000-00-00 00:00:00'),
@@ -650,7 +1065,8 @@ INSERT INTO `ps_configuration` VALUES
 (428,NULL,NULL,'BANK_WIRE_OWNER','Sklep E-commerce','2026-11-09 18:47:25','2026-11-09 18:47:25'),
 (429,NULL,NULL,'BANK_WIRE_ADDRESS','Bank Polski','2026-11-09 18:47:25','2026-11-09 18:47:25'),
 (430,NULL,NULL,'BANK_WIRE_RESERVATION_DAYS','0','2026-11-09 18:47:25','2026-11-09 18:47:25'),
-(431,NULL,NULL,'BANK_WIRE_CUSTOM_TEXT',NULL,'2026-11-09 18:47:25','2026-11-09 18:47:25');
+(431,NULL,NULL,'BANK_WIRE_CUSTOM_TEXT',NULL,'2026-11-09 18:47:25','2026-11-09 18:47:25'),
+(432,NULL,NULL,'PS_WEBSERVICE','1','2026-11-22 18:15:04','2026-11-22 18:15:04');
 /*!40000 ALTER TABLE `ps_configuration` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -663,4 +1079,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-11-09 19:32:57
+-- Dump completed on 2026-11-22 18:15:29
