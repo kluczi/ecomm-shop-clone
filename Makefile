@@ -2,7 +2,13 @@
 
 COMPOSE ?= docker compose --env-file .env -f deploy/compose.yaml
 
-.PHONY: up down init cms payments shipping check-env
+ifeq ($(OS),Windows_NT)
+PYTHON ?= $(shell if [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; elif [ -f scraper/.venv/Scripts/python.exe ]; then echo scraper/.venv/Scripts/python.exe; else echo python; fi)
+else
+PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
+endif
+
+.PHONY: up down init cms payments shipping webservice import check-env
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -13,6 +19,9 @@ ifndef DATABASE_USER
 endif
 ifndef DATABASE_NAME
 	$(error BŁĄD: Brak zmiennej DATABASE_NAME w pliku .env!)
+endif
+ifndef PRESTASHOP_WEBSERVICE_KEY
+	$(error BŁĄD: Brak zmiennej PRESTASHOP_WEBSERVICE_KEY w pliku .env!)
 endif
 
 up:
@@ -33,4 +42,11 @@ payments: check-env
 shipping: check-env
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/shipping_config.sql
 
-init: check-env cms payments shipping
+webservice: check-env
+	$(COMPOSE) cp deploy/init-webservice.sql mariadb:/tmp/init-webservice.sql
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SET @api_key = '\''$(PRESTASHOP_WEBSERVICE_KEY)'\''; SOURCE /tmp/init-webservice.sql;"'
+
+init: check-env cms payments shipping webservice
+
+import: check-env
+	$(PYTHON) shop/import_api.py
