@@ -19,7 +19,7 @@ up:
 	$(COMPOSE) up -d --build
 
 down:
-	$(COMPOSE) down
+	docker compose -f deploy/compose.yaml down
 
 cms: check-env
 	$(COMPOSE) cp deploy/init-cms.sql mariadb:/tmp/init-cms.sql
