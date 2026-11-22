@@ -8,7 +8,7 @@ else
 PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
 endif
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env e2e
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -80,3 +80,6 @@ restore: check-env
 
 promotions:
 	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php
+
+e2e:
+	tests/.venv/bin/python -m pytest -c tests/pytest.ini tests $(E2E_ARGS)
