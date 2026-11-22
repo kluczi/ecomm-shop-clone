@@ -130,7 +130,8 @@ class PrestaShopImporter:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                for p in data.get("products", []):
+                prods = data.get("products", []) if isinstance(data, dict) else []
+                for p in prods:
                     ref = p.get("reference", "")
                     if ref.startswith("demo_"):
                         self.client.delete(f"{self.api_url}/products/{p['id']}")
@@ -148,7 +149,7 @@ class PrestaShopImporter:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                cats = data.get("categories", [])
+                cats = data.get("categories", []) if isinstance(data, dict) else []
                 for c in cats:
                     c_id = int(c.get("id"))
                     name = c.get("name")
@@ -158,7 +159,7 @@ class PrestaShopImporter:
                         name_str = name
                     else:
                         name_str = ""
-                    p_id = int(c.get("id_parent", 0))
+                    p_id = int(c.get("id_parent") or 0)
                     key = f"{name_str.strip().lower()}|{p_id}"
                     self.existing_categories[key] = c_id
         except (httpx.HTTPError, OSError) as e:
@@ -172,10 +173,10 @@ class PrestaShopImporter:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                prods = data.get("products", [])
+                prods = data.get("products", []) if isinstance(data, dict) else []
                 for p in prods:
-                    ref = p.get("reference", "").strip()
                     pid = int(p.get("id"))
+                    ref = p.get("reference", "").strip()
                     if ref:
                         self.existing_products[ref] = pid
                     if p.get("id_default_image"):
@@ -260,7 +261,7 @@ class PrestaShopImporter:
             )
             if resp.status_code == 200:
                 data = resp.json()
-                manufs = data.get("manufacturers", [])
+                manufs = data.get("manufacturers", []) if isinstance(data, dict) else []
                 for m in manufs:
                     m_id = int(m.get("id"))
                     m_name = m.get("name", "").strip().lower()
