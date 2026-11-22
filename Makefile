@@ -1,7 +1,6 @@
 -include .env
-DB_NAME ?= $(DATABASE_NAME)
-DB_USER ?= $(DATABASE_USER)
-DB_PASS ?= $(DATABASE_PASSWORD)
+
+COMPOSE ?= docker compose --env-file .env -f deploy/compose.yaml
 
 .PHONY: up down init cms payments shipping check-env
 
@@ -17,21 +16,21 @@ ifndef DATABASE_NAME
 endif
 
 up:
-	docker compose -f deploy/compose.yaml up -d --build
+	$(COMPOSE) up -d --build
 
 down:
-	docker compose -f deploy/compose.yaml down
+	$(COMPOSE) down
 
 cms: check-env
-	docker compose -f deploy/compose.yaml cp deploy/init-cms.sql mariadb:/tmp/init-cms.sql
-	@docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u "$(DB_USER)" "-p$(DB_PASS)" "$(DB_NAME)" -e "SOURCE /tmp/init-cms.sql;"
-	docker compose -f deploy/compose.yaml exec -T prestashop php /var/www/html/bin/console prestashop:module install domitekcookies || true
-	docker compose -f deploy/compose.yaml exec -T prestashop rm -rf /var/www/html/var/cache/prod
+	$(COMPOSE) cp deploy/init-cms.sql mariadb:/tmp/init-cms.sql
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SOURCE /tmp/init-cms.sql;"'
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module install domitekcookies || true"
+	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
 
 payments: check-env
-	@docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u "$(DB_USER)" "-p$(DB_PASS)" "$(DB_NAME)" < deploy/payment_config.sql
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/payment_config.sql
 
 shipping: check-env
-	@docker compose -f deploy/compose.yaml exec -T mariadb mariadb --default-character-set=utf8mb4 -u "$(DB_USER)" "-p$(DB_PASS)" "$(DB_NAME)" < deploy/shipping_config.sql
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/shipping_config.sql
 
 init: check-env cms payments shipping
