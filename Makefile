@@ -57,5 +57,5 @@ init: check-env cms payments shipping webservice storefront
 images: check-env
 	$(PYTHON) scraper/download_release_images.py
 
-import: check-env
+import: check-env images
 	$(PYTHON) shop/import_api.py

@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
 """Download and unpack product images archive for PrestaShop.
 
 Workflow:
-1. Local cache: Check if scraper-results/images/ has >= 1000 images.
-2. Local ZIP: Check if scraper-results/images.zip exists locally.
-3. GitHub CLI: Check if 'gh' CLI is installed and authenticated.
-4. Direct HTTP API: Check if GITHUB_TOKEN is available in environment.
-5. Scraper Fallback: Run 'scraper/images.py'.
+1. Local cache: Check if every product in scraper-results/products.json has images.
+2. Local ZIP: Check if scraper-results/images.zip exists locally with valid checksum.
+3. GitHub CLI: Check if 'gh' CLI is installed and download release asset.
+4. Direct HTTP API: Download via GitHub REST API streaming directly from storage.
+5. Scraper Fallback: Run 'scraper/images.py' as safety net.
 """
 
 from __future__ import annotations
@@ -26,6 +25,21 @@ ASSET_NAME = "images.zip"
 EXPECTED_SHA256 = "f6df0a22378b05137b93d6ba5bd2901e7eabd2ed5943b89c241459107c5925c7"
 
 
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Custom HTTP redirect handler that stops automatic redirect following."""
+
+    def redirect_request(
+        self,
+        req: urllib.request.Request,
+        fp: object,
+        code: int,
+        msg: str,
+        headers: object,
+        newurl: str,
+    ) -> None:
+        return None
+
+
 def get_required_images_count(repo_root: Path) -> int:
     """Determine minimum required images count based on products.json."""
     products_file = repo_root / "scraper-results" / "products.json"
@@ -38,6 +52,37 @@ def get_required_images_count(repo_root: Path) -> int:
         except (json.JSONDecodeError, OSError):
             pass
     return 1000
+
+
+def check_images_per_product(
+    repo_root: Path, images_dir: Path
+) -> tuple[bool, int, int]:
+    """Verify that every product from products.json has at least one valid image in images_dir."""
+    products_file = repo_root / "scraper-results" / "products.json"
+    if not products_file.exists():
+        return False, 0, 0
+
+    try:
+        with open(products_file, "r", encoding="utf-8") as f:
+            products = json.load(f)
+        if not isinstance(products, list) or len(products) == 0:
+            return False, 0, 0
+    except (json.JSONDecodeError, OSError):
+        return False, 0, 0
+
+    total_products = len(products)
+    products_with_images = 0
+
+    for prod in products:
+        pid = prod.get("id")
+        if not pid:
+            continue
+        p_dir = images_dir / str(pid)
+        if p_dir.is_dir() and any(p.stat().st_size > 0 for p in p_dir.glob("*.jpg")):
+            products_with_images += 1
+
+    all_present = (products_with_images == total_products) and total_products > 0
+    return all_present, products_with_images, total_products
 
 
 def verify_zip_integrity(
@@ -108,10 +153,8 @@ def download_from_gh_cli(repo_root: Path, zip_path: Path) -> bool:
             text=True,
             check=False,
         )
-        if result.returncode == 0 and zip_path.exists() and zip_path.stat().st_size > 0:
-            print(
-                f"[OK] Downloaded {zip_path.name} via gh CLI ({zip_path.stat().st_size / (1024 * 1024):.1f} MB)."
-            )
+        if zip_path.exists() and zip_path.stat().st_size > 0:
+            print(f"[OK] Downloaded {zip_path.name} via gh CLI.")
             return True
         if result.returncode != 0:
             print(
@@ -125,7 +168,12 @@ def download_from_gh_cli(repo_root: Path, zip_path: Path) -> bool:
 
 
 def download_from_http_api(zip_path: Path) -> bool:
-    """Step 4: Attempt direct HTTP download from GitHub Releases REST API."""
+    """Step 4: Attempt direct HTTP download from GitHub Releases REST API.
+
+    GitHub API responds to asset stream requests with a 302 redirect to storage (AWS S3).
+    We intercept the redirect URL and make the download request without the Authorization
+    header so authentication mechanisms do not clash.
+    """
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     api_url = f"https://api.github.com/repos/kluczi/ecomm-shop-clone/releases/tags/{RELEASE_TAG}"
     print(f"Attempting direct HTTP download from GitHub API ({api_url})...")
@@ -150,12 +198,35 @@ def download_from_http_api(zip_path: Path) -> bool:
                     asset_req.add_header("Accept", "application/octet-stream")
                     if token:
                         asset_req.add_header("Authorization", f"Bearer {token}")
+
+                    # Intercept 302 redirect from GitHub API to get AWS S3 presigned URL
+                    opener = urllib.request.build_opener(NoRedirectHandler())
+                    download_url = None
+                    try:
+                        with opener.open(asset_req, timeout=30) as r:
+                            download_url = r.geturl()
+                    except urllib.error.HTTPError as e:
+                        if e.code in (301, 302, 303, 307, 308):
+                            download_url = e.headers.get("Location")
+                        else:
+                            raise
+
+                    if not download_url:
+                        print(
+                            "[WARN] Could not retrieve download URL from GitHub redirect."
+                        )
+                        continue
+
+                    # Stream download from storage without Authorization header
+                    download_req = urllib.request.Request(download_url)
+                    download_req.add_header("User-Agent", "Python-Release-Downloader")
                     with (
-                        urllib.request.urlopen(asset_req, timeout=120) as in_f,
+                        urllib.request.urlopen(download_req, timeout=120) as in_f,
                         open(zip_path, "wb") as out_f,
                     ):
                         while chunk := in_f.read(1024 * 1024):
                             out_f.write(chunk)
+
                     if zip_path.exists() and zip_path.stat().st_size > 0:
                         print(f"[OK] Downloaded {zip_path.name} via HTTP API.")
                         return True
@@ -164,8 +235,8 @@ def download_from_http_api(zip_path: Path) -> bool:
     return False
 
 
-def fallback_to_scraper(repo_root: Path) -> bool:
-    """Step 5: Fallback to scraping images directly from source URLs in products.json."""
+def fallback_scraper(repo_root: Path) -> bool:
+    """Step 5: Fallback to running scraper/images.py."""
     print(
         "[WARN] GitHub Release unavailable. Falling back to scraping images via scraper/images.py..."
     )
@@ -191,16 +262,18 @@ def ensure_images(repo_root: Path | None = None) -> bool:
     zip_path = repo_root / "scraper-results" / ASSET_NAME
     min_count = get_required_images_count(repo_root)
 
-    # 1. Local cache: Check if images are already present
-    existing_count = count_existing_images(images_dir)
-    if existing_count >= min_count:
+    # 1. Local cache: Check if every product has images present
+    all_cached, present_products, total_products = check_images_per_product(
+        repo_root, images_dir
+    )
+    if all_cached:
         print(
-            f"[OK] Product images already present ({existing_count} images found, required >= {min_count}). Skipping download."
+            f"[OK] Product images cache verified ({present_products}/{total_products} products have images). Skipping download."
         )
         return True
 
     print(
-        f"Product images missing or incomplete ({existing_count} found, expected >= {min_count})."
+        f"Product images cache incomplete ({present_products}/{total_products} products covered). Provisioning..."
     )
 
     # 2. Local ZIP: Check if local archive already exists and is valid
@@ -228,20 +301,14 @@ def ensure_images(repo_root: Path | None = None) -> bool:
         return True
 
     # 5. Scraper Fallback: Execute scraper/images.py
-    if fallback_to_scraper(repo_root):
-        final_count = count_existing_images(images_dir)
-        print(f"[OK] Scraper finished. Total images available: {final_count}")
-        return final_count >= min_count
-
-    print(
-        "[ERROR] Failed to obtain product images via cache, archive, GitHub Release or scraper fallback."
-    )
-    return False
+    return fallback_scraper(repo_root)
 
 
-def main():
-    success = ensure_images()
-    sys.exit(0 if success else 1)
+def main() -> None:
+    repo_root = Path(__file__).resolve().parent.parent
+    if not ensure_images(repo_root):
+        print("[ERROR] Failed to ensure product images.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
