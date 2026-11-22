@@ -160,6 +160,21 @@
 | Co było błędne    | Pierwsze odpalenie modułu nie podpięło go do sklepu. Po poprawce pierwszy zestaw wariantów rozróżniał liczbę opakowań np. worki na śmieci 60L można było wybrać 1 lub 2 opakowania (co było trochę trywialnym rozwiązaniem patrząc na to, że w naszej bazie produktów występują takie, które mają np. różną pojemność). Po weryfikacji zastąpiono go rzeczywistymi pojemnościami i rozmiarami. Agent również ustawił wszystkie promocję na 10%. Niby było to poprawne, ale nadal trochę nienaturalne, więc poprosiłem go o zmianę zakresu promocji na 10-30%. Agent również scalił dwa produkty o innych wariantach w jeden i dał na stronie produktu możliwość wyboru wariantu. Jest to niepopularna praktyka (produkty nadal powinny wyświetlać się oddzielnie, a na ich stronie powinno móc się zmienić wariant). |
 | Weryfikacja       | Odpaliłem `make promotions` i sprawdziłem 20 cen Omnibus wśród promocyjnych produktów. Sprawdziłem również produkty z różnymi wariantami, czy po dodaniu do koszyka dwóch wariantów występują jako dwa oddzielne oraz czy mają ich własne stany magazynowe (a nie wspólne). Sprawdzono też osobne wyniki dla dwóch wersji Magnum Flex, otwieranie właściwego wariantu i zmianę opcji na karcie.                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
+---
+
+## Testy E2E w Playwright
+
+| Pole              | Opis                                                                                                                                                                                                                                                                                      |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data i autor      | 16.11.2026, Bartek Kluska                                                                                                                                                                                                                                                                 |
+| Narzędzie i model | Codex GPT-6.1-Sol                                                                                                                                                                                                                                                                         |
+| Zadanie           | #16 Implementacja testów E2E w Playwright (Python) na wzorowanej stronie. Testy miały obejmować podstawowe operacje (jeszcze bez finalizacji zamówienie, która zostanie dodana podczas testowania na naszej stronie)                                                                      |
+| Co otrzymano      | Cztery testy obejmujące koszyk, wyszukiwanie, usuwanie produktów, zmianę ilości i szczegóły produktu. Otrzymano również raport HTML, zrzuty ekranu przy błędzie oraz komendę make e2e do odpalania testów. Zgodnie z prośbą testy nie obejmują jeszcze rejestracji, zamówień i płatności. |
+| Co było błędne    | W pierwszej wersji testów problemy sprawiały błędne selektory i opóźnione pojawienie się banera cookies. Zbyt wczesne kliknięcie Dodaj do koszyka mogło otworzyć pusty koszyk.                                                                                                            |
+| Weryfikacja       | Odpalenie testów i weryfikacja poprawności ich działania. Sprawdzenie raportu HTML. Testy przeszły poprawnie 4/4.                                                                                                                                                                         |
+
+---
+
 <!--
 ## Wpis X:
 
