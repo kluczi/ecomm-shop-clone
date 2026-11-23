@@ -14,7 +14,7 @@ endif
 
 COMPOSE ?= $(DOCKER) compose -f deploy/compose.yaml --env-file .env
 
-.PHONY: up down init cms payments shipping webservice storefront theme images import backup restore promotion-module promotions e2e search check-env verify
+.PHONY: up down init cms payments shipping webservice storefront-config storefront theme images import backup restore promotion-module promotions e2e search check-env verify
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -64,10 +64,11 @@ theme: check-env
 	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console cache:clear"
 	$(COMPOSE) exec -T prestashop sh -c "chown -R www-data:www-data /var/www/html/var/cache /var/www/html/themes/topmarket-child"
 
-storefront: check-env
+storefront-config: check-env
 	$(COMPOSE) cp deploy/storefront_config.sql mariadb:/tmp/storefront_config.sql
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" < /tmp/storefront_config.sql'
-	$(MAKE) theme
+
+storefront: storefront-config theme
 
 # Install Omnibus before importing so it can record the original prices.
 init: check-env
@@ -75,11 +76,12 @@ init: check-env
 	$(MAKE) shipping
 	$(MAKE) payments
 	$(MAKE) webservice
-	$(MAKE) storefront
+	$(MAKE) storefront-config
 	$(MAKE) promotion-module
 	$(MAKE) import
 	$(MAKE) promotions
 	$(MAKE) search
+	$(MAKE) theme
 	$(MAKE) verify
 
 promotion-module:

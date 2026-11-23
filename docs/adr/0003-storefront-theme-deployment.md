@@ -1,4 +1,4 @@
-# ADR 0002: Sposób wdrażania i konfiguracji motywu potomnego w kontenerach
+# ADR 0003: Sposób wdrażania i konfiguracji motywu potomnego w kontenerach
 
 **Status:** Zaakceptowano  
 **Data:** 2026-11-23  
