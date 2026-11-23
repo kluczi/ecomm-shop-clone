@@ -76,7 +76,7 @@ init: check-env
 	$(MAKE) verify
 
 promotion-module:
-	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php --install-only
+	$(COMPOSE) exec -T --user www-data prestashop sh -c "php /var/www/html/modules/omnibus/cli/seed.php --install-only"
 
 verify: check-env
 	$(PYTHON) deploy/verify_metrics.py
@@ -95,10 +95,10 @@ restore: check-env
 
 promotions:
 	$(COMPOSE) cp scraper-results/products.json prestashop:/tmp/omnibus-products.json
-	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php
+	$(COMPOSE) exec -T --user www-data prestashop sh -c "php /var/www/html/modules/omnibus/cli/seed.php"
 
 e2e:
 	"$(E2E_PYTHON)" -m pytest -c tests/pytest.ini tests $(E2E_ARGS)
 
 search:
-	$(COMPOSE) exec -T --user www-data prestashop php /tmp/search-index.php
+	$(COMPOSE) exec -T --user www-data prestashop sh -c "php /tmp/search-index.php"
