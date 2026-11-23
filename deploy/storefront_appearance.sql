@@ -14,7 +14,7 @@ ON DUPLICATE KEY UPDATE new_window = 0;
 
 INSERT INTO ps_linksmenutop_lang (id_linksmenutop, id_lang, id_shop, label, link)
 VALUES
-(1, 1, 1, 'PROMOCJE', '/pl/promocje'),
+(1, 1, 1, 'PROMOCJE', '/promocje'),
 (1, 2, 1, 'PROMOTIONS', '/en/promocje')
 ON DUPLICATE KEY UPDATE label = VALUES(label), link = VALUES(link);
 
@@ -23,7 +23,7 @@ ON DUPLICATE KEY UPDATE new_window = 0;
 
 INSERT INTO ps_linksmenutop_lang (id_linksmenutop, id_lang, id_shop, label, link)
 VALUES
-(2, 1, 1, 'BESTSELLERY', '/pl/najczesciej-kupowane'),
+(2, 1, 1, 'BESTSELLERY', '/najczesciej-kupowane'),
 (2, 2, 1, 'BESTSELLERS', '/en/najczesciej-kupowane')
 ON DUPLICATE KEY UPDATE label = VALUES(label), link = VALUES(link);
 
@@ -31,7 +31,7 @@ UPDATE ps_configuration SET value = 'LNK1,CAT10,CAT11,CAT12,CAT13,CAT14,CAT15,LN
 
 -- 4. Konfiguracja modułu banera
 UPDATE ps_configuration SET value = 'banner-promocja.jpg' WHERE name = 'BANNER_IMG';
-UPDATE ps_configuration SET value = '/pl/11-ogrod' WHERE name = 'BANNER_LINK';
+UPDATE ps_configuration SET value = '/11-ogrod' WHERE name = 'BANNER_LINK';
 UPDATE ps_configuration SET value = 'Ogromny wybór narzędzi ogrodowych i elektronarzędzi w sklepie Domitek' WHERE name = 'BANNER_DESC';
 
 -- 5. Drzewo kategorii w sidebarze (podkategorie bieżącej kategorii zamiast Strony głównej)

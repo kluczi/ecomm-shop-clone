@@ -22,7 +22,7 @@
           </ol>
           <ul class="carousel-inner" role="listbox">
             <li class="carousel-item active" role="option" aria-hidden="false">
-              <a href="{$urls.base_url}pl/11-ogrod" title="NAC ZEN AI Robot koszący - Przejdź do kategorii Ogród">
+              <a href="{$urls.base_url}11-ogrod" title="NAC ZEN AI Robot koszący - Przejdź do kategorii Ogród">
                 <figure>
                   <picture>
                     <source media="(max-width: 767px)" srcset="/themes/topmarket-child/assets/img/banner_01_zen_ai_mobile.webp">
@@ -33,7 +33,7 @@
               </a>
             </li>
             <li class="carousel-item" role="option" aria-hidden="true">
-              <a href="{$urls.base_url}pl/11-ogrod" title="Szklarnie ogrodowe TopMarket - Przejdź do kategorii Ogród">
+              <a href="{$urls.base_url}11-ogrod" title="Szklarnie ogrodowe TopMarket - Przejdź do kategorii Ogród">
                 <figure>
                   <picture>
                     <source media="(max-width: 767px)" srcset="/themes/topmarket-child/assets/img/banner_01_zen_ai_mobile.webp">
@@ -44,7 +44,7 @@
               </a>
             </li>
             <li class="carousel-item" role="option" aria-hidden="true">
-              <a href="{$urls.base_url}pl/13-narzedzia" title="Narzędzia NAC SMART - Przejdź do kategorii Narzędzia">
+              <a href="{$urls.base_url}13-narzedzia" title="Narzędzia NAC SMART - Przejdź do kategorii Narzędzia">
                 <figure>
                   <picture>
                     <source media="(max-width: 767px)" srcset="/themes/topmarket-child/assets/img/banner_01_zen_ai_mobile.webp">
@@ -55,7 +55,7 @@
               </a>
             </li>
             <li class="carousel-item" role="option" aria-hidden="true">
-              <a href="{$urls.base_url}pl/10-dom" title="Wyprzedaż noworoczna - Przejdź do kategorii Dom">
+              <a href="{$urls.base_url}10-dom" title="Wyprzedaż noworoczna - Przejdź do kategorii Dom">
                 <figure>
                   <picture>
                     <source media="(max-width: 767px)" srcset="/themes/topmarket-child/assets/img/banner_01_zen_ai_mobile.webp">
@@ -108,7 +108,7 @@
       <!-- Pomarańczowy Baner TOP CUT z 1. strony PDF -->
       <div class="topmarket-home-promo-banner-wrap">
         <div class="container">
-          <a href="{$urls.base_url}pl/13-narzedzia" class="topmarket-promo-card-banner banner-orange" title="Ogromny wybór urządzeń TOP CUT">
+          <a href="{$urls.base_url}13-narzedzia" class="topmarket-promo-card-banner banner-orange" title="Ogromny wybór urządzeń TOP CUT">
             <img src="/themes/topmarket-child/assets/img/banner-top-cut.webp" alt="Ogromny wybór URZĄDZEŃ TOP CUT - Wybieram TOP CUT" class="img-fluid w-100" loading="lazy" width="1600" height="180">
             <div class="tm-banner-overlay">
               <span class="tm-banner-subtitle">Ogromny wybór</span>
@@ -127,7 +127,7 @@
       <!-- Żółty Baner MEBLE OGRODOWE (z 1. strony PDF) -->
       <div class="topmarket-home-promo-banner-wrap">
         <div class="container">
-          <a href="{$urls.base_url}pl/11-ogrod" class="topmarket-promo-card-banner banner-yellow" title="Totalna wyprzedaż mebli ogrodowych">
+          <a href="{$urls.base_url}11-ogrod" class="topmarket-promo-card-banner banner-yellow" title="Totalna wyprzedaż mebli ogrodowych">
             <img src="/themes/topmarket-child/assets/img/banner-meble-ogrodowe.webp" alt="Totalna wyprzedaż MEBLI OGRODOWYCH - KUPUJĘ" class="img-fluid w-100" loading="lazy" width="1600" height="180">
             <div class="tm-banner-overlay tm-banner-overlay-dark">
               <span class="tm-banner-subtitle">Totalna wyprzedaż</span>
@@ -141,7 +141,7 @@
       <!-- Baner ŚRODKI CZYSTOŚCI (ze 2. strony PDF) -->
       <div class="topmarket-home-promo-banner-wrap">
         <div class="container">
-          <a href="{$urls.base_url}pl/10-dom" class="topmarket-promo-card-banner banner-czystosc" title="Najlepszy wybór środków czystości">
+          <a href="{$urls.base_url}10-dom" class="topmarket-promo-card-banner banner-czystosc" title="Najlepszy wybór środków czystości">
             <img src="/themes/topmarket-child/assets/img/banner-czystosc.webp" alt="Najlepszy wybór ŚRODKÓW CZYSTOŚCI - KUPUJĘ" class="img-fluid w-100" loading="lazy" width="1600" height="180">
             <div class="tm-banner-overlay tm-banner-overlay-dark">
               <span class="tm-banner-subtitle">Najlepszy wybór</span>
@@ -157,27 +157,27 @@
         <div class="container">
           <h2 class="section-title-divider"><span>TOP KATEGORIE</span></h2>
           <div class="top-categories-grid">
-            <a href="{$urls.base_url}pl/11-ogrod" class="top-cat-card" title="Odśnieżarki i zamiatarki">
+            <a href="{$urls.base_url}11-ogrod" class="top-cat-card" title="Odśnieżarki i zamiatarki">
               <div class="top-cat-img-box"><img src="/themes/topmarket-child/assets/img/cat-odsniezarki.webp" alt="Odśnieżarki i zamiatarki" loading="lazy" width="140" height="140"></div>
               <span class="top-cat-label">ODŚNIEŻARKI I<br>ZAMIATARKI</span>
             </a>
-            <a href="{$urls.base_url}pl/13-narzedzia" class="top-cat-card" title="Narzędzia">
+            <a href="{$urls.base_url}13-narzedzia" class="top-cat-card" title="Narzędzia">
               <div class="top-cat-img-box"><img src="/themes/topmarket-child/assets/img/cat-narzedzia.webp" alt="Narzędzia" loading="lazy" width="140" height="140"></div>
               <span class="top-cat-label">NARZĘDZIA</span>
             </a>
-            <a href="{$urls.base_url}pl/11-ogrod" class="top-cat-card" title="Meble ogrodowe">
+            <a href="{$urls.base_url}11-ogrod" class="top-cat-card" title="Meble ogrodowe">
               <div class="top-cat-img-box"><img src="/themes/topmarket-child/assets/img/cat-meble-ogrod.webp" alt="Meble ogrodowe" loading="lazy" width="140" height="140"></div>
               <span class="top-cat-label">MEBLE OGRODOWE</span>
             </a>
-            <a href="{$urls.base_url}pl/10-dom" class="top-cat-card" title="Meble do domu">
+            <a href="{$urls.base_url}10-dom" class="top-cat-card" title="Meble do domu">
               <div class="top-cat-img-box"><img src="/themes/topmarket-child/assets/img/cat-meble-dom.webp" alt="Meble do domu" loading="lazy" width="140" height="140"></div>
               <span class="top-cat-label">MEBLE DO DOMU</span>
             </a>
-            <a href="{$urls.base_url}pl/10-dom" class="top-cat-card" title="Środki czystości">
+            <a href="{$urls.base_url}10-dom" class="top-cat-card" title="Środki czystości">
               <div class="top-cat-img-box"><img src="/themes/topmarket-child/assets/img/cat-czystosc.webp" alt="Środki czystości" loading="lazy" width="140" height="140"></div>
               <span class="top-cat-label">ŚRODKI CZYSTOŚCI</span>
             </a>
-            <a href="{$urls.base_url}pl/13-narzedzia" class="top-cat-card" title="Produkty NAC">
+            <a href="{$urls.base_url}13-narzedzia" class="top-cat-card" title="Produkty NAC">
               <div class="top-cat-img-box"><img src="/themes/topmarket-child/assets/img/cat-nac.webp" alt="Produkty NAC" loading="lazy" width="140" height="140"></div>
               <span class="top-cat-label">PRODUKTY NAC</span>
             </a>
@@ -189,7 +189,7 @@
       <section class="tm-tools-showcase-section" aria-label="Polecane narzędzia">
         <div class="container">
           <div class="tm-tools-showcase-grid">
-            <a href="{$urls.base_url}pl/13-narzedzia" class="tm-tools-portrait-card" title="Duży wybór narzędzi">
+            <a href="{$urls.base_url}13-narzedzia" class="tm-tools-portrait-card" title="Duży wybór narzędzi">
               <img src="/themes/topmarket-child/assets/img/banner-narzedzia.webp" alt="Duży wybór NARZĘDZI - Kupuję" loading="lazy" width="295" height="456">
               <div class="tm-tools-portrait-overlay">
                 <span class="tm-banner-subtitle">Duży wybór</span>
@@ -202,12 +202,12 @@
               <div class="thumbnail-container">
                 <div class="thumbnail-top">
                   <div class="tm-card-badges"><span class="topmarket-badge-shipping">WYSYŁKA DZIŚ</span></div>
-                  <a href="{$urls.base_url}pl/ogrod/37-wszechstronny-akumulator-nac-b18-60-s-18v-6ah.html" class="thumbnail product-thumbnail" aria-label="Wszechstronny Akumulator NAC B18-60-S 18V, 6Ah">
+                  <a href="{$urls.base_url}ogrod/37-wszechstronny-akumulator-nac-b18-60-s-18v-6ah.html" class="thumbnail product-thumbnail" aria-label="Wszechstronny Akumulator NAC B18-60-S 18V, 6Ah">
                     <img src="{$urls.base_url}77-home_default/wszechstronny-akumulator-nac-b18-60-s-18v-6ah.jpg" alt="Wszechstronny Akumulator NAC B18-60-S 18V, 6Ah" loading="lazy" width="250" height="250">
                   </a>
                 </div>
                 <div class="product-description">
-                  <h3 class="h3 product-title"><a href="{$urls.base_url}pl/ogrod/37-wszechstronny-akumulator-nac-b18-60-s-18v-6ah.html">Wszechstronny Akumulator NAC B18-60-S 18V, 6Ah</a></h3>
+                  <h3 class="h3 product-title"><a href="{$urls.base_url}ogrod/37-wszechstronny-akumulator-nac-b18-60-s-18v-6ah.html">Wszechstronny Akumulator NAC B18-60-S 18V, 6Ah</a></h3>
                   <div class="product-price-and-shipping">
                     <span class="price product-price"><span class="price-int">293</span><sup class="price-dec">90zł</sup></span>
                   </div>
@@ -219,12 +219,12 @@
               <div class="thumbnail-container">
                 <div class="thumbnail-top">
                   <div class="tm-card-badges"><span class="topmarket-badge-shipping">WYSYŁKA DZIŚ</span></div>
-                  <a href="{$urls.base_url}pl/ogrod/38-wysokiej-jakosci-olej-do-sprezarek-nac-ldaa-100-0-6l.html" class="thumbnail product-thumbnail" aria-label="Wysokiej Jakości Olej Do Sprężarek NAC LDAA-100 0,6L">
+                  <a href="{$urls.base_url}ogrod/38-wysokiej-jakosci-olej-do-sprezarek-nac-ldaa-100-0-6l.html" class="thumbnail product-thumbnail" aria-label="Wysokiej Jakości Olej Do Sprężarek NAC LDAA-100 0,6L">
                     <img src="{$urls.base_url}80-home_default/wysokiej-jakosci-olej-do-sprezarek-nac-ldaa-100-0-6l.jpg" alt="Wysokiej Jakości Olej Do Sprężarek NAC LDAA-100 0,6L" loading="lazy" width="250" height="250">
                   </a>
                 </div>
                 <div class="product-description">
-                  <h3 class="h3 product-title"><a href="{$urls.base_url}pl/ogrod/38-wysokiej-jakosci-olej-do-sprezarek-nac-ldaa-100-0-6l.html">Wysokiej Jakości Olej Do Sprężarek NAC LDAA-100 0,6L</a></h3>
+                  <h3 class="h3 product-title"><a href="{$urls.base_url}ogrod/38-wysokiej-jakosci-olej-do-sprezarek-nac-ldaa-100-0-6l.html">Wysokiej Jakości Olej Do Sprężarek NAC LDAA-100 0,6L</a></h3>
                   <div class="product-price-and-shipping">
                     <span class="price product-price"><span class="price-int">29</span><sup class="price-dec">99zł</sup></span>
                   </div>
@@ -236,12 +236,12 @@
               <div class="thumbnail-container">
                 <div class="thumbnail-top">
                   <div class="tm-card-badges"><span class="topmarket-badge-shipping">WYSYŁKA DZIŚ</span></div>
-                  <a href="{$urls.base_url}pl/ogrod/39-toporek-siekiera-rozlupujaca-z-jednego-kawalka-stali-uchwyt-antywibracyjny-6g-nac-ht-0620-fs-620g.html" class="thumbnail product-thumbnail" aria-label="Toporek Siekiera Rozłupująca NAC HT-0620-FS 620g">
+                  <a href="{$urls.base_url}ogrod/39-toporek-siekiera-rozlupujaca-z-jednego-kawalka-stali-uchwyt-antywibracyjny-6g-nac-ht-0620-fs-620g.html" class="thumbnail product-thumbnail" aria-label="Toporek Siekiera Rozłupująca NAC HT-0620-FS 620g">
                     <img src="{$urls.base_url}82-home_default/toporek-siekiera-rozlupujaca-z-jednego-kawalka-stali-uchwyt-antywibracyjny-6g-nac-ht-0620-fs-620g.jpg" alt="Toporek Siekiera Rozłupująca NAC HT-0620-FS 620g" loading="lazy" width="250" height="250">
                   </a>
                 </div>
                 <div class="product-description">
-                  <h3 class="h3 product-title"><a href="{$urls.base_url}pl/ogrod/39-toporek-siekiera-rozlupujaca-z-jednego-kawalka-stali-uchwyt-antywibracyjny-6g-nac-ht-0620-fs-620g.html">Toporek Siekiera Rozłupująca Z Jednego Kawałka Stali NAC HT-0620-FS 620g</a></h3>
+                  <h3 class="h3 product-title"><a href="{$urls.base_url}ogrod/39-toporek-siekiera-rozlupujaca-z-jednego-kawalka-stali-uchwyt-antywibracyjny-6g-nac-ht-0620-fs-620g.html">Toporek Siekiera Rozłupująca Z Jednego Kawałka Stali NAC HT-0620-FS 620g</a></h3>
                   <div class="product-price-and-shipping">
                     <span class="price product-price"><span class="price-int">69</span><sup class="price-dec">00zł</sup></span>
                   </div>
@@ -264,14 +264,14 @@
         <div class="container">
           <h2 class="section-title-divider"><span>MARKI</span></h2>
           <div class="topmarket-brands-carousel">
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=NAC" class="brand-logo-card" title="Produkty marki NAC"><img src="/themes/topmarket-child/assets/img/brands/nac.jpg" alt="NAC" loading="lazy" width="98" height="127"></a>
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=Meven" class="brand-logo-card" title="Produkty marki Meven"><img src="/themes/topmarket-child/assets/img/brands/meven.jpg" alt="Meven" loading="lazy" width="98" height="127"></a>
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=Curver" class="brand-logo-card" title="Produkty marki Curver"><img src="/themes/topmarket-child/assets/img/brands/curver.jpg" alt="Curver" loading="lazy" width="98" height="127"></a>
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=Keter" class="brand-logo-card" title="Produkty marki Keter"><img src="/themes/topmarket-child/assets/img/brands/keter.jpg" alt="Keter" loading="lazy" width="98" height="127"></a>
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=Cellfast" class="brand-logo-card" title="Produkty marki Cellfast"><img src="/themes/topmarket-child/assets/img/brands/cellfast.jpg" alt="Cellfast" loading="lazy" width="98" height="127"></a>
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=Glade" class="brand-logo-card" title="Produkty marki Glade"><img src="/themes/topmarket-child/assets/img/brands/glade.jpg" alt="Glade" loading="lazy" width="98" height="127"></a>
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=Vileda" class="brand-logo-card" title="Produkty marki Vileda"><img src="/themes/topmarket-child/assets/img/brands/vileda.jpg" alt="Vileda" loading="lazy" width="98" height="127"></a>
-            <a href="{$urls.base_url}pl/szukaj?controller=search&amp;s=Russell+Hobbs" class="brand-logo-card" title="Produkty marki Russell Hobbs"><img src="/themes/topmarket-child/assets/img/brands/russell-hobbs.jpg" alt="Russell Hobbs" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=NAC" class="brand-logo-card" title="Produkty marki NAC"><img src="/themes/topmarket-child/assets/img/brands/nac.jpg" alt="NAC" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=Meven" class="brand-logo-card" title="Produkty marki Meven"><img src="/themes/topmarket-child/assets/img/brands/meven.jpg" alt="Meven" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=Curver" class="brand-logo-card" title="Produkty marki Curver"><img src="/themes/topmarket-child/assets/img/brands/curver.jpg" alt="Curver" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=Keter" class="brand-logo-card" title="Produkty marki Keter"><img src="/themes/topmarket-child/assets/img/brands/keter.jpg" alt="Keter" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=Cellfast" class="brand-logo-card" title="Produkty marki Cellfast"><img src="/themes/topmarket-child/assets/img/brands/cellfast.jpg" alt="Cellfast" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=Glade" class="brand-logo-card" title="Produkty marki Glade"><img src="/themes/topmarket-child/assets/img/brands/glade.jpg" alt="Glade" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=Vileda" class="brand-logo-card" title="Produkty marki Vileda"><img src="/themes/topmarket-child/assets/img/brands/vileda.jpg" alt="Vileda" loading="lazy" width="98" height="127"></a>
+            <a href="{$urls.base_url}szukaj?controller=search&amp;s=Russell+Hobbs" class="brand-logo-card" title="Produkty marki Russell Hobbs"><img src="/themes/topmarket-child/assets/img/brands/russell-hobbs.jpg" alt="Russell Hobbs" loading="lazy" width="98" height="127"></a>
           </div>
         </div>
       </section>

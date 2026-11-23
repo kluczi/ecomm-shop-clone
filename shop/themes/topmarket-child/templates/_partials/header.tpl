@@ -41,7 +41,7 @@
       <div class="row align-items-center header-main-row hidden-sm-down">
         <!-- Logo Domitek w geometrycznym stylu TopMarket -->
         <div class="col-md-3 header-col-logo" id="_desktop_logo">
-          <a href="{$urls.base_url}pl/" class="logo-link" title="Domitek - Strona główna">
+          <a href="{$urls.base_url}" class="logo-link" title="Domitek - Strona główna">
             <img class="logo img-fluid" src="/themes/topmarket-child/assets/img/logo-domitek.svg" alt="Domitek" width="180" height="54">
           </a>
         </div>
