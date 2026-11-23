@@ -327,3 +327,43 @@
 ### 3. Czego musiałem się nauczyć sam
 * **Wewnętrzna architektura PrestaShop 8.2:** Musiałem samodzielnie zrozumieć działanie Webservice API, tabel walut (`ps_currency*`) i stawek podatkowych, hooków modułów, budowania cache (`var/cache/prod`) oraz uprawnień `www-data` w kontenerze.
 * **Pełna weryfikacja na czystym środowisku:** Przekonałem się, że każdą zmianę wygenerowaną przez AI trzeba traktować jak kod młodszego kolegi — zawsze weryfikować ją od zera (`docker compose down -v`, `make init`, `make verify`, `make e2e`, `make backup`/`restore`, `gitleaks`).
+
+---
+
+## Refleksja końcowa (Dominik Szwed)
+
+### 1. Gdzie AI realnie przyspieszyło pracę
+* **Budowa całego frontendu i „orkiestra” podagentów:** AI pozwoliło w bardzo krótkim czasie postawić kompletny motyw potomny `topmarket-child` (~4 tys. linii CSS, własny JS, nadpisania szablonów Smarty), stworzyć od zera moduł `domitekcookies` i strony CMS. Przy większych zadaniach świetnie sprawdziło się delegowanie pracy osobnym agentom (osobny od strony głównej, listingu, karty produktu, dostępności i audytów).
+* **Audyty i testy na zawołanie:** Agenty w kilka chwil odpalały bezgłowe testy Playwrighta, Axe-Core oraz Google Lighthouse, od razu wskazując konkretne problemy z kontrastem, brakującymi atrybutami `aria-label` czy przelewającym się kontenerem na szerokości `360 px`.
+* **Praca z repozytorium:** AI pomagało przy dopracowaniu treści review do PR-ów kolegów, rozplątywaniu konfliktów w `Makefile` i `AI_LOG.md`, pilnowaniu konwencji commitów oraz porządkowaniu ADR-ów.
+
+### 2. Gdzie AI wprowadziło w błąd
+* **Zbyt wierna miłość do TopMarket.pl:** AI tak bardzo wczuło się w odwzorowanie pierwowzoru, że wszędzie (od banerów po drawer koszyka) powpisywało darmową dostawę od `149 zł` i baner `PayPo`, zamiast naszych wymagań (`2000 zł / 50 kg`, brak zewnętrznych operatorów płatności).
+* **Kreatywne duplikaty i pułapki w kodzie:** Raz dopisało `<script src=".../custom.js">` mimo rejestracji w `theme.yml` (przez co przycisk `+` dodawał po 3 sztuki naraz), innym razem wyrenderowało 3 paski wyszukiwania `#search_widget` w nagłówku (wysypując testy E2E na strict mode), zahardkodowało prefiksy `/pl/` i ID produktów `37–39` oraz wstawiło puste przyciski listy życzeń.
+* **Sabotaż samego siebie w CSS i SQL:** Gdy w `product.tpl` wreszcie przywróciliśmy hook `displayProductAdditionalInfo` dla wariantów z modułu `omnibus`, okazało się, że sam motyw w `custom.css` nadal ukrywał `.product-additional-info` przez `display: none !important`. Z kolei w SQL brak `DELETE` w `ps_linksmenutop_lang` zostawiał w menu stare `BESTSELLERY` (404), a `mariadb -e "SOURCE ...;"` ze średnikiem kulturalnie nie wykonywał skryptu.
+* **Wielka afera o zdjęcie 60L na workach 35L:** Przez chwilę podejrzewaliśmy AI i importera o pomieszanie zdjęć wariantów, po czym wyszło na jaw, że po prostu Bartek jest tylko trochę głuptaskiem, a winowajcą był sam sklep źródłowy (`topmarket.pl`), który wrzucił identyczne zdjęcie `60L` pod oba produkty.
+
+### 3. Czego musiałem się nauczyć sam
+* **Jak PrestaShop 8.2 działa „pod maską”:** Że `cache:clear` bez odpowiednich flag potrafi wyczyścić `dev` zamiast `var/cache/prod`, włączenie motywu potrafi po cichu przepiąć moduły na stare hooki, a checkout używa osobnego szablonu nagłówka (`checkout/_partials/header.tpl`, przez co straszyło tam domyślne logo `my store`).
+* **Pułapki Windowsa i Dockera:** Że przekierowanie pliku SQL przez potok w PowerShellu zamienia nasze piękne `zł` w `zĹ,` (dopiero `docker cp` + `<` w kontenerze rozwiązuje temat), a `MinGW make` i `cmd.exe` nie przepadają za apostrofami.
+* **Zasada ograniczonego zaufania:** Agent AI pisze kod szybciej, niż człowiek zdąży mrugnąć, ale bez ręcznego kliknięcia `Ctrl+F5`, przejrzenia konsoli i puszczenia czystego `make e2e` potrafi schować własną zmianę pod `display: none` i z pełnym przekonaniem zaraportować sukces.
+
+## Refleksja końcowa (Bartek Kluska)
+
+### 1. Gdzie AI realnie przyspieszyło pracę
+
+- **Git i code review** — Przy większych PR-ach agent pomagał mi przejrzeć zmiany i wskazywał, na co zwrócić uwagę. Sam sprawdzałem ważniejsze rzeczy, np. czy klucz API trafił do repozytorium. Agent pomagał też przy commitach i konfliktach. Przed pushem sprawdzałem, co jest w commitach, i decydowałem, kiedy je wypchnąć.
+- **Scraper** — Najpierw sam przejrzałem HTML strony i podpowiedziałem AI, skąd brać dane produktów. Wybrałem Pythona i biblioteki, których już używałem, bo dzięki temu łatwiej było mi sprawdzać i poprawiać kod. Agent pomógł uzupełnić parser, dopisać testy, a później ułożyć mój opis według wzorca ADR.
+- **Testy i wyszukiwarka** — Do Playwrighta wybrałem Pythona, bo znam ten język i łatwo mi prześledzić kolejne kroki testu. AI pomogło mi przygotować testy na stronie wzorcowej, przenieść je na nasz sklep i dodać zakup aż do pobrania faktury. Pomogło też poprawić wyszukiwarkę PrestaShop, która na zapytanie `Jan Niezbędny worki na śmieci` pokazywała również inne produkty tej marki, np. ścierki.
+
+### 2. Gdzie AI wprowadziło w błąd
+
+- **Dostępność produktów** — Pierwsza wersja scrapera brała odpowiedź HTTP 200 za oznakę dostępności. Na stronie niedostępnego produktu parser potrafił pobrać opis polecanej oferty. Wyszło to, gdy porównaliśmy zapisany rekord z kartą produktu.
+- **Warianty** — Agent początkowo połączył osobne produkty w jedną kartę. Po sprawdzeniu danych ze scrapera ustaliliśmy, że każda wersja ma zachować własną nazwę, opis i zdjęcie, a wybór opcji ma prowadzić do jej karty.
+- **Waga koszyka** — Koszyk z pierwszej wersji testu przekraczał limit 50 kg, więc na etapie dostawy zabrakło przewoźników do wyboru. W teście trzeba było dobierać lżejsze produkty.
+
+### 3. Czego musiałem się nauczyć sam
+
+- **Dostępność w HTML** — Sam musiałem znaleźć w kodzie strony, gdzie jest zapisana informacja o dostępności konkretnego produktu. Dopiero wtedy mogłem wskazać agentowi, z którego pola ma korzystać parser.
+- **Stany magazynowe w testach** — Każde zamówienie zmienia stan magazynowy. Kolejne uruchomienia pokazały, że test szukał produktów na zbyt małej liczbie stron. Po poprawce sprawdziłem cały zakup trzy razy z rzędu.
+- **Faktury w PrestaShop** — Sprawdziłem, kiedy sklep wystawia fakturę za zamówienie za pobraniem. W naszym teście pojawiała się po zmianie statusu zamówienia w panelu admina na „Płatność zaakceptowana”.
