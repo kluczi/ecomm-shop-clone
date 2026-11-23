@@ -7,14 +7,22 @@ DOCKER ?= $(shell if command -v docker.exe >/dev/null 2>&1; then echo docker.exe
 ifeq ($(OS),Windows_NT)
 PYTHON ?= $(shell if [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; elif [ -f scraper/.venv/Scripts/python.exe ]; then echo scraper/.venv/Scripts/python.exe; else echo python; fi)
 E2E_PYTHON ?= $(shell if [ -f tests/.venv/Scripts/python.exe ]; then echo tests/.venv/Scripts/python.exe; elif [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; else echo python; fi)
+VENV_PIP ?= .venv/Scripts/pip.exe
+E2E_PIP ?= tests/.venv/Scripts/pip.exe
+E2E_PLAYWRIGHT ?= tests/.venv/Scripts/playwright.exe
+SYS_PYTHON ?= python
 else
 PYTHON ?= $(shell if [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; elif [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
 E2E_PYTHON ?= $(shell if [ -f tests/.venv/Scripts/python.exe ]; then echo tests/.venv/Scripts/python.exe; elif [ -f tests/.venv/bin/python ]; then echo tests/.venv/bin/python; elif [ -f .venv/bin/python ]; then echo .venv/bin/python; else echo python3; fi)
+VENV_PIP ?= .venv/bin/pip
+E2E_PIP ?= tests/.venv/bin/pip
+E2E_PLAYWRIGHT ?= tests/.venv/bin/playwright
+SYS_PYTHON ?= python3
 endif
 
 COMPOSE ?= $(DOCKER) compose -f deploy/compose.yaml --env-file .env
 
-.PHONY: up down init cms payments shipping webservice storefront-config storefront theme images import backup restore promotion-module promotions e2e search check-env verify
+.PHONY: up down init cms payments shipping webservice storefront-config storefront theme images import backup restore promotion-module promotions e2e search check-env verify venv e2e-venv
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -70,8 +78,23 @@ storefront-config: check-env
 
 storefront: storefront-config theme
 
+venv:
+	@if [ ! -d ".venv" ]; then \
+		echo "[INFO] Tworzenie .venv i instalacja zaleznosci..."; \
+		$(SYS_PYTHON) -m venv .venv && \
+		$(VENV_PIP) install -r scraper/requirements.txt; \
+	fi
+
+e2e-venv:
+	@if [ ! -d "tests/.venv" ]; then \
+		echo "[INFO] Tworzenie tests/.venv i instalacja Playwright/Chromium..."; \
+		$(SYS_PYTHON) -m venv tests/.venv && \
+		$(E2E_PIP) install -r tests/requirements.txt && \
+		$(E2E_PLAYWRIGHT) install chromium; \
+	fi
+
 # Install Omnibus before importing so it can record the original prices.
-init: check-env
+init: check-env venv
 	$(MAKE) cms
 	$(MAKE) shipping
 	$(MAKE) payments
@@ -90,10 +113,10 @@ promotion-module:
 verify: check-env
 	$(PYTHON) deploy/verify_metrics.py
 
-images: check-env
+images: check-env venv
 	$(PYTHON) scraper/download_release_images.py
 
-import: check-env images
+import: check-env venv images
 	$(PYTHON) shop/import_api.py
 
 backup: check-env
@@ -106,7 +129,7 @@ promotions:
 	$(COMPOSE) cp scraper-results/products.json prestashop:/tmp/omnibus-products.json
 	$(COMPOSE) exec -T --user www-data prestashop sh -c "php /var/www/html/modules/omnibus/cli/seed.php"
 
-e2e:
+e2e: e2e-venv
 	"$(E2E_PYTHON)" -m pytest -c tests/pytest.ini tests $(E2E_ARGS)
 
 search:
