@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -118,9 +119,23 @@ def extract_zip(repo_root: Path, zip_path: Path, target_dir: Path) -> bool:
         return False
     print(f"Extracting {zip_path.name} to {target_dir}...")
     target_dir.mkdir(parents=True, exist_ok=True)
+    target_root = target_dir.resolve()
     try:
         with zipfile.ZipFile(zip_path, "r") as zf:
-            zf.extractall(target_dir)
+            for member in zf.infolist():
+                # Normalize Windows backslashes so extraction works identically on macOS/Linux
+                parts = [p for p in member.filename.replace("\\", "/").split("/") if p and p != "."]
+                if not parts or any(p == ".." for p in parts):
+                    continue
+                dest = (target_root.joinpath(*parts)).resolve()
+                if not dest.is_relative_to(target_root):
+                    continue
+                if member.is_dir():
+                    dest.mkdir(parents=True, exist_ok=True)
+                    continue
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                with zf.open(member, "r") as src, open(dest, "wb") as dst:
+                    shutil.copyfileobj(src, dst)
         all_cached, present_products, total_products = check_images_per_product(
             repo_root, target_dir
         )
