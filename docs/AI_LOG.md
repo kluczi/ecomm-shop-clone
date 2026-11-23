@@ -162,6 +162,36 @@
 
 ---
 
+## Testy E2E w Playwright
+
+| Pole              | Opis                                                                                                                                                                                                                                                                                      |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data i autor      | 16.11.2026, Bartek Kluska                                                                                                                                                                                                                                                                 |
+| Narzędzie i model | Codex GPT-6.1-Sol                                                                                                                                                                                                                                                                         |
+| Zadanie           | #16 Implementacja testów E2E w Playwright (Python) na wzorowanej stronie. Testy miały obejmować podstawowe operacje (jeszcze bez finalizacji zamówienie, która zostanie dodana podczas testowania na naszej stronie)                                                                      |
+| Co otrzymano      | Cztery testy obejmujące koszyk, wyszukiwanie, usuwanie produktów, zmianę ilości i szczegóły produktu. Otrzymano również raport HTML, zrzuty ekranu przy błędzie oraz komendę make e2e do odpalania testów. Zgodnie z prośbą testy nie obejmują jeszcze rejestracji, zamówień i płatności. |
+| Co było błędne    | W pierwszej wersji testów problemy sprawiały błędne selektory i opóźnione pojawienie się banera cookies. Zbyt wczesne kliknięcie Dodaj do koszyka mogło otworzyć pusty koszyk.                                                                                                            |
+| Weryfikacja       | Odpalenie testów i weryfikacja poprawności ich działania. Sprawdzenie raportu HTML. Testy przeszły poprawnie 4/4.                                                                                                                                                                         |
+
+---
+
+---
+
+## Testy E2E w Playwright - migracja na nasz sklep oraz dodanie brakującego procesu składania zamówienia
+
+| Pole              | Opis                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data i autor      | 22.11.2026, Bartek Kluska                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Narzędzie i model | Codex GPT-6.2-Sol                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Zadanie           | #16 Dostosowanie testów Playwright do naszego lokalnego sklepu i pokrycie testami całego procesu zakupowego i rejestracji klienta, który nie był wykonany podczas zrobienia testów na stronie oryginalnej.                                                                                                                                                                                                                                                                                                             |
+| Co otrzymano      | Scenariusz obejmujący koszyk, rejestrację, dostawę, płatność za pobraniem, status zamówienia i pobranie faktury PDF.                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Co było błędne    | Pierwszy koszyk przekraczał limit wagi przewoźników (50kg). Po zmniejszeniu przedmiotów w koszyku (a co za tym idzie wagi koszyku) brakowało metod płatności. Import konfiguracji zmienił identyfikatory modułów, a sklep nadal szukał ich pod starymi numerami. Obie metody przywrócono tylko w lokalnej bazie testowej, a opis poprawki przekazano odpowiedzialnemu za to zadanie koledze z zespołu do osobnego PR. Nie był to stricte błąd AI, ale błąd podczas pracy z AI, które AI wskazało i lokalnie poprawiło. |
+| Weryfikacja       | Uruchomiłem sklep na naszym lokalnym sklepie i testy przeszły 4/4. W pełnym scenariuszu test złożył zamówienie za pobraniem, zmienił jego status w panelu na Płatność zaakceptowana i zapisał fakturę PDF. Sprawdziłem również admin panel i pojawił się tam klient (Test Playwright) oraz jego zamówienia odpowiadające założeniom instrukcji projektowej.                                                                                                                                                            |
+
+---
+
+---
+
 ## Karty produktów z wariantami
 
 | Pole | Opis |
