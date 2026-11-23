@@ -112,7 +112,7 @@ def count_existing_images(images_dir: Path) -> int:
     return sum(1 for p in images_dir.glob("*/*.jpg") if p.stat().st_size > 0)
 
 
-def extract_zip(zip_path: Path, target_dir: Path, min_count: int) -> bool:
+def extract_zip(repo_root: Path, zip_path: Path, target_dir: Path) -> bool:
     """Safely verify integrity and extract ZIP archive into target directory."""
     if not verify_zip_integrity(zip_path):
         return False
@@ -121,9 +121,18 @@ def extract_zip(zip_path: Path, target_dir: Path, min_count: int) -> bool:
     try:
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(target_dir)
-        count = count_existing_images(target_dir)
-        print(f"[OK] Successfully extracted {count} images.")
-        return count >= min_count
+        all_cached, present_products, total_products = check_images_per_product(
+            repo_root, target_dir
+        )
+        if all_cached:
+            print(
+                f"[OK] Successfully extracted and verified images ({present_products}/{total_products} products covered)."
+            )
+            return True
+        print(
+            f"[WARN] Extracted archive incomplete ({present_products}/{total_products} products covered). Trying next source..."
+        )
+        return False
     except (zipfile.BadZipFile, OSError) as e:
         print(f"[ERROR] Failed to extract {zip_path}: {e}")
         return False
@@ -153,7 +162,7 @@ def download_from_gh_cli(repo_root: Path, zip_path: Path) -> bool:
             text=True,
             check=False,
         )
-        if zip_path.exists() and zip_path.stat().st_size > 0:
+        if result.returncode == 0 and zip_path.exists() and zip_path.stat().st_size > 0:
             print(f"[OK] Downloaded {zip_path.name} via gh CLI.")
             return True
         if result.returncode != 0:
@@ -260,7 +269,6 @@ def ensure_images(repo_root: Path | None = None) -> bool:
 
     images_dir = repo_root / "scraper-results" / "images"
     zip_path = repo_root / "scraper-results" / ASSET_NAME
-    min_count = get_required_images_count(repo_root)
 
     # 1. Local cache: Check if every product has images present
     all_cached, present_products, total_products = check_images_per_product(
@@ -280,7 +288,7 @@ def ensure_images(repo_root: Path | None = None) -> bool:
     if zip_path.exists():
         if verify_zip_integrity(zip_path):
             print(f"Found valid local archive: {zip_path.name} (SHA-256 verified)")
-            if extract_zip(zip_path, images_dir, min_count):
+            if extract_zip(repo_root, zip_path, images_dir):
                 return True
         else:
             print(
@@ -290,13 +298,13 @@ def ensure_images(repo_root: Path | None = None) -> bool:
 
     # 3. GitHub CLI: Download via 'gh release download'
     if download_from_gh_cli(repo_root, zip_path) and extract_zip(
-        zip_path, images_dir, min_count
+        repo_root, zip_path, images_dir
     ):
         return True
 
     # 4. Direct HTTP API: Download via GitHub REST API
     if download_from_http_api(zip_path) and extract_zip(
-        zip_path, images_dir, min_count
+        repo_root, zip_path, images_dir
     ):
         return True
 
