@@ -160,6 +160,19 @@
 | **Co było błędne** | AI w zapytaniu SQL użyło słowa kluczowego `precision` bez ucieczki w backticki, co wywołało błąd składniowy MariaDB. Ponadto AI początkowo nie wykryło, że wywołanie `docker` z Git Bash/MSYS na Windows uruchamiało skrypt-wrapper psujący flagi poleceń (np. `-f`), co naprawiono wykrywaniem `docker.exe`. W kontenerze PrestaShop generował się błąd HTTP 500 z powodu braku uprawnień procesu Apache (`www-data`) do katalogu `var/cache/prod` utworzonego przez proces roota CLI – skorygowano to wymuszeniem `chown -R www-data:www-data` i `chmod -R 777` w `Makefile` i `restore.py`. Ponadto wysyłka testowego maila w back-office rzucała błędem z powodu braku sendmaila w kontenerze, co rozwiązano automatyczną konfiguracją SMTP Mailpit w bazie. |
 | **Weryfikacja** | Przetestowanie pełnej ścieżki clean-slate od zera (`docker compose down -v` i `make init`): czas instalacji wyniósł 14.30 min (poniżej limitu 15 min z kryterium W3 [K]), poprawny import 1271 produktów i kategorii. Weryfikacja w przeglądarce: widoczny baner cookies Dominika, obie metody płatności (przelew i pobranie) widoczne i wybieralne w checkout dla DPD i InPost, złożenie zamówienia zakończone sukcesem i mail transakcyjny odebrany w Mailpit (`http://localhost:8025`). Przetestowanie Disaster Recovery (`make restore`): pełne odtworzenie bazy, zdjęć i konfiguracji w 24.40 s (limit 10 min z D4) z bezbłędnym dostępem do panelu admina bez HTTP 500. |
 
+---
+
+## Wpis 10: Issue #44 – Optymalizacja wydajności importu (wielowątkowość), konfiguracja Gitleaks i automatyzacja weryfikacji metryk
+
+| Pole | Opis |
+| --- | --- |
+| **Data i autor** | 23.11.2026, Michał Łysiak |
+| **Narzędzie i model** | Antigravity (Gemini 3.8 Flash) |
+| **Zadanie** | Issue #44: Optymalizacja czasu importu katalogu, wdrożenie reguł skanowania sekretów oraz automatyzacja weryfikacji metryk projektowych |
+| **Co otrzymano** | Architekturę równoległego wgrywania zdjęć z użyciem puli 4 wątków roboczych (`concurrent.futures.ThreadPoolExecutor`) i blokadą wątkową statystyk w `shop/import_api.py`, konfigurację reguł `.gitleaks.toml` ignorującą tokeny analityczne w testowych plikach HTML scrapera, a także skrypt `deploy/verify_metrics.py` i cel `make verify` (zintegrowany automatycznie z `make init`), weryfikujący zapytaniami SQL w MariaDB wszystkie progi z kolumny „Sposób pomiaru” z oficjalnych wymagań. |
+| **Co było błędne** | AI początkowo zaproponowało użycie `getattr(sys.stdout, "reconfigure")`, co zgłaszał linter Ruff (reguła `B009`), natomiast bezpośrednie wywołanie powodowało błąd typowania Pylance (`TextIO` nie deklaruje metody `reconfigure`). Skorygowano to poprzez zawężenie typu `isinstance(sys.stdout, io.TextIOWrapper)`. Ponadto w zapytaniu SQL weryfikującym przewoźników AI użyło sztywnego warunku `IN ('DPD', 'InPost')`, co dało wynik 0 z powodu pełnych nazw w bazie (`DPD Kurier`, `InPost Paczkomat 24/7`) – skorygowano to dopasowaniem wzorcem `LIKE`. |
+| **Weryfikacja** | Przeprowadzenie pełnego importu katalogu na czystym sklepie: czas wgrywania 1271 produktów i 1776 zdjęć spadł z ok. 12 minut do **7.06 min (423 s)**, redukując łączny czas inicjalizacji do ~8.5 minuty (bezpieczny margines poniżej 15 min z W3 [K]). Test idempotencji (drugie uruchomienie `make import`): 1272 produkty zaktualizowane, 0 utworzonych duplikatów i 0 wgranych powtórnie zdjęć w czasie 4.24 min (spełnienie D2). Uruchomienie skanera `gitleaks` na całej historii: `no leaks found` (0 znalezisk, kod wyjścia 0). Uruchomienie `make verify`: potwierdzenie statusu `[PASS]` dla wszystkich 7 metryk z tabeli wymagań. |
+
 <!--
 ## Wpis X:
 
