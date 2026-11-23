@@ -1,0 +1,11 @@
+/* Domitek Storefront Custom Styles */
+
+/* Hide empty subcategory boxes above product list */
+#subcategories {
+    display: none !important;
+}
+
+/* Hide redundant root category tree block in left column (replaced by faceted filters) */
+.block-categories {
+    display: none !important;
+}
