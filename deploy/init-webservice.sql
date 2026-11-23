@@ -17,8 +17,9 @@ SELECT id_webservice_account, 1
 FROM ps_webservice_account
 WHERE `key` = @api_key;
 
--- Grant permissions for catalog, images, stock, and tax resources
-INSERT IGNORE INTO ps_webservice_permission (resource, method, id_webservice_account)
+-- Grant permissions:
+-- 1. Full management permissions for catalog, images, features, and stock
+INSERT INTO ps_webservice_permission (resource, method, id_webservice_account)
 SELECT r.resource, m.method, a.id_webservice_account
 FROM ps_webservice_account a
 CROSS JOIN (
@@ -30,9 +31,6 @@ CROSS JOIN (
     UNION SELECT 'product_features'
     UNION SELECT 'products'
     UNION SELECT 'stock_availables'
-    UNION SELECT 'tax_rule_groups'
-    UNION SELECT 'tax_rules'
-    UNION SELECT 'taxes'
 ) r
 CROSS JOIN (
     SELECT 'GET' AS method
@@ -40,6 +38,21 @@ CROSS JOIN (
     UNION SELECT 'PUT'
     UNION SELECT 'PATCH'
     UNION SELECT 'DELETE'
+    UNION SELECT 'HEAD'
+) m
+WHERE a.`key` = @api_key;
+
+-- 2. Read-only permissions for tax tables
+INSERT INTO ps_webservice_permission (resource, method, id_webservice_account)
+SELECT r.resource, m.method, a.id_webservice_account
+FROM ps_webservice_account a
+CROSS JOIN (
+    SELECT 'tax_rule_groups' AS resource
+    UNION SELECT 'tax_rules'
+    UNION SELECT 'taxes'
+) r
+CROSS JOIN (
+    SELECT 'GET' AS method
     UNION SELECT 'HEAD'
 ) m
 WHERE a.`key` = @api_key;
