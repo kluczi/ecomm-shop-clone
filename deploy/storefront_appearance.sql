@@ -8,7 +8,7 @@ INSERT INTO ps_configuration (name, id_shop_group, id_shop, value, date_add, dat
 VALUES ('PS_THEME_NAME', NULL, 1, 'topmarket-child', NOW(), NOW())
 ON DUPLICATE KEY UPDATE value = 'topmarket-child', date_upd = NOW();
 
--- 3. Dodanie wyróżnionych pozycji PROMOCJE i BESTSELLERY do menu górnego (na wzór TopMarket.pl)
+-- 3. Dodanie wyróżnionych pozycji PROMOCJE i NOWOŚCI do menu górnego (na wzór TopMarket.pl)
 INSERT INTO ps_linksmenutop (id_linksmenutop, id_shop, new_window) VALUES (1, 1, 0)
 ON DUPLICATE KEY UPDATE new_window = 0;
 
@@ -23,8 +23,8 @@ ON DUPLICATE KEY UPDATE new_window = 0;
 
 INSERT INTO ps_linksmenutop_lang (id_linksmenutop, id_lang, id_shop, label, link)
 VALUES
-(2, 1, 1, 'BESTSELLERY', '/najczesciej-kupowane'),
-(2, 2, 1, 'BESTSELLERS', '/en/najczesciej-kupowane')
+(2, 1, 1, 'NOWOŚCI', '/nowe-produkty'),
+(2, 2, 1, 'NEW PRODUCTS', '/en/nowe-produkty')
 ON DUPLICATE KEY UPDATE label = VALUES(label), link = VALUES(link);
 
 SET @cat_items = (
