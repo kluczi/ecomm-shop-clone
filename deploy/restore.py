@@ -20,6 +20,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+import zlib
 from pathlib import Path
 
 
@@ -47,6 +48,41 @@ def find_latest_backup(backup_base: Path) -> Path | None:
     return dirs[0] if dirs else None
 
 
+def verify_dump_integrity(dump_file: Path) -> tuple[bool, str]:
+    """Verify that database dump file exists, is valid gzip, and decompresses cleanly."""
+    if not dump_file.exists():
+        return False, f"File does not exist: {dump_file}"
+    if dump_file.stat().st_size == 0:
+        return False, f"Dump file is empty (0 bytes): {dump_file}"
+
+    decompressed_bytes = 0
+    header_sample = b""
+
+    try:
+        with gzip.open(dump_file, "rb") as gz:
+            while chunk := gz.read(1024 * 1024):
+                if not header_sample:
+                    header_sample = chunk[:4096]
+                decompressed_bytes += len(chunk)
+    except gzip.BadGzipFile as e:
+        return False, f"Invalid or corrupted gzip archive: {e}"
+    except (EOFError, zlib.error, OSError) as e:
+        return False, f"Decompression failed (corrupted or truncated archive): {e}"
+
+    if decompressed_bytes == 0:
+        return False, "Decompressed SQL content is empty (0 bytes)"
+
+    # Basic sanity check for SQL dump signature
+    lower_sample = header_sample.lower()
+    if not any(
+        marker in lower_sample
+        for marker in (b"dump", b"create", b"insert", b"table", b"set", b"mariadb", b"mysql")
+    ):
+        return False, "Dump file does not appear to contain valid SQL statements"
+
+    return True, f"Verified valid gzip SQL dump ({decompressed_bytes / (1024 * 1024):.2f} MB uncompressed)"
+
+
 def main():
     parser = argparse.ArgumentParser(description="Restore PrestaShop from backup")
     parser.add_argument(
@@ -69,6 +105,15 @@ def main():
     if not db_dump_file.exists():
         print(f"[ERROR] Missing database dump: {db_dump_file}")
         sys.exit(1)
+
+    # Pre-flight check: verify dump integrity before making destructive changes (DROP DATABASE)
+    print("Checking database dump archive integrity before recovery...")
+    is_valid, validation_msg = verify_dump_integrity(db_dump_file)
+    if not is_valid:
+        print(f"[ERROR] Backup verification failed: {validation_msg}")
+        print("[ABORT] Existing database was NOT dropped. Data preserved.")
+        sys.exit(1)
+    print(f"  -> {validation_msg}")
 
     env_file = repo_root / ".env"
     env_vars = load_env(env_file)
