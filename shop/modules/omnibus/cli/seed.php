@@ -136,9 +136,8 @@ try {
                 seedDiscount($module, $products[$reference], $shopId, $percent);
             }
             $sourcePath = $argv[1] ?? '/tmp/omnibus-products.json';
-            $sourceProducts = loadVariantSourceProducts($sourcePath);
             foreach ($catalog['variant_groups'] as $group) {
-                restoreVariantProducts($group['options'], $products, $sourceProducts, $shopId);
+                restoreVariantProducts($group['options'], $products, $sourcePath, $shopId);
             }
             if (!$db->execute('COMMIT')) {
                 throw new RuntimeException('Could not commit the promotion configuration.');

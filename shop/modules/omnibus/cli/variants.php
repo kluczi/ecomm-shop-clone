@@ -8,16 +8,20 @@ if (!defined('_PS_VERSION_')) {
 
 function loadVariantSourceProducts(string $path): array
 {
-    if (!is_readable($path)) {
-        throw new RuntimeException('Missing scraper results. Run make promotions from the repository.');
+    static $catalogues = [];
+    if (isset($catalogues[$path])) {
+        return $catalogues[$path];
+    }
+    if (!is_file($path) || !is_readable($path)) {
+        throw new RuntimeException('Missing scraper results for variant migration. Run make promotions from the repository.');
     }
 
     $products = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
 
-    return array_column($products, null, 'sku');
+    return $catalogues[$path] = array_column($products, null, 'sku');
 }
 
-function moveVariantCartLines(Combination $combination, int $productId, int $shopId): void
+function moveVariantReferences(Combination $combination, int $productId, int $shopId): void
 {
     $db = Db::getInstance();
     $table = _DB_PREFIX_ . 'cart_product';
@@ -33,8 +37,11 @@ function moveVariantCartLines(Combination $combination, int $productId, int $sho
         WHERE legacy.id_product = $parentId AND legacy.id_product_attribute = $combinationId AND legacy.id_shop = $shopId
         ON DUPLICATE KEY UPDATE quantity = `$table`.quantity + VALUES(quantity)")
         || !$db->update('customization', ['id_product' => $productId, 'id_product_attribute' => 0],
-            "id_product = $parentId AND id_product_attribute = $combinationId")) {
-        throw new RuntimeException("Could not transfer carts for {$combination->reference}.");
+            "id_product = $parentId AND id_product_attribute = $combinationId")
+        // Keep the original order details while routing reorders and refunds to the current SKU.
+        || !$db->update('order_detail', ['product_id' => $productId, 'product_attribute_id' => 0],
+            "product_id = $parentId AND product_attribute_id = $combinationId AND id_shop = $shopId")) {
+        throw new RuntimeException("Could not transfer cart and order references for {$combination->reference}.");
     }
 }
 
@@ -65,14 +72,8 @@ function detachCopiedVariantImages(Combination $combination, Product $source, Pr
     }
 }
 
-function restoreVariantProducts(array $options, array $products, array $sourceProducts, int $shopId): void
+function restoreVariantProducts(array $options, array $products, string $sourcePath, int $shopId): void
 {
-    foreach ($options as $reference) {
-        if (!isset($sourceProducts[$reference])) {
-            throw new RuntimeException("Product {$reference} is missing from the scraper results.");
-        }
-    }
-
     $parent = $products[reset($options)];
     $parentId = (int) $parent->id;
     $legacyAliases = array_filter($options, static function (string $reference) use ($products, $parentId): bool {
@@ -82,6 +83,13 @@ function restoreVariantProducts(array $options, array $products, array $sourcePr
     });
     if (!$legacyAliases) {
         return;
+    }
+
+    $sourceProducts = loadVariantSourceProducts($sourcePath);
+    foreach ($options as $reference) {
+        if (!isset($sourceProducts[$reference])) {
+            throw new RuntimeException("Product {$reference} is missing from the scraper results.");
+        }
     }
 
     $combinations = [];
@@ -94,15 +102,17 @@ function restoreVariantProducts(array $options, array $products, array $sourcePr
     }
 
     $db = Db::getInstance();
-    $ids = implode(',', array_map(static fn (Combination $combination) => (int) $combination->id, $combinations));
-    if ($db->getValue((new DbQuery())->select('id_order_detail')->from('order_detail')->where("product_attribute_id IN ($ids)"))) {
-        throw new RuntimeException("Existing orders reference combinations for {$parent->reference}.");
-    }
-
     $stocks = [];
     foreach ($combinations as $reference => $combination) {
-        $stocks[$reference] = (int) StockAvailable::getQuantityAvailableByProduct($parentId, (int) $combination->id, $shopId);
-        moveVariantCartLines($combination, (int) $products[$reference]->id, $shopId);
+        $stockId = (int) StockAvailable::getStockAvailableIdByProductId($parentId, (int) $combination->id, $shopId);
+        $stock = $db->getRow((new DbQuery())->select('quantity, reserved_quantity, physical_quantity')
+            ->from('stock_available')->where("id_stock_available = $stockId"));
+        if (!$stock) {
+            throw new RuntimeException("Could not read the old stock for {$reference}.");
+        }
+        $stocks[$reference] = array_map('intval', $stock);
+
+        moveVariantReferences($combination, (int) $products[$reference]->id, $shopId);
         detachCopiedVariantImages($combination, $products[$reference], $parent, $shopId);
         if (!$combination->delete()) {
             throw new RuntimeException("Could not remove the old combination for {$reference}.");
@@ -127,8 +137,14 @@ function restoreVariantProducts(array $options, array $products, array $sourcePr
         }
 
         $productId = (int) $product->id;
-        StockAvailable::setQuantity($productId, 0, $stocks[$reference], $shopId, false);
-        if ((int) StockAvailable::getQuantityAvailableByProduct($productId, 0, $shopId) !== $stocks[$reference]
+        $stock = $stocks[$reference];
+        StockAvailable::setQuantity($productId, 0, $stock['quantity'], $shopId, false);
+        $stockId = (int) StockAvailable::getStockAvailableIdByProductId($productId, 0, $shopId);
+        if (!$stockId || !$db->update('stock_available', [
+            'reserved_quantity' => $stock['reserved_quantity'],
+            'physical_quantity' => $stock['physical_quantity'],
+        ], "id_stock_available = $stockId")
+            || (int) StockAvailable::getQuantityAvailableByProduct($productId, 0, $shopId) !== $stock['quantity']
             || !Search::indexation(false, $productId)) {
             throw new RuntimeException("Could not restore stock or indexing for {$reference}.");
         }
