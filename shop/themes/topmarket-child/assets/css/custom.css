@@ -1,0 +1,4294 @@
+/**
+ * TopMarket Child Theme - Master Stylesheet
+ * Domitek E-Commerce (Etap 1 - Issue #30)
+ * Variant A: 1:1 Reproduction of TopMarket.pl dla sklepu Domitek
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&display=swap');
+
+/* ==========================================================================
+   1. Design Variables & Base Reset
+   ========================================================================== */
+:root {
+  --tm-sapphire: #140f9a;
+  --tm-sapphire-hover: #0d0a68;
+  --tm-red: #dc3545;
+  --tm-gold: #f59e0b;
+  --tm-dark: #212529;
+  --tm-gray-dark: #495057;
+  --tm-gray-muted: #6c757d;
+  --tm-gray-light: #f8fafc;
+  --tm-border: #e2e8f0;
+  --tm-white: #ffffff;
+}
+
+html {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: visible !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+}
+
+body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  color: var(--tm-dark);
+  background-color: #ffffff;
+  font-family: 'Karla', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ukrycie domyślnego bloku tekstowego PrestaShop z tekstem Lorem Ipsum */
+#custom-text,
+.block-custom-text {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Wide Modern Containers (Matching TopMarket 1600px Layout)
+   ========================================================================== */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1600px !important;
+    width: 95% !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1600px !important;
+    width: 95% !important;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+  }
+}
+
+/* Pure white page background matching TopMarket */
+#wrapper {
+  background-color: #ffffff !important;
+}
+
+/* Homepage full-bleed wrapper setup */
+#index #wrapper {
+  padding-top: 0 !important;
+}
+
+#index #wrapper>.container {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#index #wrapper>.container>.row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#index #wrapper>.container>.row>#content-wrapper {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#index #content.page-home>section,
+#index #content.page-home>div:not(.topmarket-home-hero-section):not(.topmarket-reassurance) {
+  max-width: 1600px !important;
+  width: 95% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+:focus-visible {
+  outline: 3px solid var(--tm-sapphire) !important;
+  outline-offset: 2px !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   2. Topbar (Hidden on Desktop 1:1 TopMarket, Mobile Nav Container < 768px)
+   ========================================================================== */
+#header {
+  background-color: #f8f8f8 !important;
+}
+
+.topbar-light {
+  background-color: #f8f8f8 !important;
+  border-bottom: 1px solid #e3e3e3;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--tm-gray-muted);
+}
+
+@media (min-width: 768px) {
+  .header-nav.topbar-light {
+    display: none !important;
+  }
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-link {
+  color: #4b5563 !important;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 12px;
+  transition: color 0.15s ease;
+}
+
+.topbar-link:hover {
+  color: var(--tm-sapphire) !important;
+  text-decoration: underline;
+}
+
+.topbar-divider {
+  color: #d1d5db;
+}
+
+.topbar-info-item {
+  color: #4b5563;
+  font-size: 12px;
+}
+
+.topbar-info-item .material-icons {
+  font-size: 14px;
+  margin-right: 4px;
+  vertical-align: middle;
+  color: var(--tm-sapphire);
+}
+
+.topbar-info-item strong {
+  color: #111827;
+}
+
+/* ==========================================================================
+   3. Main Header (Logo | Wyszukiwarka | Konto + Koszyk)
+   ========================================================================== */
+.header-top {
+  background-color: #f8f8f8 !important;
+  padding: 14px 0 0 0 !important;
+  border-bottom: none;
+}
+
+.header-main-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 10px !important;
+}
+
+/* Kolumna Logo */
+.header-col-logo {
+  flex: 0 0 200px !important;
+  max-width: 200px !important;
+  width: 200px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.header-col-logo #_desktop_logo {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.header-col-logo .logo {
+  width: 180px !important;
+  height: 54px !important;
+  max-height: 54px !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* Kolumna Środkowa: Wyszukiwarka */
+.header-col-search {
+  flex: 1 1 auto !important;
+  max-width: 620px !important;
+  margin: 0 auto !important;
+  padding: 0 20px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.topmarket-search-widget {
+  width: 100% !important;
+  max-width: 620px !important;
+  margin: 0 auto !important;
+  float: none !important;
+  overflow: visible !important;
+}
+
+.topmarket-search-input-wrap {
+  position: relative !important;
+  width: 100% !important;
+  height: 45px !important;
+  overflow: visible !important;
+}
+
+.topmarket-search-input {
+  width: 100% !important;
+  height: 45px !important;
+  background: #ffffff !important;
+  border: 1px solid #e3e3e3 !important;
+  border-radius: 0 !important;
+  padding: 0 45px 0 16px !important;
+  font-size: 14px !important;
+  color: #111827 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font-family: 'Karla', sans-serif !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.topmarket-search-input:focus {
+  border-color: var(--tm-sapphire) !important;
+  box-shadow: 0 0 0 2px rgba(20, 15, 154, 0.1) !important;
+}
+
+.topmarket-search-input::placeholder {
+  color: #6b7280 !important;
+  font-size: 14px !important;
+}
+
+.topmarket-search-btn {
+  position: absolute !important;
+  right: 20px !important;
+  top: 35% !important;
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  color: #111827 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.topmarket-search-btn:hover {
+  color: var(--tm-sapphire) !important;
+}
+
+.topmarket-search-btn .material-icons {
+  font-size: 22px !important;
+}
+
+.header-menu-row #search_widget {
+  display: none !important;
+}
+
+/* Kolumna Prawa: Przyciski Akcji */
+.header-col-actions {
+  flex: 0 0 200px !important;
+  max-width: 200px !important;
+  width: 200px !important;
+  margin-left: auto !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 28px !important;
+  float: none !important;
+}
+
+.header-actions-right #_desktop_language_selector,
+.header-actions-right #_desktop_currency_selector {
+  display: none !important;
+}
+
+.header-user-btn-wrapper,
+.header-cart-btn-wrapper {
+  display: inline-flex !important;
+}
+
+.header-action-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  color: #111827 !important;
+  cursor: pointer !important;
+  min-width: 54px !important;
+  transition: color 0.15s ease !important;
+}
+
+.header-action-btn:hover {
+  color: var(--tm-sapphire) !important;
+}
+
+.header-btn-icon {
+  font-size: 28px !important;
+  color: #111827 !important;
+  line-height: 1 !important;
+  margin-bottom: 3px !important;
+  transition: color 0.15s ease !important;
+}
+
+.header-action-btn:hover .header-btn-icon {
+  color: var(--tm-sapphire) !important;
+}
+
+.header-btn-title {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.2px !important;
+  line-height: 1.2 !important;
+}
+
+.header-action-btn:hover .header-btn-title {
+  color: var(--tm-sapphire) !important;
+}
+
+.header-logout-link {
+  font-size: 10px !important;
+  color: #6b7280 !important;
+  text-decoration: none !important;
+  display: block !important;
+  text-align: center !important;
+}
+
+.header-logout-link:hover {
+  color: var(--tm-red) !important;
+  text-decoration: underline !important;
+}
+
+.cart-icon-container {
+  position: relative !important;
+  display: inline-flex !important;
+}
+
+.header-bag-svg {
+  width: 26px !important;
+  height: 26px !important;
+  display: block !important;
+}
+
+.cart-products-count-badge {
+  position: absolute !important;
+  top: -6px !important;
+  right: -9px !important;
+  background-color: #d06e6a !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  border-radius: 9px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 4px !important;
+  line-height: 1 !important;
+}
+
+@media (min-width: 768px) {
+  .blockcart.inactive .cart-products-count-badge {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   4. Pasek Kategorii (TopMarket horizontal menu)
+   ========================================================================== */
+.header-menu-row {
+  border-top: none !important;
+  border-bottom: 1px solid #e3e3e3 !important;
+  background-color: #f8f8f8 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  width: 100% !important;
+}
+
+#_desktop_top_menu {
+  width: 100% !important;
+}
+
+.topmarket-menu-primary,
+#top-menu {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+#top-menu>li {
+  margin: 0 !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+}
+
+#top-menu>li>a {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 12px 14px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  letter-spacing: 0.3px !important;
+  border: none !important;
+  font-family: 'Karla', sans-serif !important;
+  transition: color 0.15s ease !important;
+}
+
+#top-menu>li>a:hover {
+  color: var(--tm-sapphire) !important;
+  background-color: transparent !important;
+}
+
+.menu-dropdown-icon {
+  font-size: 16px !important;
+  margin-left: 3px !important;
+  color: #6b7280 !important;
+}
+
+/* Czerwone PROMOCJE */
+#top-menu>li:first-child>a,
+.menu-item-promocje>a,
+.nav-link-promocje,
+#lnk-promocje>a {
+  color: #d92829 !important;
+  font-weight: 800 !important;
+}
+
+#top-menu>li:first-child>a:hover,
+.menu-item-promocje>a:hover,
+.nav-link-promocje:hover,
+#lnk-promocje>a:hover {
+  color: #d92829 !important;
+  text-decoration: underline !important;
+}
+
+/* Granatowy przycisk BESTSELLERY po prawej z BIAŁYM TEKSTEM */
+#top-menu>li.menu-item-bestsellery,
+#top-menu>li#lnk-bestsellery {
+  margin-left: auto !important;
+}
+
+#top-menu>li.menu-item-bestsellery>a,
+#top-menu>li#lnk-bestsellery>a,
+#top-menu>li>a.nav-link-bestsellery {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  border-radius: 0 !important;
+  padding: 13px 22px !important;
+  height: 45px !important;
+  margin: 0 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+#top-menu>li.menu-item-bestsellery>a *,
+#top-menu>li#lnk-bestsellery>a *,
+#top-menu>li>a.nav-link-bestsellery * {
+  color: #ffffff !important;
+}
+
+#top-menu>li.menu-item-bestsellery>a:hover,
+#top-menu>li#lnk-bestsellery>a:hover,
+#top-menu>li>a.nav-link-bestsellery:hover {
+  background-color: var(--tm-sapphire-hover) !important;
+  color: #ffffff !important;
+}
+
+/* Rozwijane mega-menu desktopowe (1:1 TopMarket 4-kolumnowe, pełna szerokość kontenera) */
+@media (min-width: 768px) {
+  .header-menu-row {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  .header-menu-row > .col-md-12,
+  #_desktop_top_menu,
+  #_desktop_top_menu #top-menu,
+  #_desktop_top_menu #top-menu > li {
+    position: static !important;
+  }
+
+  #_desktop_top_menu #top-menu > li:hover > a:not(.nav-link-bestsellery) {
+    background-color: #ffffff !important;
+    color: var(--tm-sapphire) !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-top: 2px solid var(--tm-sapphire) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12) !important;
+    padding: 24px 28px !important;
+    max-height: 75vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    display: none;
+  }
+
+  #_desktop_top_menu #top-menu > li:hover > .popover.sub-menu,
+  #_desktop_top_menu #top-menu > li:focus-within > .popover.sub-menu {
+    display: block !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul.top-menu[data-depth="1"] {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 22px 28px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="1"] > li {
+    display: block !important;
+    float: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="1"] > li > a {
+    display: block !important;
+    padding: 0 0 8px 0 !important;
+    margin: 0 0 8px 0 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    color: #1f2937 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    white-space: normal !important;
+    line-height: 1.35 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="1"] > li > a:hover {
+    color: var(--tm-sapphire) !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="1"] > li > .collapse {
+    display: block !important;
+    height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul.top-menu[data-depth="2"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="2"] > li {
+    display: block !important;
+    float: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="2"] > li > a {
+    display: block !important;
+    padding: 3px 0 !important;
+    font-size: 12.5px !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
+    color: #4b5563 !important;
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    transition: color 0.15s ease, padding-left 0.15s ease !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="2"] > li > a::before {
+    content: "\203A" !important;
+    margin-right: 6px !important;
+    color: #9ca3af !important;
+    font-weight: 700 !important;
+  }
+
+  #_desktop_top_menu #top-menu .popover.sub-menu ul[data-depth="2"] > li > a:hover {
+    color: var(--tm-sapphire) !important;
+    padding-left: 4px !important;
+    background: transparent !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  #_desktop_top_menu #top-menu .popover.sub-menu ul.top-menu[data-depth="1"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ==========================================================================
+   5. Hero Slider & Baner Promocyjny (100% Edge-to-Edge)
+   ========================================================================== */
+.topmarket-home-hero-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background: #f8fafc;
+}
+
+.topmarket-home-hero-section #carousel,
+.topmarket-home-hero-section .carousel {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  position: relative !important;
+}
+
+.topmarket-home-hero-section .carousel-inner {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+}
+
+.topmarket-home-hero-section .carousel-item {
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+}
+
+.topmarket-home-hero-section .carousel-item a,
+.topmarket-home-hero-section .carousel-item figure,
+.topmarket-home-hero-section .carousel-item picture {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+.topmarket-home-hero-section .carousel-item img {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 540px !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  display: block !important;
+}
+
+/* Slider Controls (Strzałki przyklejone do krawędzi ekranu jak w TopMarket) */
+.topmarket-home-hero-section .carousel .direction .carousel-control {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 44px !important;
+  height: 60px !important;
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0.9 !important;
+  transition: opacity 0.2s ease, background-color 0.2s ease !important;
+  z-index: 10 !important;
+  border: none !important;
+}
+
+.topmarket-home-hero-section .carousel .direction .carousel-control:hover {
+  opacity: 1 !important;
+  background-color: var(--tm-sapphire-hover) !important;
+}
+
+.topmarket-home-hero-section .carousel .direction .carousel-control.left {
+  left: 0 !important;
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.topmarket-home-hero-section .carousel .direction .carousel-control.right {
+  right: 0 !important;
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+.topmarket-home-hero-section .carousel .direction .carousel-control .material-icons {
+  font-size: 32px !important;
+  color: #ffffff !important;
+}
+
+/* Baner promocyjny w stylu TopMarket */
+.topmarket-home-banner-wrapper {
+  margin: 25px 0 35px 0 !important;
+  width: 100% !important;
+}
+
+.topmarket-home-banner-wrapper .topmarket-promo-banner {
+  display: block !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+.topmarket-home-banner-wrapper .banner-promo-img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 200px !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+  display: block !important;
+}
+
+/* ==========================================================================
+   6. Pasek Korzyści (1:1 TopMarket USP Items - 4 kolumny desktop / 2x2 mobile)
+   ========================================================================== */
+.tm-usp-section {
+  background-color: #ffffff !important;
+  padding: 28px 0 22px !important;
+  width: 100% !important;
+}
+
+.tm-usp-bar {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 20px !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.tm-usp-item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+}
+
+.tm-usp-icon {
+  width: 52px !important;
+  height: 52px !important;
+  flex-shrink: 0 !important;
+  object-fit: contain !important;
+}
+
+.tm-usp-text {
+  font-family: 'Karla', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #222222 !important;
+  line-height: 1.3 !important;
+  text-transform: uppercase !important;
+}
+
+.topmarket-reassurance,
+#block-reassurance {
+  background-color: #ffffff !important;
+  border-top: 1px solid #f0f0f0 !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  padding: 24px 0 !important;
+  margin: 0 0 25px 0 !important;
+  width: 100% !important;
+}
+
+.topmarket-reassurance .container {
+  max-width: 1600px !important;
+  width: 95% !important;
+  margin: 0 auto !important;
+}
+
+.usp-items {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 20px !important;
+}
+
+.usp-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex: 0 1 auto !important;
+}
+
+.usp-item img {
+  width: 46px !important;
+  height: 46px !important;
+  object-fit: contain !important;
+  flex-shrink: 0 !important;
+}
+
+.usp-item span {
+  font-family: 'Karla', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #1f2937 !important;
+  letter-spacing: 0.3px !important;
+  line-height: 1.35 !important;
+  max-width: 180px !important;
+}
+
+/* ==========================================================================
+   7. Listing i Karta Produktu (Szafirowa cena #140f9a)
+   ========================================================================== */
+/* Ukrycie kafelków podkategorii nad produktami; drzewko kategorii po lewej pod filtrami zostaje widoczne */
+#subcategories,
+.subcategories-tree,
+.subcategories-list {
+  display: none !important;
+}
+
+#left-column {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#search_filters_wrapper {
+  order: 1 !important;
+}
+
+#left-column .block-categories {
+  order: 2 !important;
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px solid #e5e7eb !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 14px 12px 0 0 !important;
+  margin: 8px 0 0 0 !important;
+}
+
+#left-column .block-categories .category-top-menu > li > a {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  text-transform: none !important;
+  margin-bottom: 10px !important;
+  display: block !important;
+  text-decoration: none !important;
+}
+
+#left-column .block-categories .category-sub-menu {
+  margin-top: 6px !important;
+  padding-left: 0 !important;
+}
+
+#left-column .block-categories .category-sub-menu a {
+  font-size: 13px !important;
+  color: #4b5563 !important;
+  padding: 4px 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease !important;
+}
+
+#left-column .block-categories .category-sub-menu a::before {
+  content: "›" !important;
+  margin-right: 6px !important;
+  color: #6b7280 !important;
+  font-weight: 700 !important;
+}
+
+#left-column .block-categories .category-sub-menu a:hover {
+  color: var(--tm-sapphire) !important;
+}
+
+/* Czysty nagłówek kategorii i pasek sortowania 1:1 TopMarket */
+#js-product-list-header .block-category {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 0 12px 0 !important;
+  min-height: 0 !important;
+}
+
+#js-product-list-header h1 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #333333 !important;
+  margin: 0 0 18px 0 !important;
+  text-transform: none !important;
+}
+
+#js-product-list-top {
+  border-top: 1px solid #e5e7eb !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 10px 0 !important;
+  margin: 0 0 20px 0 !important;
+  align-items: center !important;
+}
+
+.total-products p {
+  font-size: 13px !important;
+  color: #374151 !important;
+  margin: 0 !important;
+}
+
+.products-sort-order .select-title {
+  height: 36px !important;
+  line-height: 34px !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 3px !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Ukrycie niechcianych plakietek z kafelków produktów */
+.product-flags .product-flag.new,
+.product-flags .product-flag.on-sale {
+  display: none !important;
+}
+
+/* Kafelki produktów w katalogu (1:1 TopMarket) */
+.product-miniature {
+  background-color: var(--tm-white) !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  padding: 14px 16px 16px !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  margin-bottom: 24px !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.product-miniature:hover {
+  border-color: var(--tm-sapphire) !important;
+  box-shadow: 0 4px 16px rgba(20, 15, 154, 0.08) !important;
+}
+
+.product-miniature .thumbnail-container {
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+.product-miniature .product-thumbnail {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+  min-height: 210px !important;
+}
+
+.product-miniature .product-thumbnail img {
+  height: 210px !important;
+  max-height: 210px !important;
+  width: 100% !important;
+  object-fit: contain !important;
+}
+
+.product-miniature .product-description {
+  text-align: left !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.product-miniature .product-title {
+  text-align: left !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin: 10px 0 12px 0 !important;
+  min-height: 40px !important;
+}
+
+.product-miniature .product-title a {
+  color: #4b4b4b !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease !important;
+}
+
+.product-miniature .product-title a:hover {
+  color: var(--tm-sapphire) !important;
+}
+
+/* Szafirowa cena w stylu TopMarket */
+.product-miniature .product-price-and-shipping {
+  text-align: left !important;
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin-top: auto !important;
+}
+
+.product-price-and-shipping .price,
+.product-miniature .price,
+.product-miniature .product-price {
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  color: var(--tm-sapphire) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.5px !important;
+}
+
+.product-miniature .price-dec {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  vertical-align: super !important;
+  margin-left: 3px !important;
+  top: -0.45em !important;
+  position: relative !important;
+  color: inherit !important;
+}
+
+.product-price-and-shipping .regular-price {
+  font-size: 0.88rem !important;
+  text-decoration: line-through !important;
+  color: var(--tm-gray-muted) !important;
+}
+
+.product-price-and-shipping .discount-product {
+  background-color: var(--tm-red) !important;
+  color: var(--tm-white) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+}
+
+/* Filtry fasetowe (czysty lewy sidebar bez ciężkiego boxa) */
+#search_filters {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 12px 0 0 !important;
+  margin-bottom: 25px !important;
+  box-shadow: none !important;
+}
+
+#search_filters > p.h6,
+#search_filters .text-uppercase.h6 {
+  text-transform: none !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin-bottom: 16px !important;
+  letter-spacing: 0 !important;
+}
+
+#search_filters .facet {
+  border-top: 1px solid #e5e7eb !important;
+  padding-top: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+#search_filters .facet .facet-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  text-transform: none !important;
+  margin-bottom: 10px !important;
+  letter-spacing: 0 !important;
+}
+
+#search_filters .facet .facet-label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  padding: 3px 0 !important;
+  color: #374151 !important;
+  font-size: 13px !important;
+}
+
+#search_filters .facet .custom-checkbox {
+  margin-right: 8px !important;
+  top: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+#search_filters .facet .facet-label a {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  text-decoration: none !important;
+}
+
+#search_filters .facet .facet-label a,
+#search_filters .facet p {
+  color: #374151 !important;
+  font-size: 13px !important;
+}
+
+#search_filters .facet .magnitude {
+  color: #595959 !important;
+  font-size: 12px !important;
+  margin-left: auto !important;
+}
+
+#search_filters .facet .facet-dropdown,
+#search_filters .facet .select-title {
+  width: 100% !important;
+  height: 38px !important;
+  line-height: 36px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 3px !important;
+  background: #ffffff !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  color: #111827 !important;
+}
+
+#search_filters .ui-slider-horizontal {
+  height: 4px !important;
+  background: #d1d5db !important;
+  border: none !important;
+  border-radius: 2px !important;
+  margin: 14px 8px !important;
+}
+
+#search_filters .ui-slider-horizontal .ui-slider-range {
+  background: #9ca3af !important;
+}
+
+#search_filters .ui-slider-horizontal .ui-slider-handle {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 3px solid #9ca3af !important;
+  top: -6px !important;
+  cursor: pointer !important;
+}
+
+/* ==========================================================================
+   8. Stopka (Czarna stopka + biały dolny pasek 1:1 z TopMarket dla Domitek)
+   ========================================================================== */
+.topmarket-footer,
+#footer.page-footer,
+footer#footer {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  padding: 0 !important;
+  margin-top: 45px !important;
+  border: none !important;
+}
+
+#footer-container-main {
+  background-color: #000000 !important;
+  padding: 36px 0 32px 0 !important;
+}
+
+.footer-main-row {
+  display: grid !important;
+  grid-template-columns: 1.1fr 0.9fr 1.2fr 1.2fr 1.1fr 0.7fr !important;
+  gap: 24px !important;
+  align-items: start !important;
+}
+
+@media (max-width: 991px) {
+  .footer-main-row {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+.footer-heading {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  margin: 0 0 14px 0 !important;
+}
+
+.footer-contact-text-link {
+  color: #cbd5e1 !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+}
+
+.footer-contact-text-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+.footer-social-icons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.footer-social-link {
+  color: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0.85 !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.footer-social-link:hover {
+  opacity: 1 !important;
+  color: #ffffff !important;
+}
+
+.footer-links-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.footer-links-list li {
+  margin-bottom: 8px !important;
+}
+
+.footer-links-list a {
+  color: #cbd5e1 !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  transition: color 0.15s ease !important;
+}
+
+.footer-links-list a:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+.footer-links-list .chevron {
+  color: #94a3b8 !important;
+  font-weight: bold !important;
+  margin-right: 4px !important;
+}
+
+.footer-contact-content {
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+}
+
+.footer-brand-title {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  margin-bottom: 6px !important;
+}
+
+.footer-hr {
+  border-top: 1px solid #262626 !important;
+  margin: 8px 0 !important;
+}
+
+.footer-contact-part {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  color: #cbd5e1 !important;
+}
+
+.footer-contact-part .contact-icon {
+  font-size: 16px !important;
+  color: #ffffff !important;
+  margin-top: 2px !important;
+}
+
+.footer-contact-part .phone-link,
+.footer-contact-part .email-link {
+  color: #ffffff !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+}
+
+.footer-contact-part .work-hours {
+  display: block !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+}
+
+.btn-contact-form {
+  display: inline-block !important;
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  padding: 6px 14px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.btn-contact-form:hover {
+  background-color: #334155 !important;
+}
+
+.footer-badge-wrap {
+  margin-bottom: 12px !important;
+}
+
+.footer-payments-img,
+.footer-delivery-img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  border-radius: 3px !important;
+}
+
+/* Dolny biały pasek praw autorskich */
+#footer-copyrights {
+  background-color: #ffffff !important;
+  color: #374151 !important;
+  padding: 18px 0 !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+.copyright-text {
+  font-size: 13px !important;
+  color: #374151 !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+
+.footer-copyright-right-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 14px !important;
+}
+
+.footer-brand-logo-img {
+  height: 34px !important;
+  width: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.btn-back-to-top {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 3px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.btn-back-to-top:hover {
+  background-color: var(--tm-sapphire) !important;
+}
+
+.btn-back-to-top .material-icons {
+  font-size: 18px !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   9. Mobile Responsiveness (360 px Viewport)
+   ========================================================================== */
+@media (max-width: 767px) {
+
+  .hidden-sm-down,
+  .header-main-row,
+  .header-menu-row,
+  .header-col-actions,
+  .topbar-left,
+  .topbar-right {
+    display: none !important;
+  }
+
+  .header-top {
+    padding: 0 !important;
+    background-color: #f8f8f8 !important;
+  }
+
+  .header-nav.topbar-light {
+    display: block !important;
+    background-color: #f8f8f8 !important;
+    border-bottom: 1px solid #e3e3e3 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 56px !important;
+  }
+
+  .mobile-header-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    height: 56px !important;
+    padding: 0 15px !important;
+  }
+
+  #_mobile_logo {
+    display: flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+  }
+
+  #_mobile_logo img,
+  .top-logo img {
+    max-height: 36px !important;
+    width: auto !important;
+    display: block !important;
+  }
+
+  .mobile-actions-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-left: auto !important;
+    float: none !important;
+  }
+
+  .mobile-icon-btn {
+    background: transparent !important;
+    border: none !important;
+    color: #111827 !important;
+    width: 40px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+  }
+
+  .mobile-icon-btn .material-icons {
+    font-size: 26px !important;
+    line-height: 1 !important;
+    color: #111827 !important;
+  }
+
+  #_mobile_cart,
+  #_mobile_cart .blockcart,
+  #_mobile_cart .header,
+  #_mobile_user_info,
+  #_mobile_user_info .user-info {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    float: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .mobile-header-row .header-btn-title,
+  #_mobile_user_info .header-btn-title,
+  #_mobile_cart .header-btn-title {
+    display: none !important;
+  }
+
+  .mobile-header-row .header-action-btn {
+    min-width: 38px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    flex-direction: row !important;
+  }
+
+  .mobile-header-row .header-btn-icon {
+    font-size: 26px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .mobile-header-row .header-bag-svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .mobile-search-panel {
+    background: #f8f8f8 !important;
+    padding: 8px 0 12px !important;
+    border-top: 1px solid #e3e3e3 !important;
+  }
+
+  .topmarket-search-widget {
+    margin: 0 !important;
+  }
+
+  #menu-icon {
+    width: 44px !important;
+    height: 48px !important;
+  }
+
+  #menu-icon[aria-expanded="true"] {
+    width: 44px !important;
+    height: 48px !important;
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-radius: 0 !important;
+    outline: none !important;
+  }
+
+  #menu-icon[aria-expanded="true"] .material-icons {
+    color: #ffffff !important;
+  }
+
+  #mobile_top_menu_wrapper {
+    background-color: #000000 !important;
+    padding: 8px 0 16px !important;
+    border: none !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  #mobile_top_menu_wrapper:not(.is-open) {
+    display: none !important;
+  }
+
+  #mobile_top_menu_wrapper.is-open {
+    display: block !important;
+  }
+
+  #mobile_top_menu_wrapper .js-top-menu-bottom {
+    display: none !important;
+  }
+
+  #mobile_top_menu_wrapper #top-menu,
+  #mobile_top_menu_wrapper .top-menu {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #000000 !important;
+  }
+
+  #mobile_top_menu_wrapper #top-menu > li,
+  #mobile_top_menu_wrapper #top-menu > li.menu-item-bestsellery,
+  #mobile_top_menu_wrapper #top-menu > li#lnk-bestsellery {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  #mobile_top_menu_wrapper #top-menu > li > a,
+  #mobile_top_menu_wrapper #top-menu > li:first-child > a,
+  #mobile_top_menu_wrapper #top-menu > li.menu-item-promocje > a,
+  #mobile_top_menu_wrapper #top-menu > li > a.nav-link-promocje,
+  #mobile_top_menu_wrapper #top-menu > li#lnk-promocje > a,
+  #mobile_top_menu_wrapper #top-menu > li.menu-item-bestsellery > a,
+  #mobile_top_menu_wrapper #top-menu > li#lnk-bestsellery > a,
+  #mobile_top_menu_wrapper #top-menu > li > a.nav-link-bestsellery {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding: 14px 20px !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    letter-spacing: 0 !important;
+    text-decoration: none !important;
+  }
+
+  #mobile_top_menu_wrapper #top-menu > li > a:hover,
+  #mobile_top_menu_wrapper #top-menu > li.menu-item-promocje > a:hover,
+  #mobile_top_menu_wrapper #top-menu > li.menu-item-bestsellery > a:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+  }
+
+  #mobile_top_menu_wrapper .collapse-icons {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 4px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+
+  #mobile_top_menu_wrapper .collapse-icons .material-icons {
+    color: #ffffff !important;
+    font-size: 22px !important;
+  }
+
+  #mobile_top_menu_wrapper .collapse-icons .remove {
+    display: none !important;
+  }
+
+  #mobile_top_menu_wrapper .collapse-icons[aria-expanded="true"] .add {
+    display: none !important;
+  }
+
+  #mobile_top_menu_wrapper .collapse-icons[aria-expanded="true"] .remove {
+    display: inline-block !important;
+  }
+
+  #mobile_top_menu_wrapper #top-menu > li:hover > .popover.sub-menu {
+    display: none !important;
+  }
+
+  #mobile_top_menu_wrapper #top-menu > li > .popover.sub-menu {
+    position: static !important;
+    background: #141414 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px 0 8px 16px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  #mobile_top_menu_wrapper #top-menu > li > .popover.sub-menu.in,
+  #mobile_top_menu_wrapper #top-menu > li > .popover.sub-menu.show {
+    display: block !important;
+  }
+
+  #mobile_top_menu_wrapper .popover.sub-menu a {
+    color: #e5e7eb !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    padding: 10px 16px !important;
+    display: block !important;
+    text-decoration: none !important;
+  }
+
+  .topmarket-home-hero-section .carousel .direction .carousel-control {
+    display: none !important;
+  }
+
+  .tm-usp-section {
+    background-color: #f8f9fa !important;
+    padding: 16px 0 !important;
+  }
+
+  .tm-usp-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .tm-usp-item {
+    flex-direction: column !important;
+    text-align: center !important;
+    background-color: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 18px 10px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+    gap: 10px !important;
+  }
+
+  .tm-usp-icon {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .tm-usp-text {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  .tm-banner-overlay {
+    left: 14px !important;
+    gap: 2px !important;
+  }
+
+  .tm-banner-subtitle {
+    font-size: 12px !important;
+  }
+
+  .tm-banner-title {
+    font-size: 15px !important;
+  }
+
+  .tm-banner-cta {
+    margin-top: 4px !important;
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+
+  .topmarket-promo-card-banner.banner-orange img,
+  .topmarket-promo-card-banner.banner-yellow img,
+  .topmarket-promo-card-banner.banner-czystosc img {
+    min-height: 124px !important;
+    object-fit: cover !important;
+    object-position: right center !important;
+  }
+
+  .tm-tools-showcase-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .topmarket-brands-carousel {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .usp-items {
+    flex-direction: column;
+    align-items: flex-start !important;
+    padding-left: 20px;
+    gap: 14px;
+  }
+
+  .footer-copyright-right-wrap {
+    justify-content: flex-start !important;
+    margin-top: 10px;
+  }
+
+  #search_filter_toggler {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 2px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .products-sort-order .select-title {
+    height: 40px !important;
+    line-height: 38px !important;
+  }
+
+  #js-product-list .products.row,
+  .featured-products .products.row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-left: -5px !important;
+    margin-right: -5px !important;
+  }
+
+  #js-product-list .products.row > .js-product,
+  .featured-products .products.row > .js-product {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+    width: 50% !important;
+    padding: 0 5px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .product-miniature {
+    width: 100% !important;
+    margin: 0 !important;
+    height: 100% !important;
+    padding: 10px 10px 12px !important;
+    border-radius: 8px !important;
+  }
+
+  .product-miniature .product-thumbnail {
+    min-height: 120px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .product-miniature .product-thumbnail img {
+    height: 120px !important;
+    max-height: 120px !important;
+  }
+
+  .product-miniature .product-title {
+    font-size: 12px !important;
+    min-height: 34px !important;
+    margin: 6px 0 8px !important;
+  }
+
+  .product-miniature .product-price,
+  .product-miniature .price {
+    font-size: 24px !important;
+  }
+
+  .product-miniature .price-dec {
+    font-size: 11px !important;
+  }
+
+  .tm-card-badges {
+    top: 4px !important;
+    left: 4px !important;
+  }
+
+  .topmarket-badge-shipping,
+  .topmarket-badge-promo,
+  .topmarket-badge-out-of-stock {
+    font-size: 8.5px !important;
+    padding: 2px 7px !important;
+  }
+
+  #left-column .block-categories {
+    display: none !important;
+  }
+
+  #search_filters_wrapper:not(.hidden-sm-down) {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: 88vw !important;
+    max-width: 330px !important;
+    height: 100vh !important;
+    background: #ffffff !important;
+    z-index: 10000 !important;
+    overflow-y: auto !important;
+    padding: 0 0 76px 0 !important;
+    margin: 0 !important;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35), 0 0 0 100vw rgba(0, 0, 0, 0.45) !important;
+  }
+
+  #search_filters_wrapper:not(.hidden-sm-down) #search_filters {
+    padding: 12px 16px !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+  }
+
+  #search_filters_wrapper:not(.hidden-sm-down) #search_filter_controls {
+    position: fixed !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 88vw !important;
+    max-width: 330px !important;
+    background: #f8f9fa !important;
+    border-top: 1px solid #e5e7eb !important;
+    padding: 12px 16px !important;
+    z-index: 10001 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+
+  #search_filters_wrapper:not(.hidden-sm-down) #search_filter_controls .ok {
+    flex: 1 1 auto !important;
+    background-color: #140f9a !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 3px !important;
+    height: 42px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+  }
+
+  .footer-main-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px 14px !important;
+  }
+
+  .topmarket-wishlist-icon {
+    width: 26px !important;
+    height: 26px !important;
+    top: 26px !important;
+    right: 4px !important;
+  }
+
+  .topmarket-wishlist-icon .material-icons {
+    font-size: 15px !important;
+  }
+
+  .topmarket-card-btn-container {
+    justify-content: stretch !important;
+  }
+
+  .btn-topmarket-cart,
+  .btn-topmarket-view {
+    width: 100% !important;
+    min-width: 0 !important;
+    border-radius: 20px !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+    min-height: 36px !important;
+  }
+}
+
+/* ==========================================================================
+   10. TopMarket Homepage Components (1:1 from Official PDF)
+   ========================================================================== */
+.section-title-divider {
+  display: flex !important;
+  align-items: center !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  color: #111827 !important;
+  letter-spacing: 0.6px !important;
+  margin: 35px 0 20px 0 !important;
+}
+
+.section-title-divider span {
+  padding-right: 18px !important;
+}
+
+.section-title-divider::after {
+  content: "" !important;
+  flex: 1 !important;
+  height: 1px !important;
+  background: #e5e7eb !important;
+}
+
+/* Kafelki banerów promocyjnych */
+.topmarket-home-promo-banner-wrap {
+  width: 100% !important;
+  margin: 24px 0 !important;
+}
+
+.topmarket-promo-card-banner {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.tm-banner-overlay {
+  position: absolute !important;
+  left: 32px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  color: #ffffff !important;
+  pointer-events: none !important;
+}
+
+.tm-banner-subtitle {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  line-height: 1.2 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+}
+
+.tm-banner-title {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  line-height: 1.15 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18) !important;
+}
+
+.tm-banner-cta {
+  margin-top: 8px !important;
+  background-color: #ffffff !important;
+  color: #140f9a !important;
+  border: 1px solid #140f9a !important;
+  border-radius: 6px !important;
+  padding: 7px 16px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.tm-banner-overlay-dark .tm-banner-subtitle,
+.tm-banner-overlay-dark .tm-banner-title {
+  color: #111827 !important;
+  text-shadow: none !important;
+}
+
+.tm-banner-cta-dark {
+  margin-top: 8px !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 7px 18px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Sekcja Narzędzia: pionowy portret po lewej + 3 produkty po prawej */
+.tm-tools-showcase-section {
+  width: 100% !important;
+  margin: 28px 0 !important;
+}
+
+.tm-tools-showcase-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 20px !important;
+  align-items: stretch !important;
+}
+
+.tm-tools-showcase-grid .product-miniature {
+  margin-bottom: 0 !important;
+  height: 100% !important;
+}
+
+.tm-tools-portrait-card {
+  position: relative !important;
+  display: block !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  height: 100% !important;
+  min-height: 360px !important;
+  background: #0c1f17 !important;
+  text-decoration: none !important;
+}
+
+.tm-tools-portrait-card img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.tm-tools-portrait-overlay {
+  position: absolute !important;
+  left: 20px !important;
+  bottom: 20px !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+}
+
+.tm-tools-portrait-cta {
+  margin-top: 8px !important;
+  background-color: #ffffff !important;
+  color: #140f9a !important;
+  border: 1px solid #140f9a !important;
+  border-radius: 6px !important;
+  padding: 7px 16px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.topmarket-promo-card-banner:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+.topmarket-promo-card-banner img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 180px !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* Siatka TOP KATEGORIE */
+.top-categories-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 16px !important;
+  margin-bottom: 25px !important;
+}
+
+.top-cat-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-decoration: none !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  padding: 16px 8px !important;
+  text-align: center !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
+}
+
+.top-cat-card:hover {
+  border-color: var(--tm-sapphire) !important;
+  box-shadow: 0 4px 14px rgba(20, 15, 154, 0.08) !important;
+  transform: translateY(-2px) !important;
+}
+
+.top-cat-img-box {
+  width: 100px !important;
+  height: 100px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 12px !important;
+}
+
+.top-cat-img-box img {
+  max-width: 90px !important;
+  max-height: 90px !important;
+  object-fit: contain !important;
+}
+
+.top-cat-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #111827 !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0.2px !important;
+}
+
+@media (max-width: 991px) {
+  .top-categories-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .top-categories-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Granatowy pasek promocyjny Odbierz 20 zł */
+.topmarket-blue-promo-strip {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  padding: 24px 0 !important;
+  margin: 35px 0 25px 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.blue-strip-text {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+}
+
+/* Karuzela marek (Logotypy z linkami do filtrowania po marce) */
+.topmarket-brands-carousel {
+  display: grid !important;
+  grid-template-columns: repeat(8, 1fr) !important;
+  gap: 14px !important;
+  padding: 10px 0 !important;
+  align-items: stretch !important;
+}
+
+@media (max-width: 1199px) {
+  .topmarket-brands-carousel {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  .tm-tools-showcase-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+.brand-logo-card {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px 10px !important;
+  min-height: 76px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  text-decoration: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.brand-logo-card img {
+  max-width: 100% !important;
+  max-height: 52px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.brand-logo-card:hover {
+  border-color: var(--tm-sapphire) !important;
+  box-shadow: 0 4px 12px rgba(20, 15, 154, 0.08) !important;
+}
+
+/* Notka o dostawie */
+.topmarket-disclaimer-wrapper {
+  margin: 20px 0 35px 0 !important;
+}
+
+.topmarket-disclaimer-text {
+  font-size: 12px !important;
+  color: #6b7280 !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Stylowanie kafelków produktów (1:1 z PDF TopMarket) */
+.product-miniature .thumbnail-top {
+  position: relative !important;
+}
+
+.topmarket-wishlist-icon {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  z-index: 5 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  transition: color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.topmarket-wishlist-icon:hover {
+  color: var(--tm-red) !important;
+  border-color: var(--tm-red) !important;
+}
+
+.topmarket-wishlist-icon .material-icons {
+  font-size: 18px !important;
+}
+
+.tm-card-badges {
+  position: absolute !important;
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 4 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 5px !important;
+}
+
+.topmarket-badge-shipping {
+  background-color: #9bbd3c !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 4px 12px !important;
+  border-radius: 14px !important;
+  letter-spacing: 0.3px !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+}
+
+.topmarket-badge-promo {
+  background-color: #d92829 !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 4px 12px !important;
+  border-radius: 14px !important;
+  letter-spacing: 0.3px !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+}
+
+.topmarket-badge-out-of-stock {
+  background-color: #9ca3af !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 4px 10px !important;
+  border-radius: 14px !important;
+  letter-spacing: 0.3px !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+}
+
+/* Ukrycie szybkiego podglądu i dublujących przycisków wishlist z modułu */
+.product-miniature .highlighted-informations,
+.product-miniature .quick-view,
+.product-miniature .wishlist-button-add {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .product-miniature .topmarket-wishlist-icon,
+  .product-miniature .topmarket-card-btn-container {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.15s ease, visibility 0.15s ease !important;
+  }
+
+  .product-miniature:hover .topmarket-wishlist-icon,
+  .product-miniature:focus-within .topmarket-wishlist-icon,
+  .product-miniature:hover .topmarket-card-btn-container,
+  .product-miniature:focus-within .topmarket-card-btn-container {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .product-miniature:hover .topmarket-wishlist-icon {
+    color: var(--tm-sapphire) !important;
+    border-color: #e5e7eb !important;
+  }
+}
+
+.topmarket-omnibus-note {
+  font-size: 11px !important;
+  color: #6b7280 !important;
+  margin: 3px 0 10px 0 !important;
+  line-height: 1.2 !important;
+}
+
+.topmarket-card-btn-container {
+  margin-top: 10px !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+.btn-topmarket-cart {
+  width: auto !important;
+  min-width: 130px !important;
+  background-color: #ffffff !important;
+  color: var(--tm-sapphire) !important;
+  border: 1px solid var(--tm-sapphire) !important;
+  border-radius: 10px !important;
+  padding: 7px 16px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.btn-topmarket-cart:hover {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+}
+
+.btn-topmarket-cart .material-icons {
+  font-size: 18px !important;
+}
+
+.btn-topmarket-view {
+  width: auto !important;
+  min-width: 130px !important;
+  background-color: #ffffff !important;
+  color: var(--tm-sapphire) !important;
+  border: 1px solid var(--tm-sapphire) !important;
+  border-radius: 10px !important;
+  padding: 7px 16px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.btn-topmarket-view:hover {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+}
+
+.btn-topmarket-view .material-icons {
+  font-size: 18px !important;
+}
+
+/* ==========================================================================
+   11. Product Page (Karta Produktu 1:1 TopMarket.pl)
+   ========================================================================== */
+
+/* Ukrycie zbędnych elementów z Classic */
+.header-menu-row .search-widget,
+.header-menu-row #search_widget {
+  display: none !important;
+}
+
+.breadcrumb,
+#product .breadcrumb {
+  background: transparent !important;
+  padding: 12px 0 16px 0 !important;
+  margin: 0 !important;
+  font-size: 12px !important;
+  color: #374151 !important;
+}
+
+.breadcrumb a,
+.breadcrumb a span,
+.breadcrumb span,
+#product .breadcrumb a,
+#product .breadcrumb a span,
+#product .breadcrumb span {
+  color: #374151 !important;
+  text-decoration: none !important;
+}
+
+.breadcrumb a:hover,
+#product .breadcrumb a:hover {
+  color: var(--tm-sapphire) !important;
+  text-decoration: underline !important;
+}
+
+.all-product-link {
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+}
+
+/* Faceted search contrast enhancements */
+#search_filters .facet .facet-title {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+#search_filters .facet .custom-checkbox label,
+#search_filters .facet label,
+.facet-label {
+  color: #374151 !important;
+}
+
+#search_filters .facet .facet-label a,
+#search_filters .facet .magnitude {
+  color: #4b5563 !important;
+}
+
+.total-products p,
+.col-lg-5>p {
+  color: #374151 !important;
+}
+
+/* Ukrycie dublujących się flag w kafelkach produktów */
+.product-miniature .product-flags {
+  display: none !important;
+}
+
+#product .product-flags {
+  display: none !important;
+}
+
+#product .blockreassurance_product,
+#product .product-actions .product-quantity,
+#product .product-actions .product-additional-info,
+#product .product-actions .product-features,
+#product .product-actions .social-sharing,
+#product .product-actions .block-reassurance,
+#product .product-actions #block-reassurance,
+#product .product-actions .wishlist-button,
+#product .product-information>.wishlist-button,
+#product #block-reassurance {
+  display: none !important;
+}
+
+/* Ukrycie zbędnej drugiej wyszukiwarki na desktopie */
+.header-top>.container>#search_widget,
+.header-menu-row #search_widget,
+#header .search-widget:not(.topmarket-search-widget) {
+  display: none !important;
+}
+
+/* Układ galerii: miniaturki po lewej, duże foto po prawej */
+.images-container {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 16px !important;
+}
+
+.images-container .product-cover {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 8px !important;
+  background: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 400px !important;
+}
+
+.pdp-shipping-badge {
+  position: absolute !important;
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 5 !important;
+}
+
+.images-container .product-cover img {
+  max-height: 380px !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+/* Strzałki nawigacji na zdjęciu głównym */
+.topmarket-cover-arrow {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 32px !important;
+  height: 48px !important;
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 5 !important;
+  opacity: 0.9 !important;
+  transition: opacity 0.15s ease, background-color 0.15s ease !important;
+}
+
+.topmarket-cover-arrow:hover {
+  opacity: 1 !important;
+  background-color: var(--tm-sapphire-hover) !important;
+}
+
+.topmarket-cover-arrow.cover-prev {
+  left: 8px !important;
+}
+
+.topmarket-cover-arrow.cover-next {
+  right: 8px !important;
+}
+
+.topmarket-cover-arrow .material-icons {
+  font-size: 24px !important;
+  color: #ffffff !important;
+}
+
+/* Lupa w prawym dolnym rogu */
+.topmarket-zoom-icon-box {
+  position: absolute !important;
+  bottom: 12px !important;
+  right: 12px !important;
+  width: 32px !important;
+  height: 32px !important;
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  border-radius: 3px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 5 !important;
+}
+
+.topmarket-zoom-icon-box .material-icons {
+  font-size: 18px !important;
+  color: #ffffff !important;
+}
+
+/* Pionowa lista miniaturek po lewej */
+.images-container .mask {
+  flex: 0 0 80px !important;
+  width: 80px !important;
+  margin: 0 !important;
+  padding: 2px !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.images-container .product-images {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
+}
+
+.images-container .thumb-container {
+  width: 72px !important;
+  height: 72px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #ffffff !important;
+  cursor: pointer !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.images-container .thumb-container picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.images-container .thumb-container img.thumb,
+.images-container .thumb-container img.thumb.selected,
+.images-container .thumb-container img.thumb:hover {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.images-container .thumb-container.is-active,
+.images-container .thumb-container:has(.thumb.selected),
+.images-container .thumb-container:hover {
+  border: 2px solid var(--tm-sapphire) !important;
+  box-shadow: none !important;
+}
+
+/* Prawy blok zakupowy */
+.topmarket-product-title {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  line-height: 1.35 !important;
+  margin: 0 0 16px 0 !important;
+}
+
+.topmarket-product-reassurance-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin-bottom: 20px !important;
+}
+
+.topmarket-reassurance-item {
+  display: flex !important;
+  align-items: center !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  gap: 8px !important;
+}
+
+.topmarket-reassurance-item .material-icons {
+  font-size: 16px !important;
+}
+
+.topmarket-reassurance-item.in-stock .material-icons {
+  color: #16a34a !important;
+}
+
+.topmarket-reassurance-item.out-of-stock .material-icons {
+  color: #dc3545 !important;
+}
+
+.topmarket-reassurance-item.free-shipping .material-icons,
+.topmarket-reassurance-item.installments .material-icons {
+  color: var(--tm-sapphire) !important;
+}
+
+/* Główna cena produktu */
+.topmarket-product-price-block {
+  margin-bottom: 22px !important;
+}
+
+.topmarket-main-price {
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  color: #111827 !important;
+  line-height: 1.1 !important;
+}
+
+.topmarket-regular-price {
+  font-size: 14px !important;
+  color: #9ca3af !important;
+  text-decoration: line-through !important;
+  margin-top: 4px !important;
+}
+
+.topmarket-omnibus-price {
+  font-size: 11px !important;
+  color: #6b7280 !important;
+  margin-top: 2px !important;
+}
+
+/* Wiersz dodawania do koszyka: selektor ilości + przycisk + serduszko */
+.topmarket-add-to-cart-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 20px !important;
+}
+
+.topmarket-qty-stepper {
+  display: inline-flex !important;
+  align-items: center !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0 !important;
+  height: 55px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.topmarket-qty-stepper .input-group-btn-vertical,
+#product .bootstrap-touchspin .input-group-btn-vertical {
+  display: none !important;
+}
+
+.topmarket-qty-stepper .qty-btn {
+  width: 38px !important;
+  height: 53px !important;
+  background: none !important;
+  border: none !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #4b5563 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.topmarket-qty-stepper .qty-btn:hover {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.topmarket-qty-input,
+input[type="number"]#quantity_wanted,
+input[type="number"].topmarket-qty-input,
+input[type="number"].sticky-qty-input {
+  width: 44px !important;
+  height: 53px !important;
+  border: none !important;
+  text-align: center !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+.topmarket-qty-input::-webkit-outer-spin-button,
+.topmarket-qty-input::-webkit-inner-spin-button,
+input[type="number"]#quantity_wanted::-webkit-outer-spin-button,
+input[type="number"]#quantity_wanted::-webkit-inner-spin-button,
+input[type="number"].topmarket-qty-input::-webkit-outer-spin-button,
+input[type="number"].topmarket-qty-input::-webkit-inner-spin-button,
+input[type="number"].sticky-qty-input::-webkit-outer-spin-button,
+input[type="number"].sticky-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+.topmarket-btn-add-cart {
+  flex: 1 1 auto !important;
+  height: 55px !important;
+  background-color: #131a9a !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.topmarket-btn-add-cart:hover {
+  background-color: var(--tm-sapphire-hover) !important;
+  color: #ffffff !important;
+}
+
+.topmarket-btn-add-cart .material-icons {
+  font-size: 20px !important;
+  color: #ffffff !important;
+}
+
+/* Ukrycie zbędnych duplikatów przycisku listy życzeń i starych bloków PrestaShop */
+#add-to-cart-or-refresh .wishlist-button-add,
+.topmarket-paypo-banner+.wishlist-button-add,
+#add-to-cart-or-refresh .blockwishlist-button,
+.product-actions .wishlist-button-add,
+.product-actions .btn-wishlist {
+  display: none !important;
+}
+
+.topmarket-btn-wishlist {
+  width: 55px !important;
+  height: 55px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #4b5563 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  transition: color 0.15s ease !important;
+}
+
+.topmarket-btn-wishlist:hover {
+  border-color: var(--tm-red) !important;
+  color: var(--tm-red) !important;
+}
+
+.topmarket-btn-wishlist .material-icons {
+  font-size: 22px !important;
+}
+
+/* Baner PayPo */
+.topmarket-paypo-banner {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 12px 16px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  margin-top: 15px !important;
+}
+
+.paypo-logo {
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  color: #0f172a !important;
+}
+
+.paypo-divider {
+  color: #d1d5db !important;
+}
+
+.paypo-text {
+  color: #4b5563 !important;
+}
+
+.paypo-link {
+  margin-left: auto !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  color: #111827 !important;
+  text-decoration: underline !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Zakładki Opis / Szczegóły produktu */
+.tabs,
+.product-tabs {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-top: 28px !important;
+}
+
+.tabs .nav-tabs,
+.product-tabs .nav-tabs {
+  border-bottom: 1px solid #e5e7eb !important;
+  display: flex !important;
+  gap: 28px !important;
+  margin-bottom: 18px !important;
+}
+
+.tabs .nav-tabs .nav-link,
+.product-tabs .nav-tabs .nav-link,
+.nav-tabs .nav-link,
+a[href$="#product-details"] {
+  border: none !important;
+  border-bottom: 3px solid transparent !important;
+  background: transparent !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #6b7280 !important;
+  padding: 10px 0 !important;
+  position: relative !important;
+}
+
+.sort-by,
+.facet-label,
+#search_filters .facet label,
+.custom-checkbox span {
+  color: #1f2937 !important;
+}
+
+.tabs .nav-tabs .nav-link.active,
+.product-tabs .nav-tabs .nav-link.active,
+.nav-tabs .nav-link.active,
+.js-product-nav-active {
+  color: #111827 !important;
+  border-bottom: 3px solid #ca5058 !important;
+}
+
+.tabs .nav-tabs .nav-link.active::after,
+.product-tabs .nav-tabs .nav-link.active::after {
+  display: none !important;
+}
+
+/* ==========================================================================
+   12. Koszyk (1:1 TopMarket /pl/koszyk)
+   ========================================================================== */
+#cart .card.cart-container,
+#cart .cart-grid-body .card {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+#cart .cart-grid-body .card-block {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#cart .cart-grid-body .card-block h1 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #333333 !important;
+  text-transform: none !important;
+  margin-bottom: 18px !important;
+}
+
+#cart .cart-container hr {
+  border-top: 1px solid #eeeeee !important;
+  margin: 12px 0 !important;
+}
+
+#cart .cart-overview .no-items {
+  display: block !important;
+  background-color: #fff3e6 !important;
+  color: #8a4b08 !important;
+  padding: 14px 18px !important;
+  border-radius: 2px !important;
+  font-size: 14px !important;
+  margin: 12px 0 18px 0 !important;
+}
+
+#cart .cart-item {
+  padding: 18px 0 !important;
+  border-top: 1px solid #eeeeee !important;
+}
+
+#cart .cart-item:last-child {
+  border-bottom: 1px solid #eeeeee !important;
+}
+
+#cart .product-line-info a.label {
+  display: inline !important;
+  background-color: transparent !important;
+  color: #4b5563 !important;
+  padding: 0 !important;
+  margin: 0 0 6px 0 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  text-decoration: none !important;
+  border-radius: 0 !important;
+}
+
+#cart .product-line-info a.label:hover {
+  color: var(--tm-sapphire) !important;
+  text-decoration: underline !important;
+}
+
+#cart .product-line-info .current-price,
+#cart .product-line-info .current-price .price,
+#cart .product-line-info .price {
+  color: #374151 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+#cart .product-line-grid-right .product-price strong {
+  color: #ca5058 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+#cart .js-cart-line-product-quantity {
+  border: 1px solid #d1d5db !important;
+  height: 38px !important;
+  text-align: center !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+}
+
+#cart .cart-grid-body > a.label {
+  display: inline-flex !important;
+  align-items: center !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  padding: 10px 18px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  border-radius: 2px !important;
+  margin-top: 16px !important;
+}
+
+#cart .cart-grid-body > a.label:hover {
+  background-color: #222222 !important;
+  color: #ffffff !important;
+}
+
+#cart .cart-grid-right .card.cart-summary {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 2px !important;
+  background-color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+#cart .cart-grid-right .cart-summary .card-block {
+  padding: 18px 20px !important;
+}
+
+#cart .cart-summary-line {
+  font-size: 14px !important;
+  color: #374151 !important;
+  margin-bottom: 8px !important;
+}
+
+#cart .cart-summary-line.cart-total {
+  padding-top: 10px !important;
+  border-top: 1px solid #eeeeee !important;
+  margin-top: 8px !important;
+}
+
+#cart .cart-summary-line.cart-total .label,
+#cart .cart-summary-line.cart-total .value {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+#cart .checkout .btn-primary {
+  display: block !important;
+  width: 100% !important;
+  background-color: #131a9a !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 2px !important;
+  font-weight: 700 !important;
+  padding: 12px 20px !important;
+  opacity: 1 !important;
+}
+
+#cart .checkout .btn-primary.disabled,
+#cart .checkout .btn-primary:disabled {
+  background-color: #767676 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+#cart .blockreassurance_product,
+#cart #block-reassurance,
+#cart .block-reassurance {
+  display: none !important;
+}
+
+/* Opis produktu (czytelne formatowanie + specyfikacja i FAQ) */
+#description .product-description {
+  padding: 24px 0 !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  color: #374151 !important;
+}
+
+#description .product-description img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 4px !important;
+  margin: 15px 0 !important;
+}
+
+.tm-desc-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  max-width: 960px !important;
+}
+
+.tm-desc-lead {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+
+.tm-desc-model {
+  display: inline-block !important;
+  align-self: flex-start !important;
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.tm-desc-heading {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 10px 0 2px 0 !important;
+  padding-left: 12px !important;
+  border-left: 3px solid var(--tm-sapphire) !important;
+  line-height: 1.35 !important;
+}
+
+.tm-desc-para {
+  margin: 0 !important;
+  color: #374151 !important;
+  line-height: 1.7 !important;
+}
+
+.tm-desc-list {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.tm-desc-list li {
+  position: relative !important;
+  padding-left: 22px !important;
+  line-height: 1.6 !important;
+  color: #374151 !important;
+}
+
+.tm-desc-list li::before {
+  content: "✓" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  color: #131a9a !important;
+  font-weight: 800 !important;
+}
+
+.tm-desc-list li strong {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+.tm-desc-spec {
+  display: grid !important;
+  grid-template-columns: minmax(180px, 260px) 1fr !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  margin: 4px 0 !important;
+}
+
+.tm-desc-spec-row {
+  display: contents !important;
+}
+
+.tm-desc-spec-key {
+  background: #f9fafb !important;
+  padding: 9px 14px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  color: #1f2937 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.tm-desc-spec-val {
+  background: #ffffff !important;
+  padding: 9px 14px !important;
+  font-size: 13px !important;
+  color: #374151 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-left: 1px solid #e5e7eb !important;
+}
+
+.tm-desc-spec-row:last-child .tm-desc-spec-key,
+.tm-desc-spec-row:last-child .tm-desc-spec-val {
+  border-bottom: none !important;
+}
+
+.tm-desc-faq-q {
+  margin: 6px 0 2px 0 !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+.tm-desc-faq-a {
+  margin: 0 0 6px 0 !important;
+  color: #4b5563 !important;
+  padding-left: 12px !important;
+  border-left: 2px solid #e5e7eb !important;
+}
+
+@media (max-width: 767px) {
+  .tm-desc-spec {
+    grid-template-columns: 1fr !important;
+  }
+
+  .tm-desc-spec-val {
+    border-left: none !important;
+  }
+}
+
+/* Pływający dolny pasek zakupu (Sticky Bottom Buy Bar) */
+.topmarket-sticky-bar {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 -3px 16px rgba(0, 0, 0, 0.12) !important;
+  padding: 10px 0 !important;
+  z-index: 999 !important;
+  transform: translateY(100%) !important;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.topmarket-sticky-bar.visible {
+  transform: translateY(0) !important;
+}
+
+.sticky-thumb {
+  width: 44px !important;
+  height: 44px !important;
+  object-fit: contain !important;
+  margin-right: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 3px !important;
+}
+
+.sticky-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin-right: 20px !important;
+}
+
+.sticky-price {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: var(--tm-sapphire) !important;
+}
+
+.sticky-qty-stepper {
+  display: inline-flex !important;
+  align-items: center !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 4px !important;
+  height: 38px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  margin-right: 12px !important;
+}
+
+.sticky-qty-stepper .qty-btn {
+  width: 32px !important;
+  height: 36px !important;
+  background: none !important;
+  border: none !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  color: #4b5563 !important;
+}
+
+.sticky-qty-input {
+  width: 36px !important;
+  height: 36px !important;
+  border: none !important;
+  text-align: center !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  outline: none !important;
+}
+
+.topmarket-btn-sticky-cart {
+  height: 38px !important;
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  padding: 0 22px !important;
+  cursor: pointer !important;
+}
+
+.topmarket-btn-sticky-cart:hover {
+  background-color: var(--tm-sapphire-hover) !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   13. Pop-up dodania do koszyka (Slide-over Drawer jak TopMarket)
+   ========================================================================== */
+#blockcart-modal.modal {
+  padding-right: 0 !important;
+  z-index: 2147483647 !important;
+}
+
+.modal-backdrop {
+  z-index: 2147483640 !important;
+}
+
+#blockcart-modal .modal-dialog.tm-cart-drawer-dialog {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  width: 420px !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  transform: translateX(0) !important;
+}
+
+#blockcart-modal .modal-content.tm-cart-drawer-content {
+  height: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.18) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#blockcart-modal .tm-cart-drawer-header {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-bottom: none !important;
+  padding: 20px 24px 12px 24px !important;
+  position: relative !important;
+  display: block !important;
+  text-align: center !important;
+}
+
+#blockcart-modal .tm-drawer-close {
+  position: absolute !important;
+  top: 14px !important;
+  right: 16px !important;
+  font-size: 28px !important;
+  line-height: 1 !important;
+  color: #4b5563 !important;
+  opacity: 0.85 !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 8px !important;
+  cursor: pointer !important;
+}
+
+#blockcart-modal .tm-drawer-close:hover {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+#blockcart-modal .tm-drawer-title {
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  color: #222222 !important;
+  margin: 4px 0 6px 0 !important;
+  text-align: center !important;
+}
+
+#blockcart-modal .tm-drawer-added-note {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: #15803d !important;
+  margin: 0 !important;
+}
+
+#blockcart-modal .tm-drawer-added-note .material-icons {
+  font-size: 16px !important;
+  color: #15803d !important;
+}
+
+#blockcart-modal .tm-cart-drawer-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  padding: 12px 24px 20px 24px !important;
+}
+
+#blockcart-modal .tm-drawer-shipping-progress {
+  margin-bottom: 20px !important;
+}
+
+#blockcart-modal .tm-shipping-msg {
+  font-size: 13px !important;
+  color: #111827 !important;
+  font-weight: 600 !important;
+  margin: 0 0 14px 0 !important;
+  line-height: 1.4 !important;
+}
+
+#blockcart-modal .tm-shipping-msg .tm-shipping-weight-note {
+  font-weight: 400 !important;
+  color: #6b7280 !important;
+  font-size: 12px !important;
+}
+
+#blockcart-modal .tm-progress-track {
+  position: relative !important;
+  height: 4px !important;
+  background: #e5e7eb !important;
+  border-radius: 4px !important;
+  margin: 12px 16px 6px 0 !important;
+}
+
+#blockcart-modal .tm-progress-fill {
+  height: 100% !important;
+  background: #eab308 !important;
+  border-radius: 4px !important;
+}
+
+#blockcart-modal .tm-progress-truck {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 2px solid #eab308 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#blockcart-modal .tm-progress-truck .material-icons {
+  font-size: 17px !important;
+  color: #eab308 !important;
+}
+
+#blockcart-modal .tm-drawer-items {
+  border-top: 1px solid #f1f5f9 !important;
+  padding-top: 8px !important;
+}
+
+#blockcart-modal .tm-drawer-item {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  padding: 12px 0 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+#blockcart-modal .tm-drawer-item-img {
+  flex: 0 0 70px !important;
+  width: 70px !important;
+  height: 70px !important;
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+#blockcart-modal .tm-drawer-item-img img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+#blockcart-modal .tm-drawer-item-info {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+#blockcart-modal .tm-drawer-item-name {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  line-height: 1.4 !important;
+  margin: 0 0 6px 0 !important;
+}
+
+#blockcart-modal .tm-drawer-item-attrs {
+  font-size: 12px !important;
+  color: #6b7280 !important;
+  margin-bottom: 6px !important;
+}
+
+#blockcart-modal .tm-drawer-item-meta {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+#blockcart-modal .tm-drawer-item-qty {
+  font-size: 13px !important;
+  color: #4b5563 !important;
+}
+
+#blockcart-modal .tm-drawer-item-price {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+#blockcart-modal .tm-cart-drawer-footer {
+  border-top: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  padding: 16px 24px 22px 24px !important;
+  display: block !important;
+}
+
+#blockcart-modal .tm-drawer-summary-rows {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  margin-bottom: 14px !important;
+}
+
+#blockcart-modal .tm-drawer-summary-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  font-size: 13.5px !important;
+  color: #4b5563 !important;
+}
+
+#blockcart-modal .tm-drawer-summary-row .is-free {
+  color: #d97706 !important;
+  font-weight: 700 !important;
+}
+
+#blockcart-modal .tm-drawer-summary-row.is-total {
+  margin-top: 4px !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #f1f5f9 !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #1f2937 !important;
+}
+
+#blockcart-modal .tm-drawer-total-val {
+  color: var(--tm-sapphire) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+}
+
+#blockcart-modal .tm-drawer-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+#blockcart-modal .tm-drawer-cta {
+  width: 100% !important;
+  height: 46px !important;
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  box-shadow: none !important;
+}
+
+#blockcart-modal .tm-drawer-cta:hover {
+  background-color: var(--tm-sapphire-hover) !important;
+  color: #ffffff !important;
+}
+
+#blockcart-modal .tm-drawer-cta .material-icons {
+  font-size: 19px !important;
+  color: #ffffff !important;
+}
+
+#blockcart-modal .tm-drawer-continue {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  color: #4b5563 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 12px !important;
+  cursor: pointer !important;
+  text-transform: none !important;
+}
+
+#blockcart-modal .tm-drawer-continue:hover {
+  color: var(--tm-sapphire) !important;
+  text-decoration: underline !important;
+}
+
+@media (max-width: 767px) {
+  #blockcart-modal .modal-dialog.tm-cart-drawer-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  #blockcart-modal .tm-cart-drawer-header,
+  #blockcart-modal .tm-cart-drawer-body,
+  #blockcart-modal .tm-cart-drawer-footer {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* ==========================================================================
+   14. Strony Logowania, Rejestracji i Konta (#authentication, #registration)
+   ========================================================================== */
+#authentication #content,
+#registration #content,
+#password #content {
+  max-width: 540px !important;
+  margin: 18px auto 40px auto !important;
+  padding: 32px 30px !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+#authentication .page-header,
+#registration .page-header,
+#password .page-header,
+#my-account .page-header,
+#identity .page-header,
+#address .page-header,
+#addresses .page-header {
+  margin-bottom: 18px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding-bottom: 12px !important;
+}
+
+#authentication .page-header h1,
+#registration .page-header h1,
+#password .page-header h1,
+#my-account .page-header h1 {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 0 !important;
+  text-transform: none !important;
+}
+
+#authentication .form-control,
+#registration .form-control,
+#password .form-control,
+#identity .form-control,
+#address .form-control {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 2px !important;
+  height: 44px !important;
+  font-size: 14px !important;
+  color: #111827 !important;
+  padding: 8px 12px !important;
+  box-shadow: none !important;
+}
+
+#authentication .form-control:focus,
+#registration .form-control:focus,
+#password .form-control:focus,
+#identity .form-control:focus,
+#address .form-control:focus {
+  border-color: var(--tm-sapphire) !important;
+  box-shadow: 0 0 0 2px rgba(20, 15, 154, 0.14) !important;
+  outline: none !important;
+}
+
+#authentication .form-control-label,
+#registration .form-control-label,
+#password .form-control-label,
+#identity .form-control-label,
+#address .form-control-label {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+}
+
+#authentication .input-group-btn .btn,
+#registration .input-group-btn .btn {
+  height: 44px !important;
+  background-color: #111827 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 0 2px 2px 0 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 0 16px !important;
+  letter-spacing: 0.4px !important;
+  box-shadow: none !important;
+}
+
+#authentication .input-group-btn .btn:hover,
+#registration .input-group-btn .btn:hover {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+}
+
+#submit-login,
+#authentication .form-footer .btn-primary,
+#registration .form-footer .btn-primary,
+#password .form-footer .btn-primary,
+#identity .form-footer .btn-primary,
+#address .form-footer .btn-primary {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 2px !important;
+  height: 46px !important;
+  padding: 0 28px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: none !important;
+  transition: background-color 0.15s ease !important;
+}
+
+#submit-login:hover,
+#authentication .form-footer .btn-primary:hover,
+#registration .form-footer .btn-primary:hover,
+#password .form-footer .btn-primary:hover,
+#identity .form-footer .btn-primary:hover,
+#address .form-footer .btn-primary:hover {
+  background-color: var(--tm-sapphire-hover) !important;
+  color: #ffffff !important;
+}
+
+#authentication .forgot-password a,
+#authentication .no-account a,
+#registration .login-form p a,
+#my-account .links a .link-item {
+  color: var(--tm-sapphire) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+#authentication .forgot-password a:hover,
+#authentication .no-account a:hover,
+#registration .login-form p a:hover {
+  color: var(--tm-sapphire-hover) !important;
+  text-decoration: underline !important;
+}
+
+#my-account .links a .link-item {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  color: #1f2937 !important;
+  transition: border-color 0.15s ease, color 0.15s ease !important;
+}
+
+#my-account .links a:hover .link-item {
+  border-color: var(--tm-sapphire) !important;
+  color: var(--tm-sapphire) !important;
+}
+
+@media (max-width: 767px) {
+  #authentication #content,
+  #registration #content,
+  #password #content {
+    padding: 20px 16px !important;
+    margin: 12px 0 24px 0 !important;
+  }
+}
+
+/* ==========================================================================
+   15. Elementy dynamiczne, hovery i eliminacja cyjanu z Classic
+   ========================================================================== */
+.btn-primary {
+  background-color: var(--tm-sapphire) !important;
+  border-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--tm-sapphire-hover) !important;
+  border-color: var(--tm-sapphire-hover) !important;
+  color: #ffffff !important;
+}
+
+/* Akcje konta i koszyka w headerze */
+.header-actions-right .user-info a:hover,
+.header-actions-right .header-cart-trigger:hover {
+  color: var(--tm-sapphire) !important;
+}
+
+.header-actions-right .user-info a:hover span,
+.header-actions-right .user-info a:hover .material-icons,
+.header-actions-right .header-cart-trigger:hover span {
+  color: var(--tm-sapphire) !important;
+}
+
+/* Breadcrumbs */
+.breadcrumb a:hover {
+  color: var(--tm-sapphire) !important;
+  text-decoration: underline !important;
+}
+
+/* Sortowanie na stronie kategorii (.products-sort-order) */
+.products-sort-order .select-title {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 2px !important;
+  color: #1f2937 !important;
+  box-shadow: none !important;
+}
+
+.products-sort-order .select-title:hover,
+.products-sort-order.open .select-title,
+.products-sort-order.show .select-title {
+  border-color: var(--tm-sapphire) !important;
+}
+
+.products-sort-order .dropdown-menu {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 2px !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+  padding: 4px 0 !important;
+  margin-top: 2px !important;
+}
+
+.products-sort-order .dropdown-menu .select-list {
+  color: #374151 !important;
+  font-size: 13px !important;
+  padding: 8px 14px !important;
+  display: block !important;
+  text-decoration: none !important;
+  transition: background-color 0.12s ease, color 0.12s ease !important;
+}
+
+.products-sort-order .dropdown-menu .select-list:hover,
+.products-sort-order .dropdown-menu .select-list.current {
+  background: #f3f4f6 !important;
+  color: var(--tm-sapphire) !important;
+  font-weight: 700 !important;
+}
+
+/* Aktywne chipy filtrów i paginacja */
+#js-active-search-filters .filter-block {
+  background: #f3f4f6 !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 20px !important;
+  color: #1f2937 !important;
+  box-shadow: none !important;
+}
+
+#js-active-search-filters .filter-block a:hover,
+#js-active-search-filters .filter-block .close:hover {
+  color: #d92829 !important;
+}
+
+.pagination .page-list a {
+  color: #374151 !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.pagination .page-list a:hover {
+  background: #f3f4f6 !important;
+  color: var(--tm-sapphire) !important;
+}
+
+.pagination .page-list .current a {
+  background: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Autouzupełnianie wyszukiwarki (.ui-autocomplete) */
+.ui-autocomplete.ui-menu {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-top: 2px solid var(--tm-sapphire) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12) !important;
+  z-index: 10000 !important;
+}
+
+.ui-autocomplete.ui-menu .ui-menu-item a:hover,
+.ui-autocomplete.ui-menu .ui-menu-item .ui-state-active {
+  background: #f8fafc !important;
+  color: var(--tm-sapphire) !important;
+  border: none !important;
+}
+
+/* Modal powiększenia zdjęcia na karcie produktu i lista życzeń */
+#product-modal .modal-content {
+  border-radius: 4px !important;
+  border: none !important;
+}
+
+#product-modal .thumbnails img.selected,
+#product-modal .thumbnails img:hover {
+  border: 2px solid var(--tm-sapphire) !important;
+}
+
+.topmarket-btn-wishlist:hover,
+.topmarket-btn-wishlist:hover .material-icons {
+  color: #ca5058 !important;
+}
+
+/* Back to top button hover */
+.btn-back-to-top:hover {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   16. Podstrony CMS (#cms: Dostawa, Polityka prywatności, Regulamin, O sklepie, Płatności)
+   ========================================================================== */
+#cms .page-header h1 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  margin-bottom: 20px !important;
+  text-transform: none !important;
+}
+
+#cms .page-cms {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  padding: 32px 36px !important;
+  box-shadow: none !important;
+  max-width: 960px !important;
+  margin-bottom: 40px !important;
+}
+
+#cms .page-cms h2 {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 0 0 14px 0 !important;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  line-height: 1.35 !important;
+}
+
+#cms .page-cms h3 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 22px 0 10px 0 !important;
+  padding-left: 12px !important;
+  border-left: 3px solid var(--tm-sapphire) !important;
+  line-height: 1.35 !important;
+}
+
+#cms .page-cms p {
+  font-size: 14.5px !important;
+  line-height: 1.75 !important;
+  color: #374151 !important;
+  margin-bottom: 12px !important;
+}
+
+#cms .page-cms ul {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 0 0 16px 0 !important;
+}
+
+#cms .page-cms ul li {
+  position: relative !important;
+  padding-left: 20px !important;
+  font-size: 14.5px !important;
+  line-height: 1.7 !important;
+  color: #374151 !important;
+  margin-bottom: 6px !important;
+}
+
+#cms .page-cms ul li::before {
+  content: "\2022" !important;
+  position: absolute !important;
+  left: 4px !important;
+  top: 0 !important;
+  color: var(--tm-sapphire) !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
+}
+
+#cms .page-cms ol {
+  padding-left: 22px !important;
+  line-height: 1.7 !important;
+  color: #374151 !important;
+  font-size: 14.5px !important;
+  margin: 0 0 14px 0 !important;
+}
+
+#cms .page-cms ol li {
+  margin-bottom: 6px !important;
+}
+
+#cms .page-cms a {
+  color: var(--tm-sapphire) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+#cms .page-cms a:hover {
+  color: var(--tm-sapphire-hover) !important;
+  text-decoration: underline !important;
+}
+
+@media (max-width: 767px) {
+  #cms .page-header h1 {
+    font-size: 22px !important;
+  }
+
+  #cms .page-cms {
+    padding: 20px 16px !important;
+    margin-bottom: 24px !important;
+  }
+}
+
+/* ==========================================================================
+   17. Podstrona Kontakt (#contact)
+   ========================================================================== */
+#contact .contact-rich,
+#contact #content.card {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  padding: 26px 28px !important;
+}
+
+#contact .contact-rich h4,
+#contact .contact-form h3 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  padding-left: 12px !important;
+  border-left: 3px solid var(--tm-sapphire) !important;
+  margin: 0 0 18px 0 !important;
+  text-transform: uppercase !important;
+  line-height: 1.35 !important;
+}
+
+#contact .contact-rich .block {
+  font-size: 14px !important;
+  color: #374151 !important;
+  line-height: 1.6 !important;
+}
+
+#contact .contact-rich .icon i {
+  color: var(--tm-sapphire) !important;
+}
+
+#contact .contact-rich a {
+  color: var(--tm-sapphire) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+#contact .contact-rich a:hover {
+  color: var(--tm-sapphire-hover) !important;
+  text-decoration: underline !important;
+}
+
+#contact .form-control-label {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+}
+
+#contact .form-control {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 2px !important;
+  font-size: 14px !important;
+  color: #111827 !important;
+  padding: 8px 12px !important;
+  box-shadow: none !important;
+}
+
+#contact input.form-control,
+#contact select.form-control {
+  height: 44px !important;
+}
+
+#contact textarea.form-control {
+  min-height: 120px !important;
+  height: auto !important;
+}
+
+#contact .form-control:focus {
+  border-color: var(--tm-sapphire) !important;
+  box-shadow: 0 0 0 2px rgba(20, 15, 154, 0.14) !important;
+  outline: none !important;
+}
+
+#contact .bootstrap-filestyle .group-span-filestyle .btn {
+  height: 44px !important;
+  background-color: #111827 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 0 2px 2px 0 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 0 16px !important;
+  text-transform: uppercase !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  box-shadow: none !important;
+}
+
+#contact .bootstrap-filestyle .group-span-filestyle .btn:hover {
+  background-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+}
+
+#contact .form-footer .btn-primary {
+  background-color: var(--tm-sapphire) !important;
+  border-color: var(--tm-sapphire) !important;
+  color: #ffffff !important;
+  height: 46px !important;
+  padding: 0 32px !important;
+  border-radius: 2px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: none !important;
+}
+
+#contact .form-footer .btn-primary:hover {
+  background-color: var(--tm-sapphire-hover) !important;
+  border-color: var(--tm-sapphire-hover) !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 767px) {
+  #contact .contact-rich,
+  #contact #content.card {
+    padding: 18px 16px !important;
+    overflow-x: hidden !important;
+  }
+
+  #contact input.filestyle {
+    width: 1px !important;
+    max-width: 100% !important;
+    height: 1px !important;
+    overflow: hidden !important;
+  }
+}

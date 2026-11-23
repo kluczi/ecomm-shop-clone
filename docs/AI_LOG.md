@@ -255,6 +255,19 @@
 | Co było błędne    | Pierwsza nazwa pliku była po polsku. Po mojej uwadze agent zmienił ją na angielską, zachowując polską treść, by nazewnictwo było spójne.                                    |
 | Weryfikacja       | Agent porównał opis z kodem scrapera i importera oraz sprawdził układ dokumentu względem ADR o Nginx.                                                                       |
 
+---
+
+## Wpis 12: Issue #30 – D1. Wygląd sklepu i dostępność cyfrowa (Child Theme TopMarket.pl dla Domitek)
+
+| Pole | Opis |
+| --- | --- |
+| **Data i autor** | 23.11.2026, Dominik Szwed |
+| **Narzędzie i model** | Antigravity (Gemini 4 Hydrogen) |
+| **Zadanie** | Issue #30: Implementacja motywu potomnego `shop/themes/topmarket-child/` (Wariant A – TopMarket.pl), responsywność 360 px, dostępność Lighthouse >= 85, automatyzacja wdrożenia oraz ADR 0002. |
+| **Co otrzymano** | Utworzono motyw potomny `topmarket-child` (`parent: classic`) ze stylami `custom.css`, skryptem `custom.js` i nadpisaniami szablonów (header z jednym `#search_widget`, 4-kolumnowe mega-menu, strona główna z banerami < 300 KB, karta produktu z hookami `omnibus`, koszyk i CMS). Dodano też `deploy/storefront_appearance.sql`, bind-mount w `deploy/compose.yaml`, cel `theme:`/`storefront:` w `Makefile` oraz `docs/adr/0002-storefront-theme-deployment.md`. |
+| **Co było błędne** | AI początkowo użyło progów darmowej dostawy `149 zł`, duplikowało `#search_widget` i prefiksy `/pl/`, pominęło hooki modułu `omnibus` w `product.tpl` oraz klasę `.account` i `{$customerName}` w `ps_customersignin.tpl`. Dodatkowo `storefront_appearance.sql` dopisywał duplikaty w `ps_linksmenutop_lang` z linkiem `BESTSELLERY` (404 przy braku zamówień), a przekierowanie SQL przez stdin w PowerShellu psuło kodowanie `zł` na `zĹ,`. Wszystkie te problemy skorygowano po review i testach E2E (podmieniono też link na `NOWOŚCI` → `/nowe-produkty`, przeniesiono SQL po `theme:enable` i usunięto atrapy PayPo/wishlist). |
+| **Weryfikacja** | Audyt Google Lighthouse: Desktop — **Performance 90**, **Accessibility 96**, **Best Practices 100**, **SEO 92**; Mobile — **Accessibility 93**, **CLS 0**. Sprawdzono też Axe-Core (95.9%–100%), widok 360 px i 1440 px (0 błędów JS, brak przewijania poziomego), poprawne UTF-8 (`zł`), pojedynczy `#search_widget` w DOM oraz przejście kroków wyszukiwania i rejestracji w `make e2e`. |
+
 <!--
 ## Wpis X:
 

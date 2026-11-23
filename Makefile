@@ -14,7 +14,7 @@ endif
 
 COMPOSE ?= $(DOCKER) compose -f deploy/compose.yaml --env-file .env
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions e2e search check-env verify
+.PHONY: up down init cms payments shipping webservice storefront theme images import backup restore promotion-module promotions e2e search check-env verify
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -56,11 +56,18 @@ webservice: check-env
 	$(COMPOSE) cp deploy/init-webservice.sql mariadb:/tmp/init-webservice.sql
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SET @api_key = '\''$(PRESTASHOP_WEBSERVICE_KEY)'\''; SOURCE /tmp/init-webservice.sql;"'
 
+theme: check-env
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:theme:enable topmarket-child || true"
+	$(COMPOSE) cp deploy/storefront_appearance.sql mariadb:/tmp/storefront_appearance.sql
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" < /tmp/storefront_appearance.sql'
+	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod/*"
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console cache:clear"
+	$(COMPOSE) exec -T prestashop sh -c "chown -R www-data:www-data /var/www/html/var/cache /var/www/html/themes/topmarket-child"
+
 storefront: check-env
 	$(COMPOSE) cp deploy/storefront_config.sql mariadb:/tmp/storefront_config.sql
-	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SOURCE /tmp/storefront_config.sql;"'
-	$(COMPOSE) cp shop/custom.css prestashop:/var/www/html/themes/classic/assets/css/custom.css
-	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod && chown -R www-data:www-data /var/www/html/var/cache && chmod -R 777 /var/www/html/var/cache || true"
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" < /tmp/storefront_config.sql'
+	$(MAKE) theme
 
 # Install Omnibus before importing so it can record the original prices.
 init: check-env
