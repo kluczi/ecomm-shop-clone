@@ -1,14 +1,20 @@
 -include .env
 
-COMPOSE ?= docker compose --env-file .env -f deploy/compose.yaml
+SHELL := /bin/sh
+
+DOCKER ?= $(shell if command -v docker.exe >/dev/null 2>&1; then echo docker.exe; else echo docker; fi)
 
 ifeq ($(OS),Windows_NT)
 PYTHON ?= $(shell if [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; elif [ -f scraper/.venv/Scripts/python.exe ]; then echo scraper/.venv/Scripts/python.exe; else echo python; fi)
+E2E_PYTHON ?= $(shell if [ -f tests/.venv/Scripts/python.exe ]; then echo tests/.venv/Scripts/python.exe; elif [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; else echo python; fi)
 else
-PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
+PYTHON ?= $(shell if [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; elif [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
+E2E_PYTHON ?= $(shell if [ -f tests/.venv/Scripts/python.exe ]; then echo tests/.venv/Scripts/python.exe; elif [ -f tests/.venv/bin/python ]; then echo tests/.venv/bin/python; elif [ -f .venv/bin/python ]; then echo .venv/bin/python; else echo python3; fi)
 endif
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore check-env
+COMPOSE ?= $(DOCKER) compose -f deploy/compose.yaml --env-file .env
+
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotions e2e check-env
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -37,7 +43,10 @@ cms: check-env
 	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
 
 payments: check-env
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module install ps_wirepayment || true"
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module install ps_cashondelivery || true"
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/payment_config.sql
+	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
 
 shipping: check-env
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/shipping_config.sql
@@ -52,7 +61,7 @@ storefront: check-env
 	$(COMPOSE) cp shop/custom.css prestashop:/var/www/html/themes/classic/assets/css/custom.css
 	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
 
-init: check-env cms payments shipping webservice storefront
+init: check-env cms payments shipping webservice storefront import promotions
 
 images: check-env
 	$(PYTHON) scraper/download_release_images.py
@@ -65,3 +74,9 @@ backup: check-env
 
 restore: check-env
 	$(PYTHON) deploy/restore.py
+
+promotions: check-env
+	@$(COMPOSE) exec -T prestashop sh -c "if [ -f /var/www/html/modules/omnibus/cli/seed.php ]; then su www-data -s /bin/sh -c 'php /var/www/html/modules/omnibus/cli/seed.php'; else echo '[INFO] Omnibus module not present, skipping promotions.'; fi"
+
+e2e:
+	$(E2E_PYTHON) -m pytest -c tests/pytest.ini tests $(E2E_ARGS)

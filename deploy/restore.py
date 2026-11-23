@@ -5,8 +5,9 @@ PrestaShop Disaster Recovery: Restore Script
 Restores the complete PrestaShop store from a backup:
 1. Re-creates MariaDB database and imports decompressed database.sql.gz.
 2. Extracts product images into PrestaShop volume (/var/www/html/img/p).
-3. Clears PrestaShop production cache.
-4. Validates store health and benchmarks recovery time.
+3. Restores deployment configuration files and .env.example from config/.
+4. Clears PrestaShop production cache.
+5. Validates store health and benchmarks recovery time.
 
 Usage:
     python deploy/restore.py [--backup-dir DIR]
@@ -14,6 +15,7 @@ Usage:
 
 import argparse
 import gzip
+import shutil
 import ssl
 import subprocess
 import sys
@@ -135,7 +137,7 @@ def main():
     start_time = time.perf_counter()
 
     # 1. Reset Database & Import Dump
-    print("\n[1/4] Re-creating database and importing database dump...")
+    print("\n[1/5] Re-creating database and importing database dump...")
     recreate_sql = (
         f"DROP DATABASE IF EXISTS `{db_name}`;"
         f"CREATE DATABASE `{db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
@@ -200,7 +202,7 @@ def main():
     # 2. Restore Product Images
     images_tar_file = backup_dir / "images.tar.gz"
     if images_tar_file.exists():
-        print("\n[2/4] Restoring product images into PrestaShop volume...")
+        print("\n[2/5] Restoring product images into PrestaShop volume...")
         tar_cmd = [
             "docker",
             "compose",
@@ -237,8 +239,23 @@ def main():
     else:
         print("\n[2/4] Skipping images restore (images.tar.gz not present).")
 
-    # 3. Clear PrestaShop Cache
-    print("\n[3/4] Clearing PrestaShop production cache...")
+    # 3. Restore Configuration Files
+    config_dir = backup_dir / "config"
+    if config_dir.exists() and config_dir.is_dir():
+        print("\n[3/5] Restoring configuration files from backup...")
+        for conf_file in config_dir.glob("*.sql"):
+            dest_file = repo_root / "deploy" / conf_file.name
+            shutil.copy2(conf_file, dest_file)
+            print(f"  -> Restored deploy/{conf_file.name}")
+        env_example_src = config_dir / ".env.example"
+        if env_example_src.exists():
+            shutil.copy2(env_example_src, repo_root / ".env.example")
+            print("  -> Restored .env.example")
+    else:
+        print("\n[3/5] Skipping configuration restore (no config directory in backup).")
+
+    # 4. Clear PrestaShop Cache
+    print("\n[4/5] Clearing PrestaShop production cache...")
     cache_cmd = [
         "docker",
         "compose",
@@ -256,8 +273,8 @@ def main():
     subprocess.run(cache_cmd, capture_output=True, text=True, check=False)
     print("  -> Cache cleared.")
 
-    # 4. Verify Store Health and Product Count
-    print("\n[4/4] Verifying restored store...")
+    # 5. Verify Store Health and Product Count
+    print("\n[5/5] Verifying restored store...")
     count_cmd = [
         "docker",
         "compose",
