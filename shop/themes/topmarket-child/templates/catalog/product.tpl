@@ -95,6 +95,10 @@
     </div>
 
     {hook h='displayProductActions' product=$product}
+
+    {block name='product_additional_info'}
+      {include file='catalog/_partials/product-additional-info.tpl'}
+    {/block}
   </form>
 
   <!-- Pływający dolny pasek zakupu (Sticky Bottom Buy Bar jak w TopMarket) -->
