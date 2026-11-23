@@ -352,18 +352,19 @@
 
 ### 1. Gdzie AI realnie przyspieszyło pracę
 
-- **Git i code review** — Przy większych PR-ach agent pomagał mi przejrzeć zmiany i wskazywał, na co zwrócić uwagę. Sam sprawdzałem ważniejsze rzeczy, np. czy klucz API trafił do repozytorium. Agent pomagał też przy commitach i konfliktach. Przed pushem sprawdzałem, co jest w commitach, i decydowałem, kiedy je wypchnąć.
+- **Git i code review** — Przy większych PR-ach agent pomagał mi przejrzeć zmiany i wskazywał, na co zwrócić uwagę. Sam sprawdzałem ważniejsze rzeczy, np. czy klucz API nie trafił przypadkiem do repozytorium. Agent pomagał też przy commitach i konfliktach. Przed pushem sprawdzałem, co jest w commitach, i decydowałem kiedy je pushować na remote.
 - **Scraper** — Najpierw sam przejrzałem HTML strony i podpowiedziałem AI, skąd brać dane produktów. Wybrałem Pythona i biblioteki, których już używałem, bo dzięki temu łatwiej było mi sprawdzać i poprawiać kod. Agent pomógł uzupełnić parser, dopisać testy, a później ułożyć mój opis według wzorca ADR.
 - **Testy i wyszukiwarka** — Do Playwrighta wybrałem Pythona, bo znam ten język i łatwo mi prześledzić kolejne kroki testu. AI pomogło mi przygotować testy na stronie wzorcowej, przenieść je na nasz sklep i dodać zakup aż do pobrania faktury. Pomogło też poprawić wyszukiwarkę PrestaShop, która na zapytanie `Jan Niezbędny worki na śmieci` pokazywała również inne produkty tej marki, np. ścierki.
 
 ### 2. Gdzie AI wprowadziło w błąd
 
-- **Dostępność produktów** — Pierwsza wersja scrapera brała odpowiedź HTTP 200 za oznakę dostępności. Na stronie niedostępnego produktu parser potrafił pobrać opis polecanej oferty. Wyszło to, gdy porównaliśmy zapisany rekord z kartą produktu.
+- **Dostępność produktów** — Pierwsza wersja scrapera brała odpowiedź HTTP 200 za oznakę dostępności. Na stronie niedostępnego produktu opis polecanej oferty był w HTML wyżej niż właściwy opis i miał ten sam selektor. Parser brał więc pierwszy opis, jaki znalazł. Zauważyliśmy to po porównaniu zapisanego rekordu z kartą produktu.
 - **Warianty** — Agent początkowo połączył osobne produkty w jedną kartę. Po sprawdzeniu danych ze scrapera ustaliliśmy, że każda wersja ma zachować własną nazwę, opis i zdjęcie, a wybór opcji ma prowadzić do jej karty.
 - **Waga koszyka** — Koszyk z pierwszej wersji testu przekraczał limit 50 kg, więc na etapie dostawy zabrakło przewoźników do wyboru. W teście trzeba było dobierać lżejsze produkty.
 
 ### 3. Czego musiałem się nauczyć sam
 
-- **Dostępność w HTML** — Sam musiałem znaleźć w kodzie strony, gdzie jest zapisana informacja o dostępności konkretnego produktu. Dopiero wtedy mogłem wskazać agentowi, z którego pola ma korzystać parser.
-- **Stany magazynowe w testach** — Każde zamówienie zmienia stan magazynowy. Kolejne uruchomienia pokazały, że test szukał produktów na zbyt małej liczbie stron. Po poprawce sprawdziłem cały zakup trzy razy z rzędu.
-- **Faktury w PrestaShop** — Sprawdziłem, kiedy sklep wystawia fakturę za zamówienie za pobraniem. W naszym teście pojawiała się po zmianie statusu zamówienia w panelu admina na „Płatność zaakceptowana”.
+- **Weryfikacja kodu** — Musiałem nauczyć się sprawdzać kod wygenerowany przez AI na nowych dla mnie technologiach tak samo dokładnie jak własny. Czytałem zmiany, uruchamiałem scraper i testy, a wyniki porównywałem z tym co faktycznie było na stronie i w sklepie, zanim uznałem zadanie za poprawne. Ułatwieniem było to, że w większości moich zadań używałem Pythona, którego znam.
+- **Code review innych** — Przeglądałem PR-y kolegów z zespołu i nauczyło mnie to, że każdy z nas ma różne podejście i trzeba o tym rozmawiać, by wybrać to najbardziej optymalne.
+- **Organizacja pracy w zespole** — Pilnowałem podziału większości początkowych zadań na issues, kolejności mergowania i tego, żeby nasze zmiany się nie wykluczały. Regularnie sprawdzałem też u kolegów, czy nie potrzebują pomocy.
+- **Nowe technologie** — W projekcie pierwszy raz pracowałem z Playwrightem i PrestaShopem. Musiałem ogarnąć czego oczekiwać w testach E2E oraz, po których selektorach powinny się one odbywać i co sprawdzać oraz jak PrestaShop obsługuje produkty, warianty, stany magazynowe, wyszukiwarkę i faktury.
