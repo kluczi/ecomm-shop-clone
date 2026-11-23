@@ -33,7 +33,10 @@ Zgodnie z wymaganiem, sklep uruchamia się z czystego klona repozytorium **jedn�
 git clone https://github.com/kluczi/ecomm-shop-clone.git
 cd ecomm-shop-clone
 cp .env.example .env
+python3 -m venv .venv
+.venv/bin/pip install -r scraper/requirements.txt
 ```
+*(W systemie Windows odpowiednikiem dla instalacji zależności jest `.venv\Scripts\python.exe -m pip install -r scraper/requirements.txt`).*
 
 Zgodnie z kryterium, plik `.env.example` zawiera wyłącznie nazwy zmiennych bez haseł. Przed uruchomieniem należy uzupełnić w pliku `.env` lokalne poświadczenia bazy MariaDB (`DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_ROOT_PASSWORD`), dane administratora (`ADMIN_MAIL`, `ADMIN_PASSWORD`) oraz 32-znakowy klucz `PRESTASHOP_WEBSERVICE_KEY`.
 
