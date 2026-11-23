@@ -1,0 +1,6 @@
+httpx
+selectolax
+pydantic
+pillow>=13.0.0
+pytest
+ruff
