@@ -147,6 +147,19 @@
 | **Co było błędne** | AI początkowo zaproponowało tworzenie pliku-znacznika `latest`, co było zbędną redundancją wobec naturalnego słownikowego i chronologicznego sortowania katalogów `backup_YYYYMMDD_HHMMSS`. W `restore.py` brakowało bezpośredniego importu `urllib.error`, co zgłaszał Pylance. Ponadto zrzut SQL pobierany przez PowerShell `>` generował kodowanie UTF-16 z bajtami `\0`, co naprawiono przez strumieniowanie w Pythonie. AI nie uwzględniło także faktu, że domyślny zrzut konfiguracji płatności nie zawierał definicji waluty PLN w tabelach `ps_currency*`, powodując błąd `LocalizationException` w panelu admina – skorygowano to dodając pełny eksport waluty PLN i czyszczenie cache `var/cache/prod` po odtworzeniu. |
 | **Weryfikacja** | Wykonanie pełnego backupu bazy i zdjęć (1271 produktów, 1751 zdjęć) – czas wykonania 17 s, rozmiar 336 MB. Następnie przetestowanie Disaster Recovery (`make restore`): całkowite zresetowanie bazy, import dumpa gzip i rozpakowanie zdjęć zajęło 25 s, co z zapasem spełnia wymóg poniżej 10 minut. Weryfikacja spójności: 1271 odtworzonych produktów, status HTTP 200 OK na `https://localhost`, panel admina poprawnie zalogowany bez błędów waluty z aktywnym PLN. Weryfikacja jakości kodu linterem `ruff check deploy/`. |
 
+---
+
+## Wpis 9: Issue #44 – Kompleksowa dokumentacja README, automatyzacja inicjalizacji sklepu i stabilizacja środowiska
+
+| Pole | Opis |
+| --- | --- |
+| **Data i autor** | 23.11.2026, Michał Łysiak |
+| **Narzędzie i model** | Antigravity (Gemini 3.8 Flash) |
+| **Zadanie** | Issue #44: Dokumentacja README, pełna automatyzacja procesu uruchomienia sklepu (one-command init), spójność bazodanowa płatności/dostawców oraz utwardzenie Disaster Recovery |
+| **Co otrzymano** | Pełną dokumentację `README.md` (instalacja 2 komendami, architektura, linki, testy Playwright E2E, polityka zero sekretów w git, DR), stały adres panelu admina (`PS_FOLDER_ADMIN: admin-dev` w `deploy/compose.yaml`), idempotentny i niedestrukcyjny skrypt `deploy/payment_config.sql` wiążący płatności (przelew i pobranie) z PLN, Polską, grupami klientów i kurierami DPD/InPost, automatyczną konfigurację SMTP dla Mailpit (`PS_MAIL_METHOD=2`, port 1025), synchronizację danych bankowych ze stroną CMS, wdrożenie zasady najmniejszych uprawnień (PoLP - D2) w `deploy/init-webservice.sql`, krok przywracania konfiguracji SQL i `.env.example` w `deploy/restore.py` (D4) oraz automatyczne wykrywanie `docker.exe` na Windows w `Makefile`. |
+| **Co było błędne** | AI w zapytaniu SQL użyło słowa kluczowego `precision` bez ucieczki w backticki, co wywołało błąd składniowy MariaDB. Ponadto AI początkowo nie wykryło, że wywołanie `docker` z Git Bash/MSYS na Windows uruchamiało skrypt-wrapper psujący flagi poleceń (np. `-f`), co naprawiono wykrywaniem `docker.exe`. W kontenerze PrestaShop generował się błąd HTTP 500 z powodu braku uprawnień procesu Apache (`www-data`) do katalogu `var/cache/prod` utworzonego przez proces roota CLI – skorygowano to wymuszeniem `chown -R www-data:www-data` i `chmod -R 777` w `Makefile` i `restore.py`. Ponadto wysyłka testowego maila w back-office rzucała błędem z powodu braku sendmaila w kontenerze, co rozwiązano automatyczną konfiguracją SMTP Mailpit w bazie. |
+| **Weryfikacja** | Przetestowanie pełnej ścieżki clean-slate od zera (`docker compose down -v` i `make init`): czas instalacji wyniósł 14.30 min (poniżej limitu 15 min z kryterium W3 [K]), poprawny import 1271 produktów i kategorii. Weryfikacja w przeglądarce: widoczny baner cookies Dominika, obie metody płatności (przelew i pobranie) widoczne i wybieralne w checkout dla DPD i InPost, złożenie zamówienia zakończone sukcesem i mail transakcyjny odebrany w Mailpit (`http://localhost:8025`). Przetestowanie Disaster Recovery (`make restore`): pełne odtworzenie bazy, zdjęć i konfiguracji w 24.40 s (limit 10 min z D4) z bezbłędnym dostępem do panelu admina bez HTTP 500. |
+
 <!--
 ## Wpis X:
 
