@@ -203,6 +203,19 @@
 | Co było błędne | Poprzedni skrypt zastępował nazwę i opis pierwszego produktu opisem całej grupy. Inne produkty z grupy przekierowywały na tę samą kartę, chociaż każdy miał osobny rekord w danych scrapera. |
 | Weryfikacja | Sprawdzono 11 kart z pięciu serii oraz obie opcje Magnum Flex na sklepie. Potwierdzono osobne adresy, nazwy, opisy i ilości z poprzednich wariantów. Test migracji przeniósł pozycje w koszyku, a ponowne `make promotions` zachowało dane. Po review sprawdzono seed bez pliku JSON na świeżym sklepie oraz migrację zamówienia ze starymi wariantami. Pozycje zamówienia wskazują właściwe SKU, a przywrócenie sztuki do magazynu zmienia stan wyłącznie tego produktu. |
 
+---
+
+## Trafność wyszukiwania produktów
+
+| Pole              | Opis                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data i autor      | 23.11.2026, Bartek Kluska                                                                                                                                                                                                                                                                                                                                                 |
+| Narzędzie i model | Codex GPT-6.2-Sol                                                                                                                                                                                                                                                                                                                                                         |
+| Zadanie           | Poprawa wyszukiwania nazw produktów zawierających pojemności, rozmiary i liczbę sztuk.                                                                                                                                                                                                                                                                                    |
+| Co otrzymano      | Wyszukiwarka PrestaShop uwzględnia dwuznakowe hasła i rozpoznaje liczby z jednostkami niezależnie od spacji. `make search` przebudowuje indeks, a `make init` wywołuje ten target po imporcie katalogu i ustawieniu promocji.                                                                                                                                        |
+| Co było błędne    | PrestaShop pomijał liczby `60` i `40` w zapytaniu o worki ze względu na minimalną długość hasła. Obniżenie progu nadal zwracało dwie ścierki, bo te liczby występowały w ich opisach jako procenty składu. Powiązano liczby z jednostkami, żeby `60 L` było szukane jako `60l`.                                                                                           |
+| Weryfikacja       | Zapytanie np. `Jan Niezbędny 60 L, 40 szt.` spadło z 90 wyników do 3 pasujących produktów. Zapis bez polskich znaków i zapis `60l 40szt` zwróciły te same produkty. Sprawdzono też zapytanie ogólne i wyszukiwanie po SKU. Po review sprawdzono 11 jednostek technicznych, m.in. `2200 W`, `144 Hz` i `128 GB`, w zapytaniach ze spacją i bez niej. Gdy wyszukujemy worki marki np. `Jan Niezbędny` to faktycznie wyświetlają się same worki, a nie także inne produkty tak jak to było wcześniej. |
+
 <!--
 ## Wpis X:
 
