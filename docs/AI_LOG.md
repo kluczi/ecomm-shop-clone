@@ -327,16 +327,16 @@
 
 - **Git i code review** — Przy większych PR-ach agent pomagał mi przejrzeć zmiany i wskazywał, na co zwrócić uwagę. Sam sprawdzałem ważniejsze rzeczy, np. czy klucz API trafił do repozytorium. Agent pomagał też przy commitach i konfliktach. Przed pushem sprawdzałem, co jest w commitach, i decydowałem, kiedy je wypchnąć.
 - **Scraper** — Najpierw sam przejrzałem HTML strony i podpowiedziałem AI, skąd brać dane produktów. Wybrałem Pythona i biblioteki, których już używałem, bo dzięki temu łatwiej było mi sprawdzać i poprawiać kod. Agent pomógł uzupełnić parser, dopisać testy, a później ułożyć mój opis według wzorca ADR.
-- **Testy** — Testy Playwright też są w Pythonie, bo znam ten język i łatwo mi prześledzić, na którym kroku test się zatrzymał. AI pomogło mi przygotować testy na stronie wzorcowej, przenieść je na nasz sklep i dodać brakujące kroki, od rejestracji po pobranie faktury.
+- **Testy i wyszukiwarka** — Do Playwrighta wybrałem Pythona, bo znam ten język i łatwo mi prześledzić kolejne kroki testu. AI pomogło mi przygotować testy na stronie wzorcowej, przenieść je na nasz sklep i dodać zakup aż do pobrania faktury. Pomogło też poprawić wyszukiwarkę PrestaShop, która na zapytanie `Jan Niezbędny worki na śmieci` pokazywała również inne produkty tej marki, np. ścierki.
 
 ### 2. Gdzie AI wprowadziło w błąd
 
 - **Dostępność produktów** — Pierwsza wersja scrapera brała odpowiedź HTTP 200 za oznakę dostępności. Na stronie niedostępnego produktu parser potrafił pobrać opis polecanej oferty. Wyszło to, gdy porównaliśmy zapisany rekord z kartą produktu.
 - **Warianty** — Agent początkowo połączył osobne produkty w jedną kartę. Po sprawdzeniu danych ze scrapera ustaliliśmy, że każda wersja ma zachować własną nazwę, opis i zdjęcie, a wybór opcji ma prowadzić do jej karty.
-- **Wyszukiwarka** — Przy wpisaniu `Jan Niezbędny worki na śmieci` sklep pokazywał też inne produkty tej marki, np. ścierki. Trzeba było poprawić wyszukiwanie tak, żeby brało pod uwagę również to, że szukamy worków.
+- **Waga koszyka** — Koszyk z pierwszej wersji testu przekraczał limit 50 kg, więc na etapie dostawy zabrakło przewoźników do wyboru. W teście trzeba było dobierać lżejsze produkty.
 
 ### 3. Czego musiałem się nauczyć sam
 
-- **Struktura HTML** — Przy scraperze nauczyłem się sprawdzać dostępność w danych konkretnego produktu. Na stronie niedostępnego produktu blok z polecaną ofertą mógł pojawić się w HTML wcześniej niż właściwy opis.
+- **Dostępność w HTML** — Sam musiałem znaleźć w kodzie strony, gdzie jest zapisana informacja o dostępności konkretnego produktu. Dopiero wtedy mogłem wskazać agentowi, z którego pola ma korzystać parser.
 - **Stany magazynowe w testach** — Każde zamówienie zmienia stan magazynowy. Kolejne uruchomienia pokazały, że test szukał produktów na zbyt małej liczbie stron. Po poprawce sprawdziłem cały zakup trzy razy z rzędu.
 - **Faktury w PrestaShop** — Sprawdziłem, kiedy sklep wystawia fakturę za zamówienie za pobraniem. W naszym teście pojawiała się po zmianie statusu zamówienia w panelu admina na „Płatność zaakceptowana”.
