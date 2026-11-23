@@ -33,10 +33,7 @@ Zgodnie z wymaganiem, sklep uruchamia się z czystego klona repozytorium **jedn�
 git clone https://github.com/kluczi/ecomm-shop-clone.git
 cd ecomm-shop-clone
 cp .env.example .env
-python3 -m venv .venv
-.venv/bin/pip install -r scraper/requirements.txt
 ```
-*(W systemie Windows odpowiednikiem dla instalacji zależności jest `.venv\Scripts\python.exe -m pip install -r scraper/requirements.txt`).*
 
 Zgodnie z kryterium, plik `.env.example` zawiera wyłącznie nazwy zmiennych bez haseł. Przed uruchomieniem należy uzupełnić w pliku `.env` lokalne poświadczenia bazy MariaDB (`DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_ROOT_PASSWORD`), dane administratora (`ADMIN_MAIL`, `ADMIN_PASSWORD`) oraz 32-znakowy klucz `PRESTASHOP_WEBSERVICE_KEY`.
 
@@ -52,15 +49,15 @@ Jednoetapowa konfiguracja platformy oraz import danych:
 make init
 ```
 **Co automatycznie wykonuje `make init`:**
-1. Sprawdza obecność wymaganych zmiennych konfiguracyjnych (`check-env`).
+1. Sprawdza obecność wymaganych zmiennych konfiguracyjnych (`check-env`) oraz przy pierwszym uruchomieniu tworzy lokalne `.venv` i instaluje zależności z `scraper/requirements.txt` (`venv`).
 2. Wgrywa strony CMS (Regulamin, Polityka, Dostawa itp.) i instaluje autorski moduł ciasteczek `domitekcookies` (`cms`).
-3. Aktywuje polskie metody płatności: Przelew bankowy oraz Płatność przy odbiorze, powiązane z walutą PLN i stawką 23% VAT (`payments`).
-4. Rejestruje przewoźników DPD Kurier i InPost Paczkomat 24/7 z progami darmowej dostawy > 2000 zł i limitem wagi 50 kg (`shipping`).
+3. Rejestruje przewoźników DPD Kurier i InPost Paczkomat 24/7 z progami darmowej dostawy > 2000 zł i limitem wagi 50 kg (`shipping`).
+4. Aktywuje polskie metody płatności: Przelew bankowy oraz Płatność przy odbiorze, powiązane z walutą PLN i stawką 23% VAT (`payments`).
 5. Tworzy klucz API Webservice z wymaganymi uprawnieniami (`webservice`).
-6. Ustawia tożsamość sklepu Domitek, domyślną walutę PLN, menu 6 głównych działów, filtry oraz niestandardowe style CSS (`storefront`).
-7. Weryfikuje lokalną pamięć podręczną lub pobiera z GitHub Releases oficjalne archiwum zdjęć `images.zip` (`images`).
-8. Importuje przez Webservice API 1271 produktów, strukturę kategorii, stany magazynowe i galerie zdjęć (`import`).
-9. Konfiguruje rabaty Omnibus na 20 produktach oraz 5 grup wariantów z osobnymi stanami magazynowymi (`promotions`).
+6. Ustawia tożsamość sklepu Domitek, domyślną walutę PLN oraz szablon filtrów (`storefront-config`).
+7. Instaluje moduł `omnibus` przed importem katalogu (`promotion-module`).
+8. Weryfikuje lokalną pamięć podręczną lub pobiera z GitHub Releases oficjalne archiwum zdjęć `images.zip` (`images`) i importuje przez Webservice API 1271 produktów, strukturę kategorii, stany magazynowe oraz galerie zdjęć (`import`).
+9. Konfiguruje rabaty Omnibus na 20 produktach oraz 5 grup wariantów z osobnymi stanami magazynowymi (`promotions`), przebudowuje indeks wyszukiwarki (`search`), aktywuje motyw potomny `topmarket-child` z menu kategorii (`theme`) oraz weryfikuje metryki projektowe (`verify`).
 
 ---
 
@@ -77,16 +74,9 @@ make init
 
 ## Testy E2E
 
-Uruchom sklep z zaimportowanym katalogiem. Przy pierwszym uruchomieniu przygotuj środowisko testów i Chromium:
+Uruchom sklep z zaimportowanym katalogiem. Przy pierwszym uruchomieniu `make e2e` automatycznie tworzy środowisko `tests/.venv`, instaluje zależności z `tests/requirements.txt` oraz pobiera przeglądarkę Chromium.
 
-```sh
-python3 -m venv tests/.venv
-tests/.venv/bin/python -m pip install -r tests/requirements.txt
-tests/.venv/bin/python -m playwright install chromium
-```
-*(W systemie Windows odpowiednikiem jest `tests\.venv\Scripts\python.exe`).*
-
-Cały zestaw w trybie headless uruchamia `make e2e`. Domyślny adres sklepu to `https://localhost`. Możesz go zmienić przez `BASE_URL`.
+Cały zestaw w trybie headless uruchamia `make e2e`. Domyślny adres sklepu to `https://localhost` (możesz go zmienić przez `BASE_URL`, a własny interpreter wskazać przez `E2E_PYTHON`).
 
 Test tworzy konto i zamówienie za pobraniem. Do zmiany statusu zamówienia używa lokalnego panelu i danych z `.env`. Na innej instancji należy ustawić `E2E_ADMIN_URL`, `E2E_ADMIN_EMAIL` i `E2E_ADMIN_PASSWORD`.
 
