@@ -190,10 +190,15 @@ def main():
     with open(backup_dir / "metadata.json", "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
+    try:
+        display_backup_dir = backup_dir.relative_to(repo_root)
+    except ValueError:
+        display_backup_dir = backup_dir
+
     print("\n" + "=" * 60)
     print("         BACKUP COMPLETED        ")
     print("=" * 60)
-    print(f"Backup Location      : {backup_dir.relative_to(repo_root)}")
+    print(f"Backup Location      : {display_backup_dir}")
     print(f"Total Products       : {product_count}")
     print(f"Backup Archive Size  : {total_size_mb:.2f} MB")
     print(f"Execution Time       : {duration:.2f} s")

@@ -122,10 +122,15 @@ def main():
     db_user = env_vars.get("DATABASE_USER", "prestashop")
     db_pass = env_vars.get("DATABASE_PASSWORD", "admin")
 
+    try:
+        display_backup_dir = backup_dir.relative_to(repo_root)
+    except ValueError:
+        display_backup_dir = backup_dir
+
     print("=" * 60)
     print("      PRESTASHOP RECOVERY SCRIPT        ")
     print("=" * 60)
-    print(f"Restoring from: {backup_dir.relative_to(repo_root)}")
+    print(f"Restoring from: {display_backup_dir}")
 
     start_time = time.perf_counter()
 
@@ -221,9 +226,14 @@ def main():
             if proc.stdin is not None:
                 proc.stdin.close()
             proc.wait()
+            if proc.returncode != 0:
+                err = proc.stderr.read().decode("utf-8", errors="replace") if proc.stderr else ""
+                print(f"[ERROR] Failed to restore product images (exit code {proc.returncode}): {err.strip()}")
+                sys.exit(1)
             print("  -> Product images restored successfully.")
         except (subprocess.SubprocessError, OSError) as e:
-            print(f"[WARN] Failed to restore product images: {e}")
+            print(f"[ERROR] Failed during product images restore: {e}")
+            sys.exit(1)
     else:
         print("\n[2/4] Skipping images restore (images.tar.gz not present).")
 
