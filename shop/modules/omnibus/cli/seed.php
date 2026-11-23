@@ -8,6 +8,24 @@ if (PHP_SAPI !== 'cli') {
 require_once dirname(__DIR__, 3) . '/config/config.inc.php';
 require_once __DIR__ . '/variants.php';
 
+function installOmnibus(Omnibus $module, Db $db): bool
+{
+    $prefix = _DB_PREFIX_;
+    // The payment snapshot can leave group and hook associations for removed module IDs.
+    $nextId = (int) $db->getValue("SELECT 1 + GREATEST(
+        COALESCE((SELECT MAX(id_module) FROM `{$prefix}module_group`), 0),
+        COALESCE((SELECT MAX(id_module) FROM `{$prefix}hook_module`), 0),
+        COALESCE((SELECT MAX(id_module) FROM `{$prefix}hook_module_exceptions`), 0)
+    )", false);
+    $autoIncrement = (int) $db->getValue("SELECT AUTO_INCREMENT FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{$prefix}module'", false);
+    if ($nextId > $autoIncrement && !$db->execute("ALTER TABLE `{$prefix}module` AUTO_INCREMENT = $nextId")) {
+        return false;
+    }
+
+    return $module->install();
+}
+
 function seedDiscount(Omnibus $module, Product $product, int $shopId, int $percent): void
 {
     $productId = (int) $product->id;
@@ -86,7 +104,7 @@ try {
 
     try {
         $module = Module::getInstanceByName('omnibus');
-        if (!$module || (!Module::isInstalled('omnibus') && !$module->install())
+        if (!$module || (!Module::isInstalled('omnibus') && !installOmnibus($module, $db))
             || (!Module::isEnabled('omnibus') && !$module->enable()) || !$module->registerVariantHooks()) {
             throw new RuntimeException('Could not install or enable the Omnibus module.');
         }

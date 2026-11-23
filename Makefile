@@ -52,8 +52,16 @@ storefront: check-env
 	$(COMPOSE) cp shop/custom.css prestashop:/var/www/html/themes/classic/assets/css/custom.css
 	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
 
-init: check-env cms payments shipping webservice storefront
+# Install Omnibus before importing so it can record the original prices.
+init: check-env
+	$(MAKE) cms
+	$(MAKE) payments
+	$(MAKE) shipping
+	$(MAKE) webservice
+	$(MAKE) storefront
 	$(MAKE) promotion-module
+	$(MAKE) import
+	$(MAKE) promotions
 
 promotion-module:
 	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php --install-only
