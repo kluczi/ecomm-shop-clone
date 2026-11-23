@@ -1,5 +1,6 @@
 services:
   nginx:
+    platform: linux/amd64
     build:
       context: ./nginx
       dockerfile: Dockerfile

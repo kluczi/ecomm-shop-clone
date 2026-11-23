@@ -106,7 +106,7 @@ def confirm_payment_in_back_office(page, admin_settings, reference):
         "data-order-title", re.compile(re.escape(reference) + r"$")
     )
     status_form = page.locator("#update_order_status_action_form")
-    status_form.get_by_role("combobox").click()
+    status_form.locator('.select2-selection[role="combobox"]').click()
     page.get_by_role("option", name=PAYMENT_ACCEPTED, exact=True).click()
     submit = status_form.locator("#update_order_status_action_btn")
     expect(submit).to_be_enabled()

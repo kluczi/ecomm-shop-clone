@@ -286,6 +286,33 @@
 
 ---
 
+## Testy E2E – dobór produktów do koszyka
+
+| Pole | Opis |
+| --- | --- |
+| Data i autor | 23.11.2026, Bartek Kluska |
+| Narzędzie i model | Codex GPT-6.2-Sol |
+| Zadanie | #16 Poprosiłem agenta o poprawienie testu zakupowego, bo czasami nie znajdował pięciu produktów w kategorii Ogród. |
+| Co otrzymano | Test sprawdza kolejne strony kategorii, aż znajdzie potrzebne produkty. W panelu admina klika teraz widoczną listę statusów zamówienia. |
+| Co było błędne | Test kończył szukanie po trzech stronach, choć na dalszych były pasujące produkty. Po tej poprawce wyszedł drugi problem. Test próbował kliknąć pole statusu w chwili, gdy panel zamieniał je na rozwijaną listę, i nie mógł zatwierdzić płatności. |
+| Weryfikacja | Uruchomiłem `make e2e` trzy razy z rzędu na lokalnym sklepie. Za każdym razem przeszły 4 testy, a cały przebieg trwał mniej niż minutę. Test złożył zamówienie za pobraniem, zmienił jego status i zapisał fakturę PDF. Sprawdziłem zapisaną fakturę i zamówienia w panelu admina. |
+
+<!--
+## Wpis X:
+
+| Pole | Opis |
+| --- | --- |
+| **Data i autor** |  |
+| **Narzędzie i model** |  |
+| **Zadanie** |  |
+| **Co otrzymano** |  |
+| **Co było błędne** |  |
+| **Weryfikacja** |  |
+
+---
+-->
+---
+
 ## Refleksja końcowa (Michał Łysiak)
 
 ### 1. Gdzie AI realnie przyspieszyło pracę

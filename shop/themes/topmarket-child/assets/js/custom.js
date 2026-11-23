@@ -382,6 +382,43 @@
    * 7. TopMarket Product Page Enhancements (Stepper, Gallery Arrows, Sticky Bar)
    */
   function initProductPageInteractions() {
+    var stockToastTimer = null;
+
+    function showStockPopup(message) {
+      var existing = document.getElementById('tm-stock-toast');
+      if (existing && existing.parentNode) {
+        existing.parentNode.removeChild(existing);
+      }
+      if (stockToastTimer) {
+        clearTimeout(stockToastTimer);
+      }
+
+      var toast = document.createElement('div');
+      toast.id = 'tm-stock-toast';
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:10050;max-width:360px;background:#0a165e;color:#fff;padding:14px 18px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.22);display:flex;align-items:center;gap:12px;font-size:14px;line-height:1.4;border-left:4px solid #f59e0b;';
+
+      var text = document.createElement('span');
+      text.textContent = message;
+      toast.appendChild(text);
+
+      var closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.setAttribute('aria-label', 'Zamknij powiadomienie');
+      closeBtn.textContent = '×';
+      closeBtn.style.cssText = 'background:transparent;border:none;color:#fff;font-size:20px;line-height:1;cursor:pointer;padding:0 2px;margin-left:auto;';
+      closeBtn.addEventListener('click', function () {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      });
+      toast.appendChild(closeBtn);
+
+      document.body.appendChild(toast);
+      stockToastTimer = setTimeout(function () {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 4000);
+    }
+
     function changeQty(delta) {
       var qtyInput = document.getElementById('quantity_wanted');
       var stickyQtyInput = document.getElementById('sticky_quantity_wanted');
@@ -390,12 +427,47 @@
       if (isNaN(cur)) cur = 1;
       var min = parseInt(qtyInput.getAttribute('min'), 10);
       if (isNaN(min) || min < 1) min = 1;
-      var next = Math.max(min, cur + delta);
+      var maxQty = parseInt(qtyInput.getAttribute('data-max-qty'), 10);
+      var rawNext = cur + delta;
+      var next = Math.max(min, rawNext);
+      if (!isNaN(maxQty) && maxQty > 0 && rawNext > maxQty) {
+        next = maxQty;
+        showStockPopup('Dostępna ilość na magazynie to maksymalnie ' + maxQty + ' szt.');
+      }
       qtyInput.value = String(next);
       if (stickyQtyInput) stickyQtyInput.value = String(next);
       var evt = document.createEvent('HTMLEvents');
       evt.initEvent('change', true, false);
       qtyInput.dispatchEvent(evt);
+    }
+
+    var mainQty = document.getElementById('quantity_wanted');
+    if (mainQty && mainQty.dataset.tmMaxBound !== '1') {
+      mainQty.dataset.tmMaxBound = '1';
+      mainQty.addEventListener('change', function () {
+        var maxQty = parseInt(mainQty.getAttribute('data-max-qty'), 10);
+        var val = parseInt(mainQty.value, 10);
+        if (!isNaN(maxQty) && maxQty > 0 && !isNaN(val) && val > maxQty) {
+          mainQty.value = String(maxQty);
+          var stickyQty = document.getElementById('sticky_quantity_wanted');
+          if (stickyQty) stickyQty.value = String(maxQty);
+          showStockPopup('Dostępna ilość na magazynie to maksymalnie ' + maxQty + ' szt.');
+        }
+      });
+    }
+
+    if (typeof window.prestashop !== 'undefined' && typeof window.prestashop.on === 'function' && !window.__tmStockErrorBound) {
+      window.__tmStockErrorBound = true;
+      window.prestashop.on('handleError', function (event) {
+        if (event && event.eventType === 'addToCart') {
+          var qInput = document.getElementById('quantity_wanted');
+          var maxQty = qInput ? parseInt(qInput.getAttribute('data-max-qty'), 10) : NaN;
+          var msg = (!isNaN(maxQty) && maxQty > 0)
+            ? 'Nie można dodać więcej sztuk — dostępnych na magazynie: ' + maxQty + ' szt.'
+            : 'Brak wystarczającej liczby sztuk na magazynie.';
+          showStockPopup(msg);
+        }
+      });
     }
 
     document.querySelectorAll('.qty-down, .sticky-qty-down').forEach(function (btn) {
