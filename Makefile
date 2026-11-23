@@ -10,7 +10,7 @@ E2E_PYTHON ?= tests/.venv/bin/python
 PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
 endif
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env e2e
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env e2e search
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -64,6 +64,7 @@ init: check-env
 	$(MAKE) promotion-module
 	$(MAKE) import
 	$(MAKE) promotions
+	$(MAKE) search
 
 promotion-module:
 	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php --install-only
@@ -86,3 +87,6 @@ promotions:
 
 e2e:
 	"$(E2E_PYTHON)" -m pytest -c tests/pytest.ini tests $(E2E_ARGS)
+
+search:
+	$(COMPOSE) exec -T --user www-data prestashop php /tmp/search-index.php
