@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- TopMarket Style Logo for DOMITEK -->
+  <!-- Top Row: Arrow pointing UP and DOMI -->
+  <g fill="#140f9a">
+    <!-- Stylized Arrow pointing straight up -->
+    <path d="M 64 2 L 76 16 L 70 16 L 70 34 L 58 34 L 58 16 L 52 16 Z" />
+    <!-- Letter D -->
+    <path d="M 10 12 L 28 12 C 38 12 44 17 44 26 C 44 34 38 40 28 40 L 10 40 Z M 19 19 L 19 33 L 27 33 C 32 33 35 30 35 26 C 35 21 32 19 27 19 Z" />
+    <!-- Letter O integrated with arrow stem -->
+    <path d="M 64 16 C 54 16 48 23 48 30 C 48 37 54 44 64 44 C 74 44 80 37 80 30 C 80 23 74 16 64 16 Z M 64 23 C 68 23 71 26 71 30 C 71 34 68 37 64 37 C 60 37 57 34 57 30 C 57 26 60 23 64 23 Z" />
+    <!-- Letter M -->
+    <path d="M 86 12 L 95 12 L 103 27 L 111 12 L 120 12 L 120 40 L 112 40 L 112 22 L 105 35 L 101 35 L 94 22 L 94 40 L 86 40 Z" />
+    <!-- Letter I -->
+    <path d="M 126 12 L 134 12 L 134 40 L 126 40 Z" />
+    <!-- Bottom Row: tek in geometric clean sans-serif -->
+    <text x="12" y="56" font-family="'Karla', 'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="3" fill="#140f9a">tek</text>
+  </g>
+</svg>

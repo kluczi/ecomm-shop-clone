@@ -1,0 +1,37 @@
+parent: classic
+name: topmarket-child
+display_name: TopMarket Child Theme (Domitek)
+version: 1.0.0
+author:
+  name: "Domitek Team"
+
+meta:
+  compatibility:
+    from: 8.0.0
+    to: ~
+
+  available_layouts:
+    layout-full-width:
+      name: Full Width
+      description: Pełna szerokość bez kolumn bocznych
+    layout-both-columns:
+      name: Three Columns
+      description: Kolumna centralna i dwie kolumny boczne
+    layout-left-column:
+      name: Two Columns, small left column
+      description: Dwie kolumny, wąska kolumna z lewej strony
+    layout-right-column:
+      name: Two Columns, small right column
+      description: Dwie kolumny, wąska kolumna z prawej strony
+
+assets:
+  use_parent_assets: true
+
+theme_settings:
+  default_layout: layout-full-width
+  layouts:
+    category: layout-left-column
+    best-sales: layout-left-column
+    new-products: layout-left-column
+    prices-drop: layout-left-column
+    contact: layout-left-column

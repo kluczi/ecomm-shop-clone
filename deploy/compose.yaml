@@ -38,6 +38,7 @@ services:
       - prestashop_data:/var/www/html
       - ../shop/modules/domitekcookies:/var/www/html/modules/domitekcookies
       - ../shop/modules/omnibus:/var/www/html/modules/omnibus
+      - ../shop/themes/topmarket-child:/var/www/html/themes/topmarket-child
       - ../shop/override/classes/Search.php:/var/www/html/override/classes/Search.php:ro
       - ./search-index.php:/tmp/search-index.php:ro
     # The generated PHP class index belongs to the container and its mounted overrides.

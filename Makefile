@@ -10,7 +10,7 @@ E2E_PYTHON ?= tests/.venv/bin/python
 PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
 endif
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env e2e search
+.PHONY: up down init cms payments shipping webservice storefront theme images import backup restore promotion-module promotions check-env e2e search
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -48,11 +48,14 @@ webservice: check-env
 	$(COMPOSE) cp deploy/init-webservice.sql mariadb:/tmp/init-webservice.sql
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SET @api_key = '\''$(PRESTASHOP_WEBSERVICE_KEY)'\''; SOURCE /tmp/init-webservice.sql;"'
 
-storefront: check-env
-	$(COMPOSE) cp deploy/storefront_config.sql mariadb:/tmp/storefront_config.sql
-	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SOURCE /tmp/storefront_config.sql;"'
-	$(COMPOSE) cp shop/custom.css prestashop:/var/www/html/themes/classic/assets/css/custom.css
-	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
+theme: check-env
+	$(COMPOSE) cp shop/themes/topmarket-child/. prestashop:/var/www/html/themes/topmarket-child/ || true
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/storefront_appearance.sql
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:theme:enable topmarket-child || true"
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console cache:clear"
+	$(COMPOSE) exec -T prestashop sh -c "chown -R www-data:www-data /var/www/html/var/cache /var/www/html/themes/topmarket-child"
+
+storefront: theme
 
 # Install Omnibus before importing so it can record the original prices.
 init: check-env
