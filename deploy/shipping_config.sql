@@ -812,4 +812,11 @@ UNLOCK TABLES;
 UPDATE ps_lang SET active = 0 WHERE iso_code = 'en';
 UPDATE ps_lang SET active = 1 WHERE iso_code = 'pl';
 
+-- Free shipping threshold: 2000 PLN gross and disable default handling fee
+DELETE FROM ps_configuration WHERE name IN ('PS_SHIPPING_FREE_PRICE', 'PS_SHIPPING_HANDLING');
+INSERT INTO ps_configuration (name, id_shop_group, id_shop, value, date_add, date_upd)
+VALUES
+('PS_SHIPPING_FREE_PRICE', NULL, NULL, '2000', NOW(), NOW()),
+('PS_SHIPPING_HANDLING', NULL, NULL, '0', NOW(), NOW());
+
 -- Dump completed on 2026-11-22 18:12:38

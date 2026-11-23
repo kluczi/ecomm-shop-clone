@@ -96,7 +96,7 @@ def choose_products(page, category, count, excluded=()):
     excluded = set(excluded)
     chosen = []
     listing_url = category
-    for _ in range(3):
+    for _ in range(6):
         visit(page, listing_url)
         urls = candidates(page)
         next_link = page.locator('link[rel="next"]')
