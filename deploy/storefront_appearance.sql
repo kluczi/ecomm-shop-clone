@@ -9,23 +9,17 @@ VALUES ('PS_THEME_NAME', NULL, 1, 'topmarket-child', NOW(), NOW())
 ON DUPLICATE KEY UPDATE value = 'topmarket-child', date_upd = NOW();
 
 -- 3. Dodanie wyróżnionych pozycji PROMOCJE i NOWOŚCI do menu górnego (na wzór TopMarket.pl)
-INSERT INTO ps_linksmenutop (id_linksmenutop, id_shop, new_window) VALUES (1, 1, 0)
-ON DUPLICATE KEY UPDATE new_window = 0;
+DELETE FROM ps_linksmenutop_lang WHERE id_linksmenutop IN (1, 2);
+DELETE FROM ps_linksmenutop WHERE id_linksmenutop IN (1, 2);
+
+INSERT INTO ps_linksmenutop (id_linksmenutop, id_shop, new_window) VALUES (1, 1, 0), (2, 1, 0);
 
 INSERT INTO ps_linksmenutop_lang (id_linksmenutop, id_lang, id_shop, label, link)
 VALUES
 (1, 1, 1, 'PROMOCJE', '/promocje'),
-(1, 2, 1, 'PROMOTIONS', '/en/promocje')
-ON DUPLICATE KEY UPDATE label = VALUES(label), link = VALUES(link);
-
-INSERT INTO ps_linksmenutop (id_linksmenutop, id_shop, new_window) VALUES (2, 1, 0)
-ON DUPLICATE KEY UPDATE new_window = 0;
-
-INSERT INTO ps_linksmenutop_lang (id_linksmenutop, id_lang, id_shop, label, link)
-VALUES
+(1, 2, 1, 'PROMOTIONS', '/en/promocje'),
 (2, 1, 1, 'NOWOŚCI', '/nowe-produkty'),
-(2, 2, 1, 'NEW PRODUCTS', '/en/nowe-produkty')
-ON DUPLICATE KEY UPDATE label = VALUES(label), link = VALUES(link);
+(2, 2, 1, 'NEW PRODUCTS', '/en/nowe-produkty');
 
 SET @cat_items = (
   SELECT GROUP_CONCAT(CONCAT('CAT', c.id_category) ORDER BY cs.position, c.id_category SEPARATOR ',')
