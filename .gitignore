@@ -54,3 +54,9 @@ deploy/ssl/*.crt
 deploy/ssl/*.csr
 deploy/ssl/*.pem
 Thumbs.db
+# PrestaShop module generated metadata cache
+shop/modules/**/config_*.xml
+
+# Disaster Recovery backups (large dumps & archives)
+deploy/backups/*
+!deploy/backups/.gitkeep

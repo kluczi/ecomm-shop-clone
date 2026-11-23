@@ -134,6 +134,19 @@
 | **Co było błędne** | AI początkowo zaproponowało sztywny próg 1000 zdjęć oraz pobieranie bezpośrednim URL `curl` bez uwzględnienia prywatnego repozytorium. Skorygowano to poprzez weryfikację kompletności zdjęć per produkt na podstawie `products.json`, wdrożenie weryfikacji sumy kontrolnej SHA-256 z wbudowanym `hashlib.file_digest`, obsłużenie przekierowania 302 z GitHub API do AWS S3 dedykowanym `NoRedirectHandler` (zapobiegającym konfliktowi nagłówków autoryzacyjnych) oraz zaimplementowanie pełnego mechanizmu awaryjnego. |
 | **Weryfikacja** | Opublikowanie wydania `v1.0.0-images` z plikiem `images.zip` na GitHubie. Przetestowanie wszystkich 5 metod pobierania w terminalu (cache lokalny, lokalny zip z SHA-256, GitHub CLI, bezpośrednie REST API oraz fallback scrapera) – każda zakończona sukcesem. Weryfikacja linterem `ruff` oraz `pyright`. |
 
+---
+
+## Wpis 8: Issue #32 – Backup i procedura Disaster Recovery
+
+| Pole | Opis |
+| --- | --- |
+| **Data i autor** | 21.11.2026, Michał Łysiak |
+| **Narzędzie i model** | Antigravity (Gemini 3.8 Flash) |
+| **Zadanie** | Issue #32: Backup and Disaster Recovery – Automatyzacja tworzenia kopii zapasowej i odtwarzania sklepu |
+| **Co otrzymano** | Architekturę i wdrożenie procedury Disaster Recovery: skrypty `deploy/backup.py` i `deploy/restore.py`, bezstratną kompresję zrzutu MariaDB w locie do `database.sql.gz`, archiwizację zdjęć produktów w PrestaShop do `images.tar.gz`, eksport konfiguracji SQL, integrację poleceń `make backup` oraz `make restore` w `Makefile`, a także automatyczny benchmark czasu odzyskiwania z health checkiem. |
+| **Co było błędne** | AI początkowo zaproponowało tworzenie pliku-znacznika `latest`, co było zbędną redundancją wobec naturalnego słownikowego i chronologicznego sortowania katalogów `backup_YYYYMMDD_HHMMSS`. W `restore.py` brakowało bezpośredniego importu `urllib.error`, co zgłaszał Pylance. Ponadto zrzut SQL pobierany przez PowerShell `>` generował kodowanie UTF-16 z bajtami `\0`, co naprawiono przez strumieniowanie w Pythonie. AI nie uwzględniło także faktu, że domyślny zrzut konfiguracji płatności nie zawierał definicji waluty PLN w tabelach `ps_currency*`, powodując błąd `LocalizationException` w panelu admina – skorygowano to dodając pełny eksport waluty PLN i czyszczenie cache `var/cache/prod` po odtworzeniu. |
+| **Weryfikacja** | Wykonanie pełnego backupu bazy i zdjęć (1271 produktów, 1751 zdjęć) – czas wykonania 17 s, rozmiar 336 MB. Następnie przetestowanie Disaster Recovery (`make restore`): całkowite zresetowanie bazy, import dumpa gzip i rozpakowanie zdjęć zajęło 25 s, co z zapasem spełnia wymóg poniżej 10 minut. Weryfikacja spójności: 1271 odtworzonych produktów, status HTTP 200 OK na `https://localhost`, panel admina poprawnie zalogowany bez błędów waluty z aktywnym PLN. Weryfikacja jakości kodu linterem `ruff check deploy/`. |
+
 <!--
 ## Wpis X:
 

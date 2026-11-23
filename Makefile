@@ -8,7 +8,7 @@ else
 PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
 endif
 
-.PHONY: up down init cms payments shipping webservice storefront images import check-env
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore check-env
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -59,3 +59,9 @@ images: check-env
 
 import: check-env images
 	$(PYTHON) shop/import_api.py
+
+backup: check-env
+	$(PYTHON) deploy/backup.py
+
+restore: check-env
+	$(PYTHON) deploy/restore.py
