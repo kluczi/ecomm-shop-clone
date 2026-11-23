@@ -78,6 +78,7 @@
           aria-label="{l s='Quantity' d='Shop.Theme.Actions'}"
           value="{if $product.quantity_wanted}{$product.quantity_wanted}{else}1{/if}"
           min="{$product.minimal_quantity}"
+          {if $product.quantity > 0}data-max-qty="{$product.quantity}"{/if}
           class="topmarket-qty-input"
         >
         <button type="button" class="qty-btn qty-up" aria-label="Zwiększ ilość">+</button>
