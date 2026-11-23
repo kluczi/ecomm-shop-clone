@@ -14,7 +14,7 @@ endif
 
 COMPOSE ?= $(DOCKER) compose -f deploy/compose.yaml --env-file .env
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotions e2e check-env
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotions e2e check-env verify
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -62,7 +62,10 @@ storefront: check-env
 	$(COMPOSE) cp shop/custom.css prestashop:/var/www/html/themes/classic/assets/css/custom.css
 	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod && chown -R www-data:www-data /var/www/html/var/cache && chmod -R 777 /var/www/html/var/cache || true"
 
-init: check-env cms shipping payments webservice storefront import promotions
+init: check-env cms shipping payments webservice storefront import promotions verify
+
+verify: check-env
+	$(PYTHON) deploy/verify_metrics.py
 
 images: check-env
 	$(PYTHON) scraper/download_release_images.py
