@@ -47,3 +47,8 @@ UPDATE ps_configuration SET value = 'Ogromny wybór narzędzi ogrodowych i elekt
 DELETE FROM ps_configuration WHERE name = 'BLOCK_CATEG_ROOT_CATEGORY';
 INSERT INTO ps_configuration (name, id_shop_group, id_shop, value, date_add, date_upd)
 VALUES ('BLOCK_CATEG_ROOT_CATEGORY', NULL, NULL, '3', NOW(), NOW());
+
+-- 6. Usunięcie zduplikowanego hooka ps_searchbar z displayTop (renderowany wyłącznie przez displaySearch w header.tpl)
+DELETE FROM ps_hook_module
+WHERE id_module = (SELECT id_module FROM ps_module WHERE name = 'ps_searchbar')
+  AND id_hook = (SELECT id_hook FROM ps_hook WHERE name = 'displayTop');

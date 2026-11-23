@@ -28,9 +28,7 @@
       </div>
     </div>
     <div id="mobile_search_bar_panel" class="hidden-md-up mobile-search-panel" style="display:none;">
-      <div class="container">
-        {hook h='displaySearch'}
-      </div>
+      <div class="container" id="_mobile_search_slot"></div>
     </div>
   </nav>
 {/block}
@@ -47,7 +45,7 @@
         </div>
 
         <!-- Środkowa wyszukiwarka Czego szukasz? -->
-        <div class="col-md-6 header-col-search header-search-center">
+        <div class="col-md-6 header-col-search header-search-center" id="_desktop_search_slot">
           {hook h='displaySearch'}
         </div>
 

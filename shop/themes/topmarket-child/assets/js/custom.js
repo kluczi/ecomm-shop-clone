@@ -106,6 +106,22 @@
   function initMobileSearch() {
     var toggleBtn = document.getElementById('mobile-search-toggle');
     var searchPanel = document.getElementById('mobile_search_bar_panel');
+    var mobileSlot = document.getElementById('_mobile_search_slot');
+    var desktopSlot = document.getElementById('_desktop_search_slot');
+    var searchWidget = document.getElementById('search_widget');
+
+    function syncSearchWidgetSlot() {
+      if (!searchWidget || !mobileSlot || !desktopSlot) {
+        return;
+      }
+      var target = window.innerWidth < 768 ? mobileSlot : desktopSlot;
+      if (searchWidget.parentNode !== target) {
+        target.appendChild(searchWidget);
+      }
+    }
+
+    syncSearchWidgetSlot();
+    window.addEventListener('resize', syncSearchWidgetSlot);
 
     if (!toggleBtn || !searchPanel) {
       return;
@@ -114,6 +130,7 @@
     toggleBtn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
+      syncSearchWidgetSlot();
 
       var isOpen = searchPanel.style.display === 'block';
       var menuWrapper = document.getElementById('mobile_top_menu_wrapper');
