@@ -3,12 +3,14 @@
 COMPOSE ?= docker compose --env-file .env -f deploy/compose.yaml
 
 ifeq ($(OS),Windows_NT)
+E2E_PYTHON ?= tests/.venv/Scripts/python.exe
 PYTHON ?= $(shell if [ -f .venv/Scripts/python.exe ]; then echo .venv/Scripts/python.exe; elif [ -f scraper/.venv/Scripts/python.exe ]; then echo scraper/.venv/Scripts/python.exe; else echo python; fi)
 else
+E2E_PYTHON ?= tests/.venv/bin/python
 PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
 endif
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env e2e
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -80,3 +82,6 @@ restore: check-env
 
 promotions:
 	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php
+
+e2e:
+	"$(E2E_PYTHON)" -m pytest -c tests/pytest.ini tests $(E2E_ARGS)
