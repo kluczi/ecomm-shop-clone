@@ -2,9 +2,11 @@
 # PrestaShop Catalog & Stock Webservice API Importer
 
 import argparse
+import concurrent.futures
 import json
 import re
 import sys
+import threading
 import time
 import warnings
 from pathlib import Path
@@ -88,7 +90,9 @@ class PrestaShopImporter:
             auth=(self.api_key, ""),
             verify=False,
             timeout=60.0,
+            limits=httpx.Limits(max_keepalive_connections=20, max_connections=20),
         )
+        self.stats_lock = threading.Lock()
         self.stats = {
             "categories_created": 0,
             "categories_updated": 0,
@@ -395,11 +399,17 @@ class PrestaShopImporter:
                     files=files,
                 )
             if resp.status_code in (200, 201):
-                self.stats["images_uploaded"] += 1
+                with self.stats_lock:
+                    self.stats["images_uploaded"] += 1
                 return True
         except (httpx.HTTPError, OSError) as e:
             print(f"[WARN] Failed to upload image for product {product_id}: {e}")
         return False
+
+    def _upload_task(self, item: tuple[int, Path]) -> bool:
+        """Worker task for multithreaded image upload"""
+        product_id, img_path = item
+        return self.upload_image(product_id, img_path)
 
     def import_products(
         self, products_file: Path, limit: int | None = None, skip_images: bool = False
@@ -414,6 +424,7 @@ class PrestaShopImporter:
             print(f"Limiting import to first {limit} products.")
 
         self.load_existing_products()
+        image_tasks: list[tuple[int, Path]] = []
 
         for idx, prod in enumerate(products):
             prod_id = prod["id"]
@@ -512,7 +523,7 @@ class PrestaShopImporter:
                         and ps_product_id not in self.products_with_images
                     ):
                         for img_path in self.get_product_images(prod):
-                            self.upload_image(ps_product_id, img_path)
+                            image_tasks.append((ps_product_id, img_path))
                         self.products_with_images.add(ps_product_id)
                 else:
                     self.stats["products_rejected"] += 1
@@ -555,13 +566,13 @@ class PrestaShopImporter:
                         self.stats["products_created"] += 1
                         self.update_stock(created_id, quantity)
 
-                        # Upload images
+                        # Queue images for multithreaded upload
                         if (
                             not skip_images
                             and created_id not in self.products_with_images
                         ):
                             for img_path in self.get_product_images(prod):
-                                self.upload_image(created_id, img_path)
+                                image_tasks.append((created_id, img_path))
                             self.products_with_images.add(created_id)
                 else:
                     print(
@@ -571,6 +582,19 @@ class PrestaShopImporter:
 
             if (idx + 1) % 100 == 0 or (idx + 1) == len(products):
                 print(f"  Progress: {idx + 1}/{len(products)} products processed...")
+
+        if not skip_images and image_tasks:
+            total_images = len(image_tasks)
+            print(
+                f"\n--- Uploading Images ({total_images} images using 4 worker threads) ---"
+            )
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                for img_idx, _ in enumerate(
+                    executor.map(self._upload_task, image_tasks),
+                    start=1,
+                ):
+                    if img_idx % 100 == 0 or img_idx == total_images:
+                        print(f"  Progress: {img_idx}/{total_images} images uploaded...")
 
     def print_report(self, duration_sec: float):
         """Print execution summary report satisfying D2 requirement"""
