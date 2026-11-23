@@ -45,11 +45,16 @@
 
 {block name='product_prices'}
   <div class="topmarket-product-price-block">
+    {hook h='displayProductPriceBlock' product=$product type='before_price' hook_origin='product_sheet'}
     <div class="topmarket-main-price">{$product.price}</div>
     {if $product.has_discount}
+      {hook h='displayProductPriceBlock' product=$product type='old_price' hook_origin='product_sheet'}
       <div class="topmarket-regular-price">{$product.regular_price}</div>
-      <div class="topmarket-omnibus-price">Cena z ostatnich 30 dni: {$product.regular_price}</div>
     {/if}
+    {hook h='displayProductPriceBlock' product=$product type='price' hook_origin='product_sheet'}
+    {hook h='displayProductPriceBlock' product=$product type='unit_price' hook_origin='product_sheet'}
+    {hook h='displayProductPriceBlock' product=$product type='weight' hook_origin='product_sheet'}
+    {hook h='displayProductPriceBlock' product=$product type='after_price' hook_origin='product_sheet'}
   </div>
 {/block}
 
@@ -87,18 +92,6 @@
         <i class="material-icons">&#xE8CC;</i>
         <span>{if $product.quantity > 0}Do koszyka{else}Brak na stanie{/if}</span>
       </button>
-
-      <button type="button" class="btn topmarket-btn-wishlist" title="Dodaj do listy życzeń" aria-label="Dodaj do listy życzeń">
-        <i class="material-icons">&#xE87E;</i>
-      </button>
-    </div>
-
-    <!-- Pasek PayPo w stylu TopMarket -->
-    <div class="topmarket-paypo-banner">
-      <span class="paypo-logo">PayPo</span>
-      <span class="paypo-divider">|</span>
-      <span class="paypo-text">Kup teraz i zapłać za 30 dni</span>
-      <a href="https://paypo.pl" target="_blank" rel="noopener" class="paypo-link">SPRAWDŹ</a>
     </div>
 
     {hook h='displayProductActions' product=$product}

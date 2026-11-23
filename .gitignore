@@ -48,13 +48,6 @@ playwright-report/
 # macOS
 .DS_Store
 
-# Temporary work and scratch scripts
-scratch/
-temp/
-photo/
-Untitled-1.html
-
-
 # Shared HTTPS and Windows exclusions
 deploy/ssl/*.key
 deploy/ssl/*.crt

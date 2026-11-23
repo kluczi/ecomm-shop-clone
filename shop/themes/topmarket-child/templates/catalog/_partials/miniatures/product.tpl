@@ -7,10 +7,6 @@
   <article class="product-miniature js-product-miniature" data-id-product="{$product.id_product}" data-id-product-attribute="{$product.id_product_attribute}">
     <div class="thumbnail-container">
       <div class="thumbnail-top">
-        <span class="topmarket-wishlist-icon" title="{l s='Add to wishlist' d='Shop.Theme.Actions'}" aria-label="{l s='Add to wishlist' d='Shop.Theme.Actions'}">
-          <i class="material-icons" aria-hidden="true">&#xE87E;</i>
-        </span>
-
         <div class="tm-card-badges">
           {if $product.has_discount}
             <span class="topmarket-badge-promo">PROMOCJA</span>
@@ -112,10 +108,6 @@
         {block name='product_reviews'}
           {hook h='displayProductListReviews' product=$product}
         {/block}
-
-        {if $product.has_discount}
-          <div class="topmarket-omnibus-note">Cena z ostatnich 30 dni: {$product.regular_price}</div>
-        {/if}
 
         <div class="topmarket-card-btn-container">
           {if $product.quantity > 0}

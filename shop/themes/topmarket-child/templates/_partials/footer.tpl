@@ -67,7 +67,7 @@
         <div class="footer-col footer-col-payments">
           <h4 class="footer-block-title footer-heading"><span>Bezpieczne płatności</span></h4>
           <div class="block-content">
-            <img src="/themes/topmarket-child/assets/img/metody-platnosci.png" alt="Bezpieczne metody płatności: PayU, BLIK, PayPo, Apple Pay, Google Pay, VISA, Mastercard" class="img-fluid footer-payments-img" loading="lazy" width="366" height="80">
+            <img src="/themes/topmarket-child/assets/img/metody-platnosci.png" alt="Bezpieczne metody płatności: przelew tradycyjny, płatność przy odbiorze" class="img-fluid footer-payments-img" loading="lazy" width="366" height="80">
           </div>
         </div>
 

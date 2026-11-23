@@ -27,11 +27,20 @@ VALUES
 (2, 2, 1, 'BESTSELLERS', '/en/najczesciej-kupowane')
 ON DUPLICATE KEY UPDATE label = VALUES(label), link = VALUES(link);
 
-UPDATE ps_configuration SET value = 'LNK1,CAT10,CAT11,CAT12,CAT13,CAT14,CAT15,LNK2' WHERE name = 'MOD_BLOCKTOPMENU_ITEMS';
+SET @cat_items = (
+  SELECT GROUP_CONCAT(CONCAT('CAT', c.id_category) ORDER BY cs.position, c.id_category SEPARATOR ',')
+  FROM ps_category c
+  INNER JOIN ps_category_shop cs ON cs.id_category = c.id_category AND cs.id_shop = 1
+  WHERE c.id_parent = 2 AND c.active = 1
+);
 
--- 4. Konfiguracja modułu banera
-UPDATE ps_configuration SET value = 'banner-promocja.jpg' WHERE name = 'BANNER_IMG';
-UPDATE ps_configuration SET value = '/11-ogrod' WHERE name = 'BANNER_LINK';
+UPDATE ps_configuration
+SET value = CONCAT_WS(',', 'LNK1', NULLIF(@cat_items, ''), 'LNK2')
+WHERE name = 'MOD_BLOCKTOPMENU_ITEMS';
+
+-- 4. Konfiguracja modułu banera (link bezpieczny niezależnie od ID kategorii)
+UPDATE ps_configuration SET value = 'banner-top-cut.webp' WHERE name = 'BANNER_IMG';
+UPDATE ps_configuration SET value = '/promocje' WHERE name = 'BANNER_LINK';
 UPDATE ps_configuration SET value = 'Ogromny wybór narzędzi ogrodowych i elektronarzędzi w sklepie Domitek' WHERE name = 'BANNER_DESC';
 
 -- 5. Drzewo kategorii w sidebarze (podkategorie bieżącej kategorii zamiast Strony głównej)
