@@ -107,6 +107,8 @@ class PrestaShopImporter:
         self.manufacturer_map: dict[str, int] = {}  # normalized_name -> id_manufacturer
         self.existing_products: dict[str, int] = {}  # reference -> id
         self.products_with_images: set[int] = set()  # product_id set with cover image
+        self.products_with_variants: set[int] = set()
+        self.redirected_products: set[int] = set()
 
     def test_connection(self) -> bool:
         """Verify API key and connectivity to PrestaShop Webservice"""
@@ -169,7 +171,14 @@ class PrestaShopImporter:
         """Fetch existing products from PrestaShop for idempotency"""
         try:
             resp = self.client.get(
-                f"{self.api_url}/products?display=[id,reference,id_default_image]&output_format=JSON"
+                f"{self.api_url}/products",
+                params={
+                    "display": (
+                        "[id,reference,id_default_image,cache_default_attribute,"
+                        "active,redirect_type]"
+                    ),
+                    "output_format": "JSON",
+                },
             )
             if resp.status_code == 200:
                 data = resp.json()
@@ -181,6 +190,13 @@ class PrestaShopImporter:
                         self.existing_products[ref] = pid
                     if p.get("id_default_image"):
                         self.products_with_images.add(pid)
+                    if int(p.get("cache_default_attribute") or 0) > 0:
+                        self.products_with_variants.add(pid)
+                    if (
+                        str(p.get("active")) == "0"
+                        and p.get("redirect_type") == "301-product"
+                    ):
+                        self.redirected_products.add(pid)
         except (httpx.HTTPError, OSError) as e:
             print(f"[WARN] Failed to preload products: {e}")
 
@@ -475,6 +491,21 @@ class PrestaShopImporter:
 
             if ps_product_id is not None:
                 # Update existing product
+                has_variants = ps_product_id in self.products_with_variants
+                is_redirect = ps_product_id in self.redirected_products
+                partial_update = has_variants or is_redirect
+                product_type = "" if partial_update else "<type>simple</type>"
+                availability = ""
+                if not is_redirect:
+                    availability = (
+                        "<active>1</active><available_for_order>1</available_for_order>"
+                    )
+                description_xml = ""
+                if not has_variants:
+                    description_xml = f"""
+    <name><language id="1"><![CDATA[{name}]]></language></name>
+    <link_rewrite><language id="1"><![CDATA[{link_rewrite}]]></language></link_rewrite>
+    <description><language id="1"><![CDATA[{description}]]></language></description>"""
                 xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
 <product>
@@ -482,31 +513,29 @@ class PrestaShopImporter:
     <id_category_default>{default_cat}</id_category_default>
     <id_manufacturer>{manuf_id}</id_manufacturer>
     <id_tax_rules_group>{tax_group_id}</id_tax_rules_group>
-    <type>simple</type>
+    {product_type}
     <id_shop_default>1</id_shop_default>
     <reference><![CDATA[{sku}]]></reference>
     <price>{price_net}</price>
     <weight>{weight}</weight>
-    <active>1</active>
-    <available_for_order>1</available_for_order>
+    {availability}
     <show_price>1</show_price>
-    <state>1</state>
-    <name><language id="1"><![CDATA[{name}]]></language></name>
-    <link_rewrite><language id="1"><![CDATA[{link_rewrite}]]></language></link_rewrite>
-    <description><language id="1"><![CDATA[{description}]]></language></description>
+    <state>1</state>{description_xml}
     <associations>
         <categories>{cat_xml_elements}</categories>
     </associations>
 </product>
 </prestashop>"""
-                resp = self.client.put(
+                resp = self.client.request(
+                    "PATCH" if partial_update else "PUT",
                     f"{self.api_url}/products/{ps_product_id}",
                     content=xml.encode("utf-8"),
                     headers={"Content-Type": "application/xml"},
                 )
                 if resp.status_code == 200:
                     self.stats["products_updated"] += 1
-                    self.update_stock(ps_product_id, quantity)
+                    if not partial_update:
+                        self.update_stock(ps_product_id, quantity)
                     if (
                         not skip_images
                         and ps_product_id not in self.products_with_images

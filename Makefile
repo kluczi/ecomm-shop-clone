@@ -8,7 +8,7 @@ else
 PYTHON ?= $(shell if [ -f .venv/bin/python ]; then echo .venv/bin/python; elif [ -f scraper/.venv/bin/python ]; then echo scraper/.venv/bin/python; else echo python3; fi)
 endif
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore check-env
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions check-env
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -53,6 +53,10 @@ storefront: check-env
 	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
 
 init: check-env cms payments shipping webservice storefront
+	$(MAKE) promotion-module
+
+promotion-module:
+	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php --install-only
 
 images: check-env
 	$(PYTHON) scraper/download_release_images.py
@@ -65,3 +69,6 @@ backup: check-env
 
 restore: check-env
 	$(PYTHON) deploy/restore.py
+
+promotions:
+	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php

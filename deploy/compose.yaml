@@ -37,6 +37,7 @@ services:
     volumes:
       - prestashop_data:/var/www/html
       - ../shop/modules/domitekcookies:/var/www/html/modules/domitekcookies
+      - ../shop/modules/omnibus:/var/www/html/modules/omnibus
     depends_on:
       - mariadb
       - mailpit
