@@ -37,8 +37,10 @@ def local_admin_url(base_url):
         "prestashop",
         "sh",
         "-c",
-        "for dir in /var/www/html/admin*/; do "
-        'if [ -f "${dir}index.php" ]; then basename "$dir"; fi; done',
+        (
+            "for dir in /var/www/html/admin*/; do "
+            'if [ -f "${dir}index.php" ]; then basename "$dir"; fi; done'
+        ),
     ]
     try:
         result = subprocess.run(

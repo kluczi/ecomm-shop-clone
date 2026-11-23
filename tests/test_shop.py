@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from playwright.sync_api import expect
-
 from checkout import (
     COD_PENDING,
     PAYMENT_ACCEPTED,
@@ -11,6 +9,8 @@ from checkout import (
     order_history_row,
     register_customer,
 )
+from playwright.sync_api import expect
+
 from shop import (
     ADD_TO_CART,
     add_product,

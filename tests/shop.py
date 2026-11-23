@@ -1,6 +1,7 @@
 """Browser interactions shared by the PrestaShop E2E scenarios."""
 
 import json
+import os
 import random
 import re
 from decimal import Decimal
@@ -45,7 +46,15 @@ def product_data(page):
 @cache
 def catalog_weights():
     # Classic omits weight from the product data embedded on the storefront.
-    catalog = Path(__file__).resolve().parents[1] / "scraper-results" / "products.json"
+    default_catalog = (
+        Path(__file__).resolve().parents[1] / "scraper-results" / "products.json"
+    )
+    catalog = Path(
+        os.environ.get("E2E_CATALOG_PATH", str(default_catalog))
+    ).expanduser()
+    if not catalog.is_file():
+        return {}
+
     return {
         str(product.get("sku") or f"TOP-{product['id']}"): Decimal(
             str(product.get("weight_kg") or 0)
@@ -64,9 +73,10 @@ def available_product(page, url, excluded, quantity):
     visit(page, url)
     data = product_data(page)
     product_id = int(data["id_product"])
+    reported_weight = data.get("weight")
     weight = (
-        Decimal(str(data["weight"]))
-        if data.get("weight")
+        Decimal(str(reported_weight))
+        if reported_weight is not None and reported_weight != ""
         else catalog_weights().get(data.get("reference"))
     )
     if (
@@ -102,7 +112,9 @@ def choose_products(page, category, count, excluded=()):
             break
         listing_url = next_url
     raise AssertionError(
-        f"Found only {len(chosen)}/{count} suitable products in {category}"
+        f"Found only {len(chosen)}/{count} suitable products in {category}. "
+        "For products that do not expose their weight, set E2E_CATALOG_PATH "
+        "to the catalogue used by the test store."
     )
 
 
@@ -157,7 +169,8 @@ def search(page, phrase):
 
 
 def choose_search_product(page, products, excluded):
-    phrases = dict.fromkeys(product["name"].split()[0] for product in products)
+    words = (re.findall(r"[^\W_]{3,}", product["name"]) for product in products)
+    phrases = dict.fromkeys(matches[0] for matches in words if matches)
     for phrase in list(phrases)[:4]:
         search(page, phrase)
         urls = candidates(page)
