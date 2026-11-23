@@ -1,0 +1,5 @@
+[allowlist]
+description = "Ignore external shop mock HTML fixtures"
+paths = [
+    '''scraper/tests/fixtures/.*'''
+]

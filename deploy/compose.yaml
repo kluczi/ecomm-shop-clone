@@ -34,6 +34,7 @@ services:
       PS_ENABLE_SSL: 1
       ADMIN_MAIL: ${ADMIN_MAIL}
       ADMIN_PASSWD: ${ADMIN_PASSWORD}
+      PS_FOLDER_ADMIN: admin-dev
     volumes:
       - prestashop_data:/var/www/html
       - ../shop/modules/domitekcookies:/var/www/html/modules/domitekcookies
