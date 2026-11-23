@@ -49,16 +49,16 @@ webservice: check-env
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SET @api_key = '\''$(PRESTASHOP_WEBSERVICE_KEY)'\''; SOURCE /tmp/init-webservice.sql;"'
 
 theme: check-env
-	$(COMPOSE) cp deploy/storefront_appearance.sql mariadb:/tmp/storefront_appearance.sql
-	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SOURCE /tmp/storefront_appearance.sql;"'
 	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:theme:enable topmarket-child || true"
+	$(COMPOSE) cp deploy/storefront_appearance.sql mariadb:/tmp/storefront_appearance.sql
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" < /tmp/storefront_appearance.sql'
 	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod/*"
 	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console cache:clear"
 	$(COMPOSE) exec -T prestashop sh -c "chown -R www-data:www-data /var/www/html/var/cache /var/www/html/themes/topmarket-child"
 
 storefront: check-env
 	$(COMPOSE) cp deploy/storefront_config.sql mariadb:/tmp/storefront_config.sql
-	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SOURCE /tmp/storefront_config.sql;"'
+	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" < /tmp/storefront_config.sql'
 	$(MAKE) theme
 
 # Install Omnibus before importing so it can record the original prices.
