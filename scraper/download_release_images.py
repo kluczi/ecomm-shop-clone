@@ -124,7 +124,11 @@ def extract_zip(repo_root: Path, zip_path: Path, target_dir: Path) -> bool:
         with zipfile.ZipFile(zip_path, "r") as zf:
             for member in zf.infolist():
                 # Normalize Windows backslashes so extraction works identically on macOS/Linux
-                parts = [p for p in member.filename.replace("\\", "/").split("/") if p and p != "."]
+                parts = [
+                    p
+                    for p in member.filename.replace("\\", "/").split("/")
+                    if p and p != "."
+                ]
                 if not parts or any(p == ".." for p in parts):
                     continue
                 dest = (target_root.joinpath(*parts)).resolve()
