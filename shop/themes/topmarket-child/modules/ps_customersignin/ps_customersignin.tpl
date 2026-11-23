@@ -5,9 +5,9 @@
 <div id="_desktop_user_info" class="header-user-btn-wrapper">
   <div class="user-info header-btn-inner">
     {if $logged}
-      <a class="header-action-btn account-link" href="{$urls.pages.my_account}" title="Moje konto" rel="nofollow">
+      <a class="header-action-btn account account-link" href="{$urls.pages.my_account}" title="Moje konto" rel="nofollow">
         <i class="material-icons header-btn-icon" aria-hidden="true">&#xE853;</i>
-        <span class="header-btn-title">Moje konto</span>
+        <span class="header-btn-title">{$customerName}</span>
       </a>
       <a class="header-logout-link hidden-sm-down" href="{$urls.actions.logout}" title="Wyloguj się" rel="nofollow">
         (Wyloguj)
