@@ -79,4 +79,5 @@ restore: check-env
 	$(PYTHON) deploy/restore.py
 
 promotions:
+	$(COMPOSE) cp scraper-results/products.json prestashop:/tmp/omnibus-products.json
 	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php

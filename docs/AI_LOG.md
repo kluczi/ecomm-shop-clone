@@ -160,6 +160,19 @@
 | Co było błędne    | Pierwsze odpalenie modułu nie podpięło go do sklepu. Po poprawce pierwszy zestaw wariantów rozróżniał liczbę opakowań np. worki na śmieci 60L można było wybrać 1 lub 2 opakowania (co było trochę trywialnym rozwiązaniem patrząc na to, że w naszej bazie produktów występują takie, które mają np. różną pojemność). Po weryfikacji zastąpiono go rzeczywistymi pojemnościami i rozmiarami. Agent również ustawił wszystkie promocję na 10%. Niby było to poprawne, ale nadal trochę nienaturalne, więc poprosiłem go o zmianę zakresu promocji na 10-30%. Agent również scalił dwa produkty o innych wariantach w jeden i dał na stronie produktu możliwość wyboru wariantu. Jest to niepopularna praktyka (produkty nadal powinny wyświetlać się oddzielnie, a na ich stronie powinno móc się zmienić wariant). |
 | Weryfikacja       | Odpaliłem `make promotions` i sprawdziłem 20 cen Omnibus wśród promocyjnych produktów. Sprawdziłem również produkty z różnymi wariantami, czy po dodaniu do koszyka dwóch wariantów występują jako dwa oddzielne oraz czy mają ich własne stany magazynowe (a nie wspólne). Sprawdzono też osobne wyniki dla dwóch wersji Magnum Flex, otwieranie właściwego wariantu i zmianę opcji na karcie.                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
+---
+
+## Karty produktów z wariantami
+
+| Pole | Opis |
+| --- | --- |
+| Data i autor | 23.11.2026, Bartek Kluska |
+| Narzędzie i model | Codex, GPT-6 |
+| Zadanie | Przywrócenie osobnych kart dla produktów z tej samej serii, które różnią się pojemnością, liczbą sztuk lub wymiarem. |
+| Co otrzymano | Każdy SKU korzysta ze swojej karty, a wybór opcji prowadzi do odpowiadającej karty. W katalogu przy cenie widać pojemność i liczbę sztuk albo rozmiar. `make promotions` przywraca dane scrapera w sklepie skonfigurowanym w poprzedni sposób i przenosi ilości z koszyków na właściwe SKU. |
+| Co było błędne | Poprzedni skrypt zastępował nazwę i opis pierwszego produktu opisem całej grupy. Inne produkty z grupy przekierowywały na tę samą kartę, chociaż każdy miał osobny rekord w danych scrapera. |
+| Weryfikacja | Sprawdzono 11 kart z pięciu serii oraz obie opcje Magnum Flex na sklepie. Potwierdzono osobne adresy, nazwy, opisy i ilości z poprzednich wariantów. Test migracji przeniósł pozycje w koszyku, a ponowne `make promotions` zachowało dane. |
+
 <!--
 ## Wpis X:
 
