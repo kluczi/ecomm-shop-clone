@@ -109,8 +109,12 @@ function seedVariantGroup(array $group, array $products, int $shopId, int $langu
     $stockLimit = array_sum($initialStocks) > 10 ? intdiv(10, count($options)) : 10;
 
     $description = '<ul>';
-    foreach ($options as $label => [, $details]) {
-        $description .= '<li>' . htmlspecialchars($label . ' — ' . $details, ENT_QUOTES, 'UTF-8') . '</li>';
+    foreach ($options as $label => [$reference, $details]) {
+        $text = $details === '' ? $label : $label . ' — ' . $details;
+        if ($reference === $parent->reference) {
+            $text .= ' (' . $group['listing_name'] . ')';
+        }
+        $description .= '<li>' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '</li>';
     }
     $description .= '</ul>';
     if ($parent->name !== $group['name'] || $parent->description !== $description) {
@@ -136,18 +140,13 @@ function seedVariantGroup(array $group, array $products, int $shopId, int $langu
         $price = round((float) $source->price - (float) $parent->price, 6);
         $weight = round((float) $source->weight - (float) $parent->weight, 6);
         if (!$id) {
-            $quantity = min($stockLimit, $initialStocks[$reference]);
             $combination->id_product = $parentId;
             $combination->reference = $reference;
             $combination->default_on = $isDefault ? true : null;
             $combination->price = $price;
             $combination->weight = $weight;
-            if (!$combination->add() || !$combination->setAttributes([$attributes[$label]])) {
+            if (!$combination->add()) {
                 throw new RuntimeException("Could not create the {$label} variant for {$parent->reference}.");
-            }
-            StockAvailable::setQuantity($parentId, (int) $combination->id, $quantity, $shopId, false);
-            if ((int) StockAvailable::getQuantityAvailableByProduct($parentId, (int) $combination->id, $shopId) !== $quantity) {
-                throw new RuntimeException("Could not set stock for {$reference}.");
             }
         } elseif ((float) $combination->price !== $price || (float) $combination->weight !== $weight) {
             $combination->price = $price;
@@ -157,17 +156,41 @@ function seedVariantGroup(array $group, array $products, int $shopId, int $langu
             }
         }
 
+        $currentAttributes = array_map('intval', array_column($combination->getWsProductOptionValues(), 'id'));
+        if ($currentAttributes !== [$attributes[$label]]) {
+            $images = array_column($combination->getWsImages(), 'id');
+            if (!$combination->setAttributes([$attributes[$label]]) || ($images && !$combination->setImages($images))) {
+                throw new RuntimeException("Could not assign the {$label} option for {$parent->reference}.");
+            }
+        }
+
+        if (!$id) {
+            $quantity = min($stockLimit, $initialStocks[$reference]);
+            StockAvailable::setQuantity($parentId, (int) $combination->id, $quantity, $shopId, false);
+            if (StockAvailable::getQuantityAvailableByProduct($parentId, (int) $combination->id, $shopId) !== $quantity) {
+                throw new RuntimeException("Could not set stock for {$reference}.");
+            }
+        }
+
         attachVariantImage($combination, $source, $copiedImages);
-        if (!$isDefault && ($source->active || $source->redirect_type !== '301-product' || (int) $source->id_type_redirected !== $parentId)) {
-            $source->active = false;
+        if ($isDefault) {
+            continue;
+        }
+        if (!$source->active || $source->available_for_order || $source->visibility !== $parent->visibility
+            || $source->redirect_type !== '301-product' || (int) $source->id_type_redirected !== $parentId) {
+            $source->active = true;
             $source->available_for_order = false;
-            $source->visibility = 'none';
+            $source->visibility = $parent->visibility;
             $source->redirect_type = '301-product';
             $source->id_type_redirected = $parentId;
             if (!$source->update()) {
                 throw new RuntimeException("Could not redirect {$reference} to {$parent->reference}.");
             }
-            Search::removeProductsSearchIndex([$sourceId]);
+            Search::indexation(false, $sourceId);
+        }
+        $stock = (int) StockAvailable::getQuantityAvailableByProduct($parentId, (int) $combination->id, $shopId);
+        if (StockAvailable::getQuantityAvailableByProduct($sourceId, 0, $shopId) !== $stock) {
+            StockAvailable::setQuantity($sourceId, 0, $stock, $shopId, false);
         }
     }
 

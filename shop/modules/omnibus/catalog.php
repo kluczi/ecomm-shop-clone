@@ -30,30 +30,34 @@ return [
     'variant_groups' => [
         [
             'name' => 'Worki Jan Niezbędny Magnum Flex Odor Control – morska bryza',
-            'attribute' => 'Pojemność',
+            'listing_name' => 'Zapachowe worki na śmieci z taśmą 35 l JAN Niezbędny Magnum Flex Odor Control morska bryza 12 szt.',
+            'attribute' => 'Pojemność i liczba sztuk',
             'options' => [
-                '35 l' => ['5900536366548', '12 szt. w rolce'],
-                '60 l' => ['5900536366531', '8 szt. w rolce'],
+                '35 l / 12 szt.' => ['5900536366548', ''],
+                '60 l / 8 szt.' => ['5900536366531', ''],
             ],
         ],
         [
             'name' => 'Worki do segregacji papieru Jan Niezbędny',
-            'attribute' => 'Pojemność',
+            'listing_name' => 'Zawiązywane worki na śmieci Jan Niezbędny 60L 16 szt.',
+            'attribute' => 'Pojemność i liczba sztuk',
             'options' => [
-                '60 l' => ['5900536340760', '16 szt. w rolce, 60 × 76 cm'],
-                '120 l' => ['5900536282466', '10 szt. w rolce, 70 × 116,5 cm'],
+                '60 l / 16 szt.' => ['5900536340760', '60 × 76 cm'],
+                '120 l / 10 szt.' => ['5900536282466', '70 × 116,5 cm'],
             ],
         ],
         [
             'name' => 'Trójwarstwowe worki budowlane Jan Niezbędny',
-            'attribute' => 'Pojemność',
+            'listing_name' => '3-warstwowe worki budowlane do remontów Jan Niezbędny 120L 15 szt.',
+            'attribute' => 'Pojemność i liczba sztuk',
             'options' => [
-                '120 l' => ['8571049669', '15 szt. w rolce, 70 × 110 cm'],
-                '160 l' => ['8571049670', '12 szt. w rolce'],
+                '120 l / 15 szt.' => ['8571049669', '70 × 110 cm'],
+                '160 l / 12 szt.' => ['8571049670', ''],
             ],
         ],
         [
             'name' => 'Doniczka Lamela Kora Textil – szara',
+            'listing_name' => 'Ładna doniczka Kora Textil Lamela szara, 18 cm',
             'attribute' => 'Rozmiar',
             'options' => [
                 '18 cm' => ['LA014-04', 'szerokość 18 cm'],
@@ -63,6 +67,7 @@ return [
         ],
         [
             'name' => 'Doniczka Lamela Gama Textil – kremowa',
+            'listing_name' => 'Rustykalna doniczka Gama Textil Lamela kremowa, 25,5x25,5x27 cm',
             'attribute' => 'Rozmiar',
             'options' => [
                 '25,5 cm' => ['LA012-07', '25,5 × 25,5 × 27 cm'],

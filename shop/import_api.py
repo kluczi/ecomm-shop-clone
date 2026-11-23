@@ -175,7 +175,7 @@ class PrestaShopImporter:
                 params={
                     "display": (
                         "[id,reference,id_default_image,cache_default_attribute,"
-                        "active,redirect_type]"
+                        "active,available_for_order,id_type_redirected,redirect_type]"
                     ),
                     "output_format": "JSON",
                 },
@@ -193,8 +193,12 @@ class PrestaShopImporter:
                     if int(p.get("cache_default_attribute") or 0) > 0:
                         self.products_with_variants.add(pid)
                     if (
-                        str(p.get("active")) == "0"
-                        and p.get("redirect_type") == "301-product"
+                        p.get("redirect_type") == "301-product"
+                        and int(p.get("id_type_redirected") or 0) > 0
+                        and (
+                            str(p.get("active")) == "0"
+                            or str(p.get("available_for_order")) == "0"
+                        )
                     ):
                         self.redirected_products.add(pid)
         except (httpx.HTTPError, OSError) as e:

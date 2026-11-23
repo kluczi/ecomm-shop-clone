@@ -87,7 +87,7 @@ try {
     try {
         $module = Module::getInstanceByName('omnibus');
         if (!$module || (!Module::isInstalled('omnibus') && !$module->install())
-            || (!Module::isEnabled('omnibus') && !$module->enable())) {
+            || (!Module::isEnabled('omnibus') && !$module->enable()) || !$module->registerVariantHooks()) {
             throw new RuntimeException('Could not install or enable the Omnibus module.');
         }
         if (($argv[1] ?? '') === '--install-only') {

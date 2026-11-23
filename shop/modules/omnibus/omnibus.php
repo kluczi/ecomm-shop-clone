@@ -51,7 +51,97 @@ class Omnibus extends Module
                 'actionObjectProductAddAfter',
                 'actionObjectProductUpdateAfter',
                 'displayProductPriceBlock',
-            ]);
+            ])
+            && $this->registerVariantHooks();
+    }
+
+    public function registerVariantHooks(): bool
+    {
+        foreach (['actionPresentProductListing', 'actionFrontControllerInitAfter', 'actionUpdateQuantity'] as $hook) {
+            if (!$this->isRegisteredInHook($hook) && !$this->registerHook($hook)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function hookActionPresentProductListing(array $params): void
+    {
+        static $listingNames = null;
+        if ($listingNames === null) {
+            $listingNames = [];
+            $catalog = require __DIR__ . '/catalog.php';
+            foreach ($catalog['variant_groups'] as $group) {
+                $options = $group['options'];
+                $listingNames[reset($options)[0]] = $group['listing_name'];
+            }
+        }
+
+        $product = $params['presentedProduct'];
+        $reference = (string) ($product['reference'] ?? '');
+        $productId = (int) $product['id_product'];
+        if (isset($listingNames[$reference])) {
+            $target = $productId;
+        } elseif (($product['redirect_type'] ?? '') === '301-product' && empty($product['available_for_order'])) {
+            $target = (int) ($product['id_type_redirected'] ?? 0);
+        } else {
+            return;
+        }
+
+        $variant = (int) Combination::getIdByReference($target, $reference);
+        if (!$variant) {
+            return;
+        }
+        if (isset($listingNames[$reference])) {
+            $product->offsetSet('name', $listingNames[$reference], true);
+        }
+        $url = $this->context->link->getProductLink($target, idProductAttribute: $variant);
+        $product->offsetSet('url', $url, true);
+        $product->offsetSet('link', $url, true);
+    }
+
+    public function hookActionFrontControllerInitAfter(array $params): void
+    {
+        if (!$params['controller'] instanceof ProductController) {
+            return;
+        }
+
+        $source = new Product((int) Tools::getValue('id_product'));
+        $target = (int) $source->id_type_redirected;
+        if (!$target || $target === (int) $source->id || $source->available_for_order || $source->redirect_type !== '301-product') {
+            return;
+        }
+        $variant = (int) Combination::getIdByReference($target, $source->reference);
+        if (!$variant) {
+            return;
+        }
+
+        $extra = Tools::getValue('ajax') && Tools::getValue('action') === 'quickview'
+            ? ['ajax' => 1, 'action' => 'quickview']
+            : [];
+        Tools::redirect($this->context->link->getProductLink($target, idProductAttribute: $variant, extraParams: $extra));
+    }
+
+    public function hookActionUpdateQuantity(array $params): void
+    {
+        $variant = (int) ($params['id_product_attribute'] ?? 0);
+        if (!$variant) {
+            return;
+        }
+
+        $combination = new Combination($variant);
+        $sourceId = (int) Product::getIdByReference($combination->reference);
+        $parentId = (int) $params['id_product'];
+        if (!$sourceId || $sourceId === $parentId) {
+            return;
+        }
+
+        $shopId = (int) (($params['id_shop'] ?? null) ?: $this->context->shop->id);
+        $source = new Product($sourceId, false, null, $shopId);
+        if (!$source->available_for_order && $source->redirect_type === '301-product' && (int) $source->id_type_redirected === $parentId) {
+            StockAvailable::setQuantity($sourceId, 0, (int) $params['quantity'], $shopId, false);
+        }
     }
 
     public function hookActionObjectProductAddAfter($params)
