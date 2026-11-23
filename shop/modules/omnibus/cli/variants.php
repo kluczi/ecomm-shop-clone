@@ -1,198 +1,152 @@
 <?php
 
+use PrestaShop\PrestaShop\Core\Domain\Product\ValueObject\ProductType;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function variantAttributes(string $groupName, array $names, int $languageId): array
+function loadVariantSourceProducts(string $path): array
+{
+    static $catalogues = [];
+    if (isset($catalogues[$path])) {
+        return $catalogues[$path];
+    }
+    if (!is_file($path) || !is_readable($path)) {
+        throw new RuntimeException('Missing scraper results for variant migration. Run make promotions from the repository.');
+    }
+
+    $products = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+
+    return $catalogues[$path] = array_column($products, null, 'sku');
+}
+
+function moveVariantReferences(Combination $combination, int $productId, int $shopId): void
 {
     $db = Db::getInstance();
-    $groupId = (int) $db->getValue(
-        (new DbQuery())->select('id_attribute_group')->from('attribute_group_lang')
-            ->where('id_lang = ' . $languageId . " AND name = '" . pSQL($groupName) . "'")
-    );
-    $languages = Language::getIDs(false);
-    if (!$groupId) {
-        $group = new AttributeGroup();
-        $group->name = array_fill_keys($languages, $groupName);
-        $group->public_name = $group->name;
-        $group->group_type = 'select';
-        if (!$group->add()) {
-            throw new RuntimeException("Could not create the {$groupName} attribute group.");
-        }
-        $groupId = (int) $group->id;
-    }
+    $table = _DB_PREFIX_ . 'cart_product';
+    $parentId = (int) $combination->id_product;
+    $combinationId = (int) $combination->id;
 
-    $ids = [];
-    foreach ($names as $name) {
-        $id = (int) $db->getValue(
-            (new DbQuery())->select('a.id_attribute')->from('attribute', 'a')
-                ->innerJoin('attribute_lang', 'al', 'al.id_attribute = a.id_attribute')
-                ->where('a.id_attribute_group = ' . $groupId . ' AND al.id_lang = ' . $languageId
-                    . " AND al.name = '" . pSQL($name) . "'")
-        );
-        if (!$id) {
-            $attribute = new ProductAttribute();
-            $attribute->id_attribute_group = $groupId;
-            $attribute->name = array_fill_keys($languages, $name);
-            if (!$attribute->add()) {
-                throw new RuntimeException("Could not create the {$name} attribute.");
-            }
-            $id = (int) $attribute->id;
-        }
-        $ids[$name] = $id;
-    }
-
-    return $ids;
-}
-
-function attachVariantImage(Combination $combination, Product $source, array &$copiedImages): void
-{
-    if ($combination->getWsImages() || !($cover = Image::getCover((int) $source->id))) {
-        return;
-    }
-
-    $image = new Image((int) $cover['id_image']);
-    $original = _PS_PRODUCT_IMG_DIR_ . $image->getExistingImgPath() . '.jpg';
-    if (!is_file($original)) {
-        return;
-    }
-
-    $imageId = (int) $image->id;
-    if ((int) $source->id !== (int) $combination->id_product) {
-        $copy = new Image();
-        $copy->id_product = (int) $combination->id_product;
-        $copy->legend = $image->legend;
-        if (!$copy->add()) {
-            throw new RuntimeException("Could not create an image for {$source->reference}.");
-        }
-        $copiedImages[] = $copy;
-        $destination = $copy->getPathForCreation();
-        if (!$destination || !copy($original, $destination . '.jpg')) {
-            throw new RuntimeException("Could not copy the image for {$source->reference}.");
-        }
-        foreach (ImageType::getImagesTypes('products') as $type) {
-            $thumbnail = $destination . '-' . $type['name'] . '.jpg';
-            if (!ImageManager::resize($original, $thumbnail, (int) $type['width'], (int) $type['height'])) {
-                throw new RuntimeException("Could not create the thumbnail for {$source->reference}.");
-            }
-        }
-        $imageId = (int) $copy->id;
-    }
-
-    if (!$combination->setImages([$imageId])) {
-        throw new RuntimeException("Could not attach the image for {$source->reference}.");
+    // Merge the quantities if the cart already contains the original SKU.
+    if (!$db->execute("INSERT INTO `$table`
+        (id_cart, id_product, id_address_delivery, id_shop, id_product_attribute, id_customization, quantity, date_add)
+        SELECT legacy.id_cart, $productId, legacy.id_address_delivery, legacy.id_shop, 0,
+            legacy.id_customization, legacy.quantity, legacy.date_add
+        FROM `$table` AS legacy
+        WHERE legacy.id_product = $parentId AND legacy.id_product_attribute = $combinationId AND legacy.id_shop = $shopId
+        ON DUPLICATE KEY UPDATE quantity = `$table`.quantity + VALUES(quantity)")
+        || !$db->update('customization', ['id_product' => $productId, 'id_product_attribute' => 0],
+            "id_product = $parentId AND id_product_attribute = $combinationId")
+        // Keep the original order details while routing reorders and refunds to the current SKU.
+        || !$db->update('order_detail', ['product_id' => $productId, 'product_attribute_id' => 0],
+            "product_id = $parentId AND product_attribute_id = $combinationId AND id_shop = $shopId")) {
+        throw new RuntimeException("Could not transfer cart and order references for {$combination->reference}.");
     }
 }
 
-function seedVariantGroup(array $group, array $products, int $shopId, int $languageId, array &$copiedImages): void
+function detachCopiedVariantImages(Combination $combination, Product $source, Product $parent, int $shopId): void
 {
-    $options = $group['options'];
-    $parent = $products[reset($options)[0]];
+    if ($source->id === $parent->id || !($cover = Image::getCover((int) $source->id))) {
+        return;
+    }
+
+    $original = new Image((int) $cover['id_image']);
+    $originalPath = _PS_PRODUCT_IMG_DIR_ . $original->getExistingImgPath() . '.jpg';
+    if (!is_file($originalPath)) {
+        return;
+    }
+
+    $originalHash = hash_file('sha256', $originalPath);
+    $parentCover = Image::getCover((int) $parent->id);
+    foreach ($combination->getWsImages() as $association) {
+        $image = new Image((int) $association['id']);
+        $path = _PS_PRODUCT_IMG_DIR_ . $image->getExistingImgPath() . '.jpg';
+        if ((int) $image->id_product === (int) $parent->id && (int) $image->id !== (int) ($parentCover['id_image'] ?? 0)
+            && is_file($path) && $originalHash !== false && hash_file('sha256', $path) === $originalHash) {
+            // Hide only the old copy. Keep the original files and image IDs available.
+            if (!Db::getInstance()->delete('image_shop', 'id_image = ' . (int) $image->id . ' AND id_shop = ' . $shopId)) {
+                throw new RuntimeException("Could not detach the copied image for {$source->reference}.");
+            }
+        }
+    }
+}
+
+function restoreVariantProducts(array $options, array $products, string $sourcePath, int $shopId): void
+{
+    $parent = $products[reset($options)];
     $parentId = (int) $parent->id;
-    $existing = array_map(
-        static fn ($row) => (new Combination((int) $row['id_product_attribute']))->reference,
-        Product::getProductAttributesIds($parentId, true)
-    );
-    if (array_diff($existing, array_column($options, 0))) {
-        throw new RuntimeException("{$parent->reference} already has other variants.");
+    $legacyAliases = array_filter($options, static function (string $reference) use ($products, $parentId): bool {
+        $product = $products[$reference];
+
+        return $product->redirect_type === '301-product' && (int) $product->id_type_redirected === $parentId;
+    });
+    if (!$legacyAliases) {
+        return;
     }
 
-    $initialStocks = [];
-    foreach ($options as [$reference]) {
-        $initialStocks[$reference] = (int) StockAvailable::getQuantityAvailableByProduct(
-            (int) $products[$reference]->id,
-            0,
-            $shopId
-        );
-    }
-    $stockLimit = array_sum($initialStocks) > 10 ? intdiv(10, count($options)) : 10;
-
-    $description = '<ul>';
-    foreach ($options as $label => [$reference, $details]) {
-        $text = $details === '' ? $label : $label . ' — ' . $details;
-        if ($reference === $parent->reference) {
-            $text .= ' (' . $group['listing_name'] . ')';
-        }
-        $description .= '<li>' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '</li>';
-    }
-    $description .= '</ul>';
-    if ($parent->name !== $group['name'] || $parent->description !== $description) {
-        $parent->name = $group['name'];
-        $parent->link_rewrite = Tools::str2url($group['name']);
-        $parent->description = $description;
-        if (!$parent->update()) {
-            throw new RuntimeException("Could not update the product page for {$parent->reference}.");
+    $sourceProducts = loadVariantSourceProducts($sourcePath);
+    foreach ($options as $reference) {
+        if (!isset($sourceProducts[$reference])) {
+            throw new RuntimeException("Product {$reference} is missing from the scraper results.");
         }
     }
 
-    $attributes = variantAttributes($group['attribute'], array_keys($options), $languageId);
-    foreach ($options as $label => [$reference]) {
-        $source = $products[$reference];
-        $sourceId = (int) $source->id;
-        $isDefault = $sourceId === $parentId;
-        if (!$isDefault && ($source->hasAttributes() || (int) $source->id_tax_rules_group !== (int) $parent->id_tax_rules_group)) {
-            throw new RuntimeException("{$reference} needs to be a simple product with the same tax rule as {$parent->reference}.");
-        }
+    $combinations = [];
+    foreach (Product::getProductAttributesIds($parentId, true) as $row) {
+        $combination = new Combination((int) $row['id_product_attribute'], null, $shopId);
+        $combinations[$combination->reference] = $combination;
+    }
+    if (count($combinations) !== count($options) || array_diff($options, array_keys($combinations))) {
+        throw new RuntimeException("The existing combinations for {$parent->reference} do not match the previous configuration.");
+    }
 
-        $id = (int) Combination::getIdByReference($parentId, $reference);
-        $combination = new Combination($id ?: null, null, $shopId);
-        $price = round((float) $source->price - (float) $parent->price, 6);
-        $weight = round((float) $source->weight - (float) $parent->weight, 6);
-        if (!$id) {
-            $combination->id_product = $parentId;
-            $combination->reference = $reference;
-            $combination->default_on = $isDefault ? true : null;
-            $combination->price = $price;
-            $combination->weight = $weight;
-            if (!$combination->add()) {
-                throw new RuntimeException("Could not create the {$label} variant for {$parent->reference}.");
-            }
-        } elseif ((float) $combination->price !== $price || (float) $combination->weight !== $weight) {
-            $combination->price = $price;
-            $combination->weight = $weight;
-            if (!$combination->update()) {
-                throw new RuntimeException("Could not update the {$label} variant for {$parent->reference}.");
-            }
+    $db = Db::getInstance();
+    $stocks = [];
+    foreach ($combinations as $reference => $combination) {
+        $stockId = (int) StockAvailable::getStockAvailableIdByProductId($parentId, (int) $combination->id, $shopId);
+        $stock = $db->getRow((new DbQuery())->select('quantity, reserved_quantity, physical_quantity')
+            ->from('stock_available')->where("id_stock_available = $stockId"));
+        if (!$stock) {
+            throw new RuntimeException("Could not read the old stock for {$reference}.");
         }
+        $stocks[$reference] = array_map('intval', $stock);
 
-        $currentAttributes = array_map('intval', array_column($combination->getWsProductOptionValues(), 'id'));
-        if ($currentAttributes !== [$attributes[$label]]) {
-            $images = array_column($combination->getWsImages(), 'id');
-            if (!$combination->setAttributes([$attributes[$label]]) || ($images && !$combination->setImages($images))) {
-                throw new RuntimeException("Could not assign the {$label} option for {$parent->reference}.");
-            }
-        }
-
-        if (!$id) {
-            $quantity = min($stockLimit, $initialStocks[$reference]);
-            StockAvailable::setQuantity($parentId, (int) $combination->id, $quantity, $shopId, false);
-            if (StockAvailable::getQuantityAvailableByProduct($parentId, (int) $combination->id, $shopId) !== $quantity) {
-                throw new RuntimeException("Could not set stock for {$reference}.");
-            }
-        }
-
-        attachVariantImage($combination, $source, $copiedImages);
-        if ($isDefault) {
-            continue;
-        }
-        if (!$source->active || $source->available_for_order || $source->visibility !== $parent->visibility
-            || $source->redirect_type !== '301-product' || (int) $source->id_type_redirected !== $parentId) {
-            $source->active = true;
-            $source->available_for_order = false;
-            $source->visibility = $parent->visibility;
-            $source->redirect_type = '301-product';
-            $source->id_type_redirected = $parentId;
-            if (!$source->update()) {
-                throw new RuntimeException("Could not redirect {$reference} to {$parent->reference}.");
-            }
-            Search::indexation(false, $sourceId);
-        }
-        $stock = (int) StockAvailable::getQuantityAvailableByProduct($parentId, (int) $combination->id, $shopId);
-        if (StockAvailable::getQuantityAvailableByProduct($sourceId, 0, $shopId) !== $stock) {
-            StockAvailable::setQuantity($sourceId, 0, $stock, $shopId, false);
+        moveVariantReferences($combination, (int) $products[$reference]->id, $shopId);
+        detachCopiedVariantImages($combination, $products[$reference], $parent, $shopId);
+        if (!$combination->delete()) {
+            throw new RuntimeException("Could not remove the old combination for {$reference}.");
         }
     }
 
-    Search::indexation(false, $parentId);
+    foreach ($options as $reference) {
+        $product = $products[$reference];
+        $source = $sourceProducts[$reference];
+        $product->name = trim($source['name']);
+        $product->description = $source['description'];
+        $product->link_rewrite = Tools::str2url($product->name);
+        $product->product_type = ProductType::TYPE_STANDARD;
+        $product->cache_default_attribute = 0;
+        $product->active = true;
+        $product->available_for_order = true;
+        $product->visibility = 'both';
+        $product->redirect_type = '';
+        $product->id_type_redirected = 0;
+        if (!$product->update()) {
+            throw new RuntimeException("Could not restore the product page for {$reference}.");
+        }
+
+        $productId = (int) $product->id;
+        $stock = $stocks[$reference];
+        StockAvailable::setQuantity($productId, 0, $stock['quantity'], $shopId, false);
+        $stockId = (int) StockAvailable::getStockAvailableIdByProductId($productId, 0, $shopId);
+        if (!$stockId || !$db->update('stock_available', [
+            'reserved_quantity' => $stock['reserved_quantity'],
+            'physical_quantity' => $stock['physical_quantity'],
+        ], "id_stock_available = $stockId")
+            || (int) StockAvailable::getQuantityAvailableByProduct($productId, 0, $shopId) !== $stock['quantity']
+            || !Search::indexation(false, $productId)) {
+            throw new RuntimeException("Could not restore stock or indexing for {$reference}.");
+        }
+    }
 }

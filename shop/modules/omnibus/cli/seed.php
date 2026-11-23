@@ -105,7 +105,7 @@ try {
     try {
         $module = Module::getInstanceByName('omnibus');
         if (!$module || (!Module::isInstalled('omnibus') && !installOmnibus($module, $db))
-            || (!Module::isEnabled('omnibus') && !$module->enable()) || !$module->registerVariantHooks()) {
+            || (!Module::isEnabled('omnibus') && !$module->enable()) || !$module->registerVariantSelector()) {
             throw new RuntimeException('Could not install or enable the Omnibus module.');
         }
         if (($argv[1] ?? '') === '--install-only') {
@@ -116,7 +116,7 @@ try {
         $catalog = require dirname(__DIR__) . '/catalog.php';
         $references = array_keys($catalog['discounts']);
         foreach ($catalog['variant_groups'] as $group) {
-            $references = array_merge($references, array_column($group['options'], 0));
+            $references = array_merge($references, array_values($group['options']));
         }
         $products = [];
         foreach ($references as $reference) {
@@ -131,26 +131,23 @@ try {
         if (!$db->execute('START TRANSACTION')) {
             throw new RuntimeException('Could not start the promotion configuration transaction.');
         }
-        $copiedImages = [];
         try {
             foreach ($catalog['discounts'] as $reference => $percent) {
                 seedDiscount($module, $products[$reference], $shopId, $percent);
             }
+            $sourcePath = $argv[1] ?? '/tmp/omnibus-products.json';
             foreach ($catalog['variant_groups'] as $group) {
-                seedVariantGroup($group, $products, $shopId, $languageId, $copiedImages);
+                restoreVariantProducts($group['options'], $products, $sourcePath, $shopId);
             }
             if (!$db->execute('COMMIT')) {
                 throw new RuntimeException('Could not commit the promotion configuration.');
             }
         } catch (Throwable $error) {
             $db->execute('ROLLBACK');
-            foreach ($copiedImages as $image) {
-                $image->deleteImage();
-            }
             throw $error;
         }
 
-        printf("Configured %d promotions and %d products with variants.\n",
+        printf("Configured %d promotions and %d variant groups.\n",
             count($catalog['discounts']), count($catalog['variant_groups']));
     } finally {
         $db->getValue("SELECT RELEASE_LOCK('$lock')", false);

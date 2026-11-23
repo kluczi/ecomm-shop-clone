@@ -52,13 +52,18 @@ class Omnibus extends Module
                 'actionObjectProductUpdateAfter',
                 'displayProductPriceBlock',
             ])
-            && $this->registerVariantHooks();
+            && $this->registerVariantSelector();
     }
 
-    public function registerVariantHooks(): bool
+    public function registerVariantSelector(): bool
     {
-        foreach (['actionPresentProductListing', 'actionFrontControllerInitAfter', 'actionUpdateQuantity'] as $hook) {
-            if (!$this->isRegisteredInHook($hook) && !$this->registerHook($hook)) {
+        $hook = 'displayProductAdditionalInfo';
+        if (!$this->isRegisteredInHook($hook) && !$this->registerHook($hook)) {
+            return false;
+        }
+
+        foreach (['actionPresentProductListing', 'actionFrontControllerInitAfter', 'actionUpdateQuantity'] as $legacyHook) {
+            if ($this->isRegisteredInHook($legacyHook) && !$this->unregisterHook($legacyHook)) {
                 return false;
             }
         }
@@ -66,82 +71,54 @@ class Omnibus extends Module
         return true;
     }
 
-    public function hookActionPresentProductListing(array $params): void
+    public function hookDisplayProductAdditionalInfo(array $params): string
     {
-        static $listingNames = null;
-        if ($listingNames === null) {
-            $listingNames = [];
+        $reference = (string) ($params['product']['reference'] ?? '');
+        $group = $this->getVariantGroup($reference);
+        if (!$group) {
+            return '';
+        }
+
+        $options = [];
+        foreach ($group['options'] as $label => $sku) {
+            $id = (int) Product::getIdByReference($sku);
+            $product = new Product($id, false, (int) $this->context->language->id, (int) $this->context->shop->id);
+            if (!Validate::isLoadedObject($product) || !$product->active || $product->visibility === 'none') {
+                continue;
+            }
+
+            $options[] = [
+                'label' => $label,
+                'url' => $this->context->link->getProductLink($product),
+                'selected' => $sku === $reference,
+            ];
+        }
+
+        if (count($options) < 2) {
+            return '';
+        }
+
+        $this->context->smarty->assign('variant_label', $group['attribute']);
+        $this->context->smarty->assign('variant_options', $options);
+
+        return $this->display(__FILE__, 'views/templates/hook/variant-selector.tpl');
+    }
+
+    private function getVariantGroup(string $reference): ?array
+    {
+        static $groups = null;
+        if ($groups === null) {
             $catalog = require __DIR__ . '/catalog.php';
-            foreach ($catalog['variant_groups'] as $group) {
-                $options = $group['options'];
-                $listingNames[reset($options)[0]] = $group['listing_name'];
+            $groups = $catalog['variant_groups'];
+        }
+
+        foreach ($groups as $group) {
+            if (in_array($reference, $group['options'], true)) {
+                return $group;
             }
         }
 
-        $product = $params['presentedProduct'];
-        $reference = (string) ($product['reference'] ?? '');
-        $productId = (int) $product['id_product'];
-        if (isset($listingNames[$reference])) {
-            $target = $productId;
-        } elseif (($product['redirect_type'] ?? '') === '301-product' && empty($product['available_for_order'])) {
-            $target = (int) ($product['id_type_redirected'] ?? 0);
-        } else {
-            return;
-        }
-
-        $variant = (int) Combination::getIdByReference($target, $reference);
-        if (!$variant) {
-            return;
-        }
-        if (isset($listingNames[$reference])) {
-            $product->offsetSet('name', $listingNames[$reference], true);
-        }
-        $url = $this->context->link->getProductLink($target, idProductAttribute: $variant);
-        $product->offsetSet('url', $url, true);
-        $product->offsetSet('link', $url, true);
-    }
-
-    public function hookActionFrontControllerInitAfter(array $params): void
-    {
-        if (!$params['controller'] instanceof ProductController) {
-            return;
-        }
-
-        $source = new Product((int) Tools::getValue('id_product'));
-        $target = (int) $source->id_type_redirected;
-        if (!$target || $target === (int) $source->id || $source->available_for_order || $source->redirect_type !== '301-product') {
-            return;
-        }
-        $variant = (int) Combination::getIdByReference($target, $source->reference);
-        if (!$variant) {
-            return;
-        }
-
-        $extra = Tools::getValue('ajax') && Tools::getValue('action') === 'quickview'
-            ? ['ajax' => 1, 'action' => 'quickview']
-            : [];
-        Tools::redirect($this->context->link->getProductLink($target, idProductAttribute: $variant, extraParams: $extra));
-    }
-
-    public function hookActionUpdateQuantity(array $params): void
-    {
-        $variant = (int) ($params['id_product_attribute'] ?? 0);
-        if (!$variant) {
-            return;
-        }
-
-        $combination = new Combination($variant);
-        $sourceId = (int) Product::getIdByReference($combination->reference);
-        $parentId = (int) $params['id_product'];
-        if (!$sourceId || $sourceId === $parentId) {
-            return;
-        }
-
-        $shopId = (int) (($params['id_shop'] ?? null) ?: $this->context->shop->id);
-        $source = new Product($sourceId, false, null, $shopId);
-        if (!$source->available_for_order && $source->redirect_type === '301-product' && (int) $source->id_type_redirected === $parentId) {
-            StockAvailable::setQuantity($sourceId, 0, (int) $params['quantity'], $shopId, false);
-        }
+        return null;
     }
 
     public function hookActionObjectProductAddAfter($params)
@@ -240,7 +217,18 @@ class Omnibus extends Module
 
     public function hookDisplayProductPriceBlock($params)
     {
-        if (($params['type'] ?? '') !== 'old_price') {
+        $type = $params['type'] ?? '';
+        if ($type === 'before_price') {
+            // Classic truncates product titles in lists. Show the option beside the price.
+            $reference = (string) ($params['product']['reference'] ?? '');
+            $group = $this->getVariantGroup($reference);
+            if ($group) {
+                $label = array_search($reference, $group['options'], true);
+
+                return '<span class="d-block small text-muted">' . Tools::safeOutput($label) . '</span>';
+            }
+        }
+        if ($type !== 'old_price') {
             return '';
         }
 

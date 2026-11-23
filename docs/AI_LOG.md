@@ -190,6 +190,19 @@
 
 ---
 
+---
+
+## Karty produktów z wariantami
+
+| Pole | Opis |
+| --- | --- |
+| Data i autor | 23.11.2026, Bartek Kluska |
+| Narzędzie i model | Codex, GPT-6 |
+| Zadanie | Przywrócenie osobnych kart dla produktów z tej samej serii, które różnią się pojemnością, liczbą sztuk lub wymiarem. |
+| Co otrzymano | Każdy SKU korzysta ze swojej karty, a wybór opcji prowadzi do odpowiadającej karty. W katalogu przy cenie widać pojemność i liczbę sztuk albo rozmiar. `make promotions` przywraca dane scrapera w sklepie skonfigurowanym w poprzedni sposób i przenosi ilości z koszyków na właściwe SKU. |
+| Co było błędne | Poprzedni skrypt zastępował nazwę i opis pierwszego produktu opisem całej grupy. Inne produkty z grupy przekierowywały na tę samą kartę, chociaż każdy miał osobny rekord w danych scrapera. |
+| Weryfikacja | Sprawdzono 11 kart z pięciu serii oraz obie opcje Magnum Flex na sklepie. Potwierdzono osobne adresy, nazwy, opisy i ilości z poprzednich wariantów. Test migracji przeniósł pozycje w koszyku, a ponowne `make promotions` zachowało dane. Po review sprawdzono seed bez pliku JSON na świeżym sklepie oraz migrację zamówienia ze starymi wariantami. Pozycje zamówienia wskazują właściwe SKU, a przywrócenie sztuki do magazynu zmienia stan wyłącznie tego produktu. |
+
 <!--
 ## Wpis X:
 
