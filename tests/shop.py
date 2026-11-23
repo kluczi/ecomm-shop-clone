@@ -95,12 +95,16 @@ def choose_products(page, category, count, excluded=()):
     """Find distinct products with two units in stock and a shippable weight."""
     excluded = set(excluded)
     chosen = []
+    visited_listings = set()
     listing_url = category
-    for _ in range(6):
+    while listing_url and listing_url not in visited_listings:
+        visited_listings.add(listing_url)
         visit(page, listing_url)
         urls = candidates(page)
         next_link = page.locator('link[rel="next"]')
-        next_url = next_link.get_attribute("href") if next_link.count() else None
+        listing_url = (
+            next_link.evaluate("link => link.href") if next_link.count() else None
+        )
         for url in dict.fromkeys(urls):
             product = available_product(page, url, excluded, quantity=2)
             if product:
@@ -108,9 +112,6 @@ def choose_products(page, category, count, excluded=()):
                 excluded.add(product["id"])
                 if len(chosen) == count:
                     return chosen
-        if not next_url:
-            break
-        listing_url = next_url
     raise AssertionError(
         f"Found only {len(chosen)}/{count} suitable products in {category}. "
         "For products that do not expose their weight, set E2E_CATALOG_PATH "
