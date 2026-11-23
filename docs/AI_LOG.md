@@ -197,11 +197,11 @@
 | Pole | Opis |
 | --- | --- |
 | Data i autor | 23.11.2026, Bartek Kluska |
-| Narzędzie i model | Codex, GPT-6 |
-| Zadanie | Przywrócenie osobnych kart dla produktów z tej samej serii, które różnią się pojemnością, liczbą sztuk lub wymiarem. |
-| Co otrzymano | Każdy SKU korzysta ze swojej karty, a wybór opcji prowadzi do odpowiadającej karty. W katalogu przy cenie widać pojemność i liczbę sztuk albo rozmiar. `make promotions` przywraca dane scrapera w sklepie skonfigurowanym w poprzedni sposób i przenosi ilości z koszyków na właściwe SKU. |
-| Co było błędne | Poprzedni skrypt zastępował nazwę i opis pierwszego produktu opisem całej grupy. Inne produkty z grupy przekierowywały na tę samą kartę, chociaż każdy miał osobny rekord w danych scrapera. |
-| Weryfikacja | Sprawdzono 11 kart z pięciu serii oraz obie opcje Magnum Flex na sklepie. Potwierdzono osobne adresy, nazwy, opisy i ilości z poprzednich wariantów. Test migracji przeniósł pozycje w koszyku, a ponowne `make promotions` zachowało dane. Po review sprawdzono seed bez pliku JSON na świeżym sklepie oraz migrację zamówienia ze starymi wariantami. Pozycje zamówienia wskazują właściwe SKU, a przywrócenie sztuki do magazynu zmienia stan wyłącznie tego produktu. |
+| Narzędzie i model | Codex GPT-6.2-Sol |
+| Zadanie | Przywrócenie osobnych kart dla tych samych produktów o innej liczbie sztuk/pojemności/rozmiarze. |
+| Co otrzymano | Każdy wariant ma własną kartę z nazwą, opisem i zdjęciem ze scrapera. Wybranie innej opcji otwiera jej kartę. W katalogu obok ceny widać rozmiar albo pojemność i liczbę sztuk. make promotions przenosi też produkty ze starych koszyków na właściwe warianty. |
+| Co było błędne | Wcześniej np. worki 35 l i 60 l prowadziły do jednej karty „Worki na śmieci”, więc obie wersje miały ten sam opis i zdjęcie, mimo że w danych ze scrapera były osobnymi produktami. |
+| Weryfikacja | Sprawdziłem 11 produktów z pięciu modeli produktów. Każdy miał własny adres, nazwę, opis i stan magazynowy. Pozycje wskazywały właściwe warianty, a po dodaniu do koszyka były rozróżnialne. |
 
 ---
 
