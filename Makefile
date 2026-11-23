@@ -14,7 +14,7 @@ endif
 
 COMPOSE ?= $(DOCKER) compose -f deploy/compose.yaml --env-file .env
 
-.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotions e2e check-env verify
+.PHONY: up down init cms payments shipping webservice storefront images import backup restore promotion-module promotions e2e search check-env verify
 
 check-env:
 ifndef DATABASE_PASSWORD
@@ -62,7 +62,21 @@ storefront: check-env
 	$(COMPOSE) cp shop/custom.css prestashop:/var/www/html/themes/classic/assets/css/custom.css
 	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod && chown -R www-data:www-data /var/www/html/var/cache && chmod -R 777 /var/www/html/var/cache || true"
 
-init: check-env cms shipping payments webservice storefront import promotions verify
+# Install Omnibus before importing so it can record the original prices.
+init: check-env
+	$(MAKE) cms
+	$(MAKE) shipping
+	$(MAKE) payments
+	$(MAKE) webservice
+	$(MAKE) storefront
+	$(MAKE) promotion-module
+	$(MAKE) import
+	$(MAKE) promotions
+	$(MAKE) search
+	$(MAKE) verify
+
+promotion-module:
+	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php --install-only
 
 verify: check-env
 	$(PYTHON) deploy/verify_metrics.py
@@ -79,8 +93,12 @@ backup: check-env
 restore: check-env
 	$(PYTHON) deploy/restore.py
 
-promotions: check-env
-	@$(COMPOSE) exec -T prestashop sh -c "if [ -f /var/www/html/modules/omnibus/cli/seed.php ]; then su www-data -s /bin/sh -c 'php /var/www/html/modules/omnibus/cli/seed.php'; else echo '[INFO] Omnibus module not present, skipping promotions.'; fi"
+promotions:
+	$(COMPOSE) cp scraper-results/products.json prestashop:/tmp/omnibus-products.json
+	$(COMPOSE) exec -T --user www-data prestashop php /var/www/html/modules/omnibus/cli/seed.php
 
 e2e:
-	$(E2E_PYTHON) -m pytest -c tests/pytest.ini tests $(E2E_ARGS)
+	"$(E2E_PYTHON)" -m pytest -c tests/pytest.ini tests $(E2E_ARGS)
+
+search:
+	$(COMPOSE) exec -T --user www-data prestashop php /tmp/search-index.php
