@@ -242,6 +242,19 @@
 | **Co było błędne** | AI początkowo zaproponowało użycie `getattr(sys.stdout, "reconfigure")`, co zgłaszał linter Ruff (reguła `B009`), natomiast bezpośrednie wywołanie powodowało błąd typowania Pylance (`TextIO` nie deklaruje metody `reconfigure`). Skorygowano to poprzez zawężenie typu `isinstance(sys.stdout, io.TextIOWrapper)`. Ponadto w zapytaniu SQL weryfikującym przewoźników AI użyło sztywnego warunku `IN ('DPD', 'InPost')`, co dało wynik 0 z powodu pełnych nazw w bazie (`DPD Kurier`, `InPost Paczkomat 24/7`) – skorygowano to dopasowaniem wzorcem `LIKE`. |
 | **Weryfikacja** | Przeprowadzenie pełnego importu katalogu na czystym sklepie: czas wgrywania 1271 produktów i 1776 zdjęć spadł z ok. 12 minut do **7.06 min (423 s)**, redukując łączny czas inicjalizacji do ~8.5 minuty (bezpieczny margines poniżej 15 min z W3 [K]). Test idempotencji (drugie uruchomienie `make import`): 1272 produkty zaktualizowane, 0 utworzonych duplikatów i 0 wgranych powtórnie zdjęć w czasie 4.24 min (spełnienie D2). Uruchomienie skanera `gitleaks` na całej historii: `no leaks found` (0 znalezisk, kod wyjścia 0). Uruchomienie `make verify`: potwierdzenie statusu `[PASS]` dla wszystkich 7 metryk z tabeli wymagań. |
 
+---
+
+## Architektura scrapera katalogu produktów
+
+| Pole              | Opis                                                                                                                                                                        |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data i autor      | 23.11.2026, Bartek Kluska                                                                                                                                                   |
+| Narzędzie i model | Codex GPT-6.2-Sol                                                                                                                                                           |
+| Zadanie           | Opisałem agentowi, jak działa scraper i dlaczego wybrałem Pythona oraz biblioteki, z którymi już pracowałem. Poprosiłem go o ułożenie tego opisu według naszego wzorca ADR. |
+| Co otrzymano      | Agent uporządkował mój opis i zapisał go w `docs/adr/0002-product-catalog-scraper.md`, wzorując się na ADR o Nginx, który zrobił Michał.                                    |
+| Co było błędne    | Pierwsza nazwa pliku była po polsku. Po mojej uwadze agent zmienił ją na angielską, zachowując polską treść, by nazewnictwo było spójne.                                    |
+| Weryfikacja       | Agent porównał opis z kodem scrapera i importera oraz sprawdził układ dokumentu względem ADR o Nginx.                                                                       |
+
 <!--
 ## Wpis X:
 
