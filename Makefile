@@ -57,8 +57,8 @@ storefront: check-env
 # Install Omnibus before importing so it can record the original prices.
 init: check-env
 	$(MAKE) cms
-	$(MAKE) payments
 	$(MAKE) shipping
+	$(MAKE) payments
 	$(MAKE) webservice
 	$(MAKE) storefront
 	$(MAKE) promotion-module
