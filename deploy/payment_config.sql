@@ -17,22 +17,25 @@ ON DUPLICATE KEY UPDATE name = VALUES(name), symbol = VALUES(symbol);
 INSERT IGNORE INTO ps_currency_shop (id_currency, id_shop, conversion_rate)
 VALUES (3, 1, 1.000000);
 
--- 4. Set PLN as default currency in configuration
+-- 4. Set PLN as default currency in configuration and deactivate other currencies
 DELETE FROM ps_configuration WHERE name = 'PS_CURRENCY_DEFAULT';
 INSERT INTO ps_configuration (id_shop_group, id_shop, name, value, date_add, date_upd)
 VALUES (NULL, NULL, 'PS_CURRENCY_DEFAULT', '3', NOW(), NOW());
+UPDATE ps_currency SET active = 0 WHERE iso_code != 'PLN';
 
 -- 5. Configure Bank Wire module settings
 DELETE FROM ps_configuration WHERE name IN ('BANK_WIRE_DETAILS', 'BANK_WIRE_OWNER', 'BANK_WIRE_ADDRESS', 'BANK_WIRE_RESERVATION_DAYS');
 INSERT INTO ps_configuration (id_shop_group, id_shop, name, value, date_add, date_upd)
 VALUES
-(NULL, NULL, 'BANK_WIRE_DETAILS', 'Przelew na rachunek bankowy', NOW(), NOW()),
+(NULL, NULL, 'BANK_WIRE_DETAILS', 'Nr rachunku: 88 1050 0000 0000 0000 1234 5678 (Bank Millennium)', NOW(), NOW()),
 (NULL, NULL, 'BANK_WIRE_OWNER', 'Domitek Sp. z o.o.', NOW(), NOW()),
-(NULL, NULL, 'BANK_WIRE_ADDRESS', 'Bank PKO BP: 12 1020 0000 0000 0000 0000 0000', NOW(), NOW()),
+(NULL, NULL, 'BANK_WIRE_ADDRESS', 'Domitek Sp. z o.o., Polska', NOW(), NOW()),
 (NULL, NULL, 'BANK_WIRE_RESERVATION_DAYS', '7', NOW(), NOW());
 
--- 6. Activate payment modules in ps_module and ps_module_shop
+-- 6. Activate payment modules in ps_module and deactivate check payment
 UPDATE ps_module SET active = 1 WHERE name IN ('ps_wirepayment', 'ps_cashondelivery');
+UPDATE ps_module SET active = 0 WHERE name = 'ps_checkpayment';
+DELETE FROM ps_module_shop WHERE id_module IN (SELECT id_module FROM ps_module WHERE name = 'ps_checkpayment');
 
 INSERT IGNORE INTO ps_module_shop (id_module, id_shop, enable_device)
 SELECT id_module, 1, 7
@@ -66,5 +69,38 @@ SELECT m.id_module, 1, c.id_reference
 FROM ps_module m
 CROSS JOIN (
     SELECT DISTINCT id_reference FROM ps_carrier WHERE deleted = 0
+    UNION SELECT 5
+    UNION SELECT 6
 ) c
 WHERE m.name IN ('ps_wirepayment', 'ps_cashondelivery');
+
+-- 11. Mailpit SMTP Configuration
+DELETE FROM ps_configuration WHERE name IN (
+    'PS_MAIL_METHOD',
+    'PS_MAIL_SERVER',
+    'PS_MAIL_USER',
+    'PS_MAIL_PASSWD',
+    'PS_MAIL_SMTP_ENCRYPTION',
+    'PS_MAIL_SMTP_PORT',
+    'PS_MAIL_TYPE',
+    'PS_MAIL_EMAIL_MESSAGE'
+);
+
+INSERT INTO ps_configuration (id_shop_group, id_shop, name, value, date_add, date_upd)
+VALUES
+(NULL, NULL, 'PS_MAIL_METHOD', '2', NOW(), NOW()),
+(NULL, NULL, 'PS_MAIL_SERVER', 'mailpit', NOW(), NOW()),
+(NULL, NULL, 'PS_MAIL_USER', '', NOW(), NOW()),
+(NULL, NULL, 'PS_MAIL_PASSWD', '', NOW(), NOW()),
+(NULL, NULL, 'PS_MAIL_SMTP_ENCRYPTION', 'off', NOW(), NOW()),
+(NULL, NULL, 'PS_MAIL_SMTP_PORT', '1025', NOW(), NOW()),
+(NULL, NULL, 'PS_MAIL_TYPE', '3', NOW(), NOW()),
+(NULL, NULL, 'PS_MAIL_EMAIL_MESSAGE', '1', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_METHOD', '2', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_SERVER', 'mailpit', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_USER', '', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_PASSWD', '', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_SMTP_ENCRYPTION', 'off', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_SMTP_PORT', '1025', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_TYPE', '3', NOW(), NOW()),
+(NULL, 1, 'PS_MAIL_EMAIL_MESSAGE', '1', NOW(), NOW());

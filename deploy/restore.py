@@ -268,7 +268,7 @@ def main():
         "prestashop",
         "sh",
         "-c",
-        "rm -rf /var/www/html/var/cache/prod",
+        "rm -rf /var/www/html/var/cache/prod && chown -R www-data:www-data /var/www/html/var/cache && chmod -R 777 /var/www/html/var/cache",
     ]
     subprocess.run(cache_cmd, capture_output=True, text=True, check=False)
     print("  -> Cache cleared.")

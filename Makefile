@@ -40,13 +40,14 @@ cms: check-env
 	$(COMPOSE) cp deploy/init-cms.sql mariadb:/tmp/init-cms.sql
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SOURCE /tmp/init-cms.sql;"'
 	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module install domitekcookies || true"
-	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
+	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod && chown -R www-data:www-data /var/www/html/var/cache && chmod -R 777 /var/www/html/var/cache || true"
 
 payments: check-env
 	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module install ps_wirepayment || true"
 	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module install ps_cashondelivery || true"
+	$(COMPOSE) exec -T prestashop sh -c "php /var/www/html/bin/console prestashop:module uninstall ps_checkpayment || true"
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/payment_config.sql
-	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
+	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod && chown -R www-data:www-data /var/www/html/var/cache && chmod -R 777 /var/www/html/var/cache || true"
 
 shipping: check-env
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"' < deploy/shipping_config.sql
@@ -59,9 +60,9 @@ storefront: check-env
 	$(COMPOSE) cp deploy/storefront_config.sql mariadb:/tmp/storefront_config.sql
 	@$(COMPOSE) exec -T mariadb sh -c 'mariadb --default-character-set=utf8mb4 -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE" -e "SOURCE /tmp/storefront_config.sql;"'
 	$(COMPOSE) cp shop/custom.css prestashop:/var/www/html/themes/classic/assets/css/custom.css
-	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod"
+	$(COMPOSE) exec -T prestashop sh -c "rm -rf /var/www/html/var/cache/prod && chown -R www-data:www-data /var/www/html/var/cache && chmod -R 777 /var/www/html/var/cache || true"
 
-init: check-env cms payments shipping webservice storefront import promotions
+init: check-env cms shipping payments webservice storefront import promotions
 
 images: check-env
 	$(PYTHON) scraper/download_release_images.py
